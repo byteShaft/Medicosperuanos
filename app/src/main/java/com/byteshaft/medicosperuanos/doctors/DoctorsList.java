@@ -260,7 +260,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 filterDialog.show();
                 return true;
             case R.id.action_location:
-                startActivity(new Intent(AppGlobals.getContext(), DoctorsLocator.class));
+                startActivity(new Intent(getActivity().getApplicationContext(), DoctorsLocator.class));
                 return true;
             default:
                 return false;
