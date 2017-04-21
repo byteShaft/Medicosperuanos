@@ -1,7 +1,7 @@
 package com.byteshaft.medicosperuanos.patients;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.byteshaft.medicosperuanos.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,14 +15,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by husnain on 2/23/17.
  */
 
-public class DoctorsRoute extends FragmentActivity implements OnMapReadyCallback {
+public class DoctorsRoute extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("");
+        setContentView(R.layout.activity_doctors_route);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
