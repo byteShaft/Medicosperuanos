@@ -1,0 +1,139 @@
+<resources>
+    <string name="app_name">Medicosperuanos</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="state_prompt">State</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"> AIzaSyAvL-0g4dIUJ57UQDh3OIvIAm6W5P7Th6s </string>
+
+
+    <string name="action_settings">Settings</string>
+    <string name="next">Next</string>
+    <string name="skip">Skip</string>
+    <string name="start">Start</string>
+    <string name="review">The best doctor In this area, The best doctor In this area. OK kr k doctor hai ye!</string>
+    <string name="signup_string">Do not have an account? <i>Sign Up</i> </string>
+    <string name="sign_up_string">Do not have an account? <i>Sign Up</i></string>
+
+
+    <!-- Screens background color-->
+    <color name="bg_screen1">#f64c73</color>
+    <color name="bg_screen2">#20d2bb</color>
+    <color name="bg_screen3">#3395ff</color>
+    <color name="bg_screen4">#c873f4</color>
+
+    <!-- dots inactive colors -->
+    <color name="dot_dark_screen1">#d1395c</color>
+    <color name="dot_dark_screen2">#14a895</color>
+    <color name="dot_dark_screen3">#2278d4</color>
+    <color name="dot_dark_screen4">#a854d4</color>
+
+    <!-- dots active colors -->
+    <color name="dot_light_screen1">#f98da5</color>
+    <color name="dot_light_screen2">#8cf9eb</color>
+    <color name="dot_light_screen3">#93c6fd</color>
+    <color name="dot_light_screen4">#e4b5fc</color>
+
+    <array name="array_dot_active">
+        <item>@color/dot_light_screen1</item>
+        <item>@color/dot_light_screen2</item>
+        <item>@color/dot_light_screen3</item>
+        <item>@color/dot_light_screen4</item>
+    </array>
+
+    <array name="array_dot_inactive">
+        <item>@color/dot_dark_screen1</item>
+        <item>@color/dot_dark_screen2</item>
+        <item>@color/dot_dark_screen3</item>
+        <item>@color/dot_dark_screen4</item>
+    </array>
+
+    <string-array name="date_array">
+        <item>12–2–2017</item>
+    </string-array>
+
+    <string name="account_activation">Account Activation</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="login">Login</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="permission_dialog_title">Location Permission Required</string>
+    <string name="permission_dialog_message">In order to get address, Location permission is required. please grant it manually</string>
+    <string name="close">Close</string>
+    <string name="permission_denied">Permission denied !</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="acquiring_location">Acquiring location please wait..</string>
+    <string name="email">Email</string>
+    <string name="resend">Resend</string>
+    <string name="activate">Activate</string>
+    <string name="phone_1">Phone-1</string>
+    <string name="phone_2">Phone-2</string>
+    <string name="college_id">College ID</string>
+    <string name="consultation_time">Consultation Time</string>
+    <string name="notifications">Notifications</string>
+    <string name="news">News</string>
+    <string name="terms_and_conditions">I accept the terms and conditions</string>
+    <string name="save">Save</string>
+    <string name="terms_and_conditions_of_the_services">Terms and conditions of the services</string>
+    <string name="recover">Recover</string>
+    <string name="password_forgot">Forgot Password?</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="reset">Reset</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="i_am_a_doctor">I am a Doctor</string>
+    <string name="create_account">Create account</string>
+    <string name="already_have_an_account_login">Already have an account? <i>Login</i></string>
+    <string name="doc_id">DocID</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="choose_your_gender">Please chose your Gender</string>
+    <string name="pick_for_current_location">Pick for current location</string>
+    <string name="enter_address">please provide your address</string>
+    <string name="address">Address</string>
+    <string name="emergency_contact">Emergency Contact</string>
+    <string name="i_accept_the_terms_and_conditions">I accept the terms and conditions</string>
+    <string name="login_faild">Login Failed!</string>
+    <string name="check_internet">Please check your internet connection</string>
+    <string name="email_not_exist">Email does not exist on server</string>
+    <string name="check_password">Please enter correct password</string>
+    <string name="activate_your_account">Please activate your account !</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="storage_permission_message">For Offline usage of this application app needs to save some images and data on your mobile.
+    please grant storage permission</string>
+    <string name="storage_permission_dialog_title">Storage Permission Required</string>
+    <string name="time_slot_booked">Time Slot already Booked</string>
+    <string name="sample_message">Sample Message</string>
+    <string name="updating">Setting up profile</string>
+    <string name="finishing_up">Finishing up</string>
+    <string name="appointments">Appointments</string>
+    <string name="my_patient_details">My Patient Details</string>
+    <string name="messages">Messages</string>
+    <string name="permission_granted">Permission Granted</string>
+    <string name="no_doctor_available">No Doctor Available</string>
+    <string name="no_doctor_available_snack_bar">No doctor available in next 7 days</string>
+    <string name="success">Schedule Created Successfully</string>
+    <string name="my_patient">My patient</string>
+    <string name="my_schedule">My Schedule</string>
+    <string name="update_profile">Update profile</string>
+    <string name="profile_updated">Profile Successfully updated</string>
+    <string name="cannot_go_back_from_current_date">Cannot go back from current date</string>
+    <string name="please_enter_appointment_reason">please enter appointment reason</string>
+    <string name="appointment_created">Appointment Created</string>
+    <string name="account_not_activated">Account not activated. we will mail you when your account gets activated</string>
+    <string name="account">Account</string>
+    <string name="getting_doctor_list">fetching doctors list…</string>
+    <string name="getting_schedule">fetching schedule…</string>
+    <string name="getting_patients">fetching patients…</string>
+    <string name="getting_favourite_doctors">fetching favourite doctor</string>
+    <string name="fetching_my_appointments">fetching…</string>
+    <string name="no_services">No Service</string>
+    <string name="no_services_message">No Service set by this doctor</string>
+
+</resources>
+

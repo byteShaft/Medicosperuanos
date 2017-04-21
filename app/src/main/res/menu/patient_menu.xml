@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_search_doctor"
+            android:icon="@mipmap/search_icon"
+            android:title="Search Doctor" />
+        <item
+            android:id="@+id/nav_appointment"
+            android:icon="@mipmap/sidebar_appoint"
+            android:title="My Appointments" />
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@mipmap/sidebar_user_icon"
+            android:title="Profile" />
+
+    </group>
+
+    <item android:title="Options">
+        <menu>
+            <item
+                android:id="@+id/nav_favt_doc"
+                android:icon="@mipmap/favt_doc"
+                android:title="My Favorite Doctors" />
+            <item
+                android:id="@+id/nav_messages"
+                android:icon="@mipmap/message_icon"
+                android:title="Messages" />
+            <item
+                android:id="@+id/nav_exit"
+                android:icon="@mipmap/exit"
+                android:title="Exit" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@mipmap/logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+</menu>

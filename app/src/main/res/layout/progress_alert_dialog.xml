@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <com.github.lzyzsd.circleprogress.DonutProgress
+        android:id="@+id/upload_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        custom:donut_text_size="28sp"
+        custom:donut_background_color="@android:color/white"
+        custom:donut_text_color="@color/buttonColor"
+        custom:donut_unfinished_color="@color/unfinished_progress_color"
+        custom:donut_finished_color="@color/finished_progress_color"
+        custom:donut_progress="0"
+        custom:donut_max="100"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+</RelativeLayout>

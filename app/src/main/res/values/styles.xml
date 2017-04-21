@@ -1,0 +1,131 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="actionButtonStyle">@style/ActionButtonStyle</item>
+        <item name="android:seekBarStyle">@style/SeekBarAppTheme</item>
+        <item name="android:homeAsUpIndicator">@mipmap/ic_custom_home</item>
+
+    </style>
+
+    <style name="RatingBar"   parent="android:style/Widget.Material.RatingBar.Small">
+        <item name="colorControlNormal">@color/normal_rating_bar</item>
+        <item name="colorControlActivated">@color/activated_rating_bar</item>
+    </style>
+
+    <style name="Rating_bar"  parent="android:style/Widget.Material.RatingBar.Small">
+        <item name="colorControlNormal">@color/normal_rating_bar_internal</item>
+        <item name="colorControlActivated">@color/activated_rating_bar_internal</item>
+    </style>
+
+    <style name="customRatingBar"
+        parent="android:style/Widget.Material.RatingBar.Small">
+        <item name="colorControlNormal">@color/normal_rating_bar</item>
+        <item name="colorControlActivated">@color/activated_rating_bar</item>
+    </style>
+
+
+    <style name="MyAlertDialogTheme">
+        <item name="android:windowBackground">@android:color/darker_gray</item>
+        <item name="android:windowTitleStyle">@style/MyAlertDialogTitle</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
+        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:textColor">@android:color/black</item>
+        <!--<item name="android:textAppearanceMedium">@style/MyAlertTextAppearance</item>-->
+        <!-- If you don't want your own button bar style use
+                @android:style/Holo.Light.ButtonBar.AlertDialog
+                and
+                ?android:attr/borderlessButtonStyle
+             instead of @style/MyButtonBar and @style/MyBorderlessButton -->
+        <!--<item name="android:buttonBarStyle">@style/MyButtonBar</item>-->
+        <item name="android:buttonBarButtonStyle">@style/MyBorderlessButton</item>
+    </style>
+
+    <style name="MyBorderlessButton">
+        <!-- Set background drawable and text size of the buttons here -->
+        <item name="android:background">@color/buttonColor</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.WhiteAccent">
+        <item name="colorAccent">@color/progressbar_background</item> <!-- Whatever color you want-->
+    </style>
+
+    <!--<style name="MyButtonBar">-->
+    <!--&lt;!&ndash; Define a background for the button bar and a divider between the buttons here &ndash;&gt;-->
+    <!--<item name="android:divider"></item>-->
+    <!--<item name="android:dividerPadding">...</item>-->
+    <!--<item name="android:showDividers">...</item>-->
+    <!--<item name="android:background">...</item>-->
+    <!--</style>-->
+
+    <style name="MyAlertDialogTitle">
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:scrollHorizontally">true</item>
+    </style>
+
+    <!--<style name="MyAlertTextAppearance">-->
+    <!--&lt;!&ndash; Set text size and color of title and message here &ndash;&gt;-->
+    <!--<item name="android:textSize"> ... </item>-->
+    <!--<item name="android:textColor">...</item>-->
+    <!--</style>-->
+
+    <style name="SeekBarAppTheme" parent="android:Widget.SeekBar">
+        <item name="android:progressDrawable">@drawable/apptheme_scrubber_control_selector_holo_dark</item>
+        <item name="android:indeterminateDrawable">@drawable/apptheme_scrubber_progress_horizontal_holo_dark</item>
+        <item name="android:minHeight">13dip</item>
+        <item name="android:maxHeight">13dip</item>
+        <item name="android:thumb">@drawable/apptheme_scrubber_control_selector_holo_dark</item>
+        <item name="android:thumbOffset">16dip</item>
+        <item name="android:paddingLeft">16dip</item>
+        <item name="android:paddingRight">16dip</item>
+    </style>
+
+    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
+        <item name="android:minWidth">0dip</item>
+        <item name="android:paddingLeft">0dip</item>
+        <item name="android:paddingRight">0dip</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.ServiceActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="switchTheme" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">#49EF00</item>
+
+        <!-- inactive thumb color #b20000 red -->
+        <item name="colorSwitchThumbNormal">#f1f1f1</item>
+
+        <!-- inactive track color (30% transparency) -->
+        <item name="android:colorForeground">#f1f1f1</item>
+    </style>
+
+    <style name="MyDialogTheme" parent="android:Theme.DeviceDefault.Light.Dialog"/>
+
+    <style name="AccentButton" parent="ThemeOverlay.AppCompat.Dark"/>
+
+    <style name="MyButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/buttonColor</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+</resources>

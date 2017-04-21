@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="selected">
+        <item>#FF5252</item>
+    </array>
+
+    <array name="not_selected">
+        <item>#AEAEAE</item>
+    </array>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.byteshaft.medicosperuanos.uihelpers.CalendarView
+        xmlns:calendarNS="http://schemas.android.com/apk/res/com.byteshaft.medicosperuanos"
+        android:id="@+id/calendar_view"
+        android:background="@color/fav_doctor_calendar_background"
+        android:layout_width="match_parent"
+        android:layout_margin="2dp"
+        android:layout_height="wrap_content"
+        calendarNS:dateFormat="MMM yyyy" />
+
+    <ListView
+        android:id="@+id/schedule_list"
+        android:layout_below="@+id/calendar_view"
+        android:layout_above="@+id/save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/save_button"
+        android:layout_alignParentBottom="true"
+        android:text="Save"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/MyButton"/>
+</RelativeLayout>
+

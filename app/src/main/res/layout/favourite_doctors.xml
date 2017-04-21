@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal"
+        android:background="@color/fav_doctor_calendar_background"
+        android:weightSum="8">
+
+        <ImageButton
+            android:id="@+id/go_back_calendar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/fav_doctor_calendar_background"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:src="@mipmap/ic_backward"/>
+
+        <TextView
+            android:id="@+id/current_date"
+            android:layout_width="0dp"
+            android:padding="5dp"
+            android:text="02 February 2017"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center"
+            android:background="@color/fav_doctor_calendar_background"
+            android:layout_weight="6"/>
+
+        <ImageButton
+            android:id="@+id/forward_calendar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/fav_doctor_calendar_background"
+            android:layout_weight="1"
+            android:src="@mipmap/ic_open_details"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/favt_doctors_list"
+        android:layout_margin="1dp"
+        android:scrollbars="none"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
