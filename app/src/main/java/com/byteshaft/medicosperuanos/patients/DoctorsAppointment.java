@@ -5,17 +5,33 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.adapters.DiagnosticsAdapter;
+import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
+import com.byteshaft.medicosperuanos.adapters.TreatmentsAdapter;
+import com.byteshaft.medicosperuanos.gettersetter.Diagnostics;
+import com.byteshaft.medicosperuanos.gettersetter.Targets;
+import com.byteshaft.medicosperuanos.gettersetter.Treatments;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,9 +40,9 @@ import java.util.List;
  * Created by husnain on 2/23/17.
  */
 
-public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
+public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
+        DatePickerDialog.OnDateSetListener {
 
-    private Spinner mAppointmentReasonSpinner;
     private Spinner mDiagnosticsSpinner;
     private Spinner mMedicationSpinner;
     private Spinner mDestinationSpinner;
@@ -41,7 +57,27 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private TimePickerDialog mTimePickerDialog;
 
     private boolean isSetForReturn = false;
+
+    private View view;
     private ImageButton backPress;
+    private TextView mPatientsName;
+    private TextView mPatientsAge;
+    private EditText mAppointmentReason;
+
+    private String mFname;
+    private String mLname;
+    private String mAge;
+    private String mReason;
+    private String mDate;
+
+    private ArrayList<Diagnostics> diagnosticsesList;
+    private DiagnosticsAdapter diagnosticsAdapter;
+
+    private ArrayList<Treatments> treatmentsArrayList;
+    private TreatmentsAdapter treatmentsAdapter;
+
+    private ArrayList<Targets> targetsArrayList;
+    private TargetsAdapter targetsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +86,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_doctors_appointment);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
-        mAppointmentReasonSpinner = (Spinner) findViewById(R.id.appointment_reason);
+        view = (View) findViewById(R.id.layout_for_name);
+        mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
+        mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
+        mAppointmentReason = (EditText) findViewById(R.id.appointment_reason_editText);
         mDiagnosticsSpinner = (Spinner) findViewById(R.id.diagnostics_spinner);
         mMedicationSpinner = (Spinner) findViewById(R.id.medication_spinner);
         mDestinationSpinner = (Spinner) findViewById(R.id.destination_spinner);
@@ -69,52 +108,32 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mExplanationEditText.setTypeface(AppGlobals.typefaceNormal);
         mConclusionsEditText.setTypeface(AppGlobals.typefaceNormal);
 
-        mDateEditText.setOnClickListener(this);
-        mTimeEditText.setOnClickListener(this);
         mReturnDateEditText.setOnClickListener(this);
 
-        List<String> AppointmentReasonList = new ArrayList<String>();
-        AppointmentReasonList.add("Headache");
-        AppointmentReasonList.add("Acute illness or injury");
-        AppointmentReasonList.add("Diabetes");
-        AppointmentReasonList.add("Cancer");
-        AppointmentReasonList.add("Fever/cough");
-        ArrayAdapter<String> AppointmentReasonAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, AppointmentReasonList);
-        AppointmentReasonAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mAppointmentReasonSpinner.setAdapter(AppointmentReasonAdapter);
 
-        List<String> DiagnosticList = new ArrayList<String>();
-        DiagnosticList.add("center1");
-        DiagnosticList.add("center2");
-        DiagnosticList.add("cantt");
-        DiagnosticList.add("city");
-        DiagnosticList.add("MMA road");
-        ArrayAdapter<String> DiagnosticListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, DiagnosticList);
-        DiagnosticListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mDiagnosticsSpinner.setAdapter(DiagnosticListAdapter);
+        mFname = getIntent().getStringExtra("first_name");
+        mLname = getIntent().getStringExtra("last_name");
+        mAge = getIntent().getStringExtra("age");
+        mReason = getIntent().getStringExtra("reason");
+        mDate = getIntent().getStringExtra("date");
 
+        mPatientsName.setText(mFname + " " + mLname);
+        String years = Helpers.calculateAge(mAge);
+        mPatientsAge.setText(years + " " + "years");
+        mAppointmentReason.setText(mReason);
+        mAppointmentReason.setEnabled(false);
+        mDateEditText.setText(mDate);
+        mTimeEditText.setText(Helpers.getTime24HourFormat());
+        mTimeEditText.setEnabled(false);
+        mDateEditText.setEnabled(false);
 
-        List<String> MedicationList = new ArrayList<String>();
-        MedicationList.add("Abilify");
-        MedicationList.add("Aspirin");
-        MedicationList.add("Bisoprolol");
-        MedicationList.add("Zantac");
-        MedicationList.add("Flagyl");
-        ArrayAdapter<String> MedicationListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, MedicationList);
-        MedicationListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mMedicationSpinner.setAdapter(MedicationListAdapter);
+        diagnosticsesList = new ArrayList<>();
+        treatmentsArrayList = new ArrayList<>();
+        targetsArrayList = new ArrayList<>();
+        getDiagnostic();
+        getTreamants();
+        getTargets();
 
-        List<String> DestinationList = new ArrayList<String>();
-        DestinationList.add("Appointment");
-        DestinationList.add("Waiting");
-        DestinationList.add("Booking for time");
-        ArrayAdapter<String> DestinationSpinnerListAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, DestinationList);
-        DestinationSpinnerListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mDestinationSpinner.setAdapter(DestinationSpinnerListAdapter);
 
 
         final Calendar calendar = Calendar.getInstance();
@@ -145,15 +164,28 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.date_edit_text:
-                datePickerDialog.show();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.appointment, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.attach_icon:
+                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
                 break;
 
-            case R.id.time_edit_text:
-                mTimePickerDialog.show();
-                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.return_date_edit_text:
                 datePickerDialog.show();
                 break;
@@ -175,5 +207,113 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         }
 
 
+    }
+
+    private void getDiagnostic() {
+        HttpRequest diagnosticsRequest = new HttpRequest(this);
+        diagnosticsRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                try {
+                                    JSONObject diagnosticsObject = new JSONObject(request.getResponseText());
+                                    JSONArray diagnosticsArray = diagnosticsObject.getJSONArray("results");
+                                    System.out.println(diagnosticsArray + "working");
+                                    for (int i = 0; i < diagnosticsArray.length(); i++) {
+                                        JSONObject jsonObject = diagnosticsArray.getJSONObject(i);
+                                        Diagnostics diagnostics = new Diagnostics();
+                                        diagnostics.setId(jsonObject.getInt("id"));
+                                        diagnostics.setName(jsonObject.getString("name"));
+                                        diagnosticsesList.add(diagnostics);
+                                    }
+                                    System.out.println(diagnosticsArray.length() + "length");
+                                    diagnosticsAdapter = new DiagnosticsAdapter(DoctorsAppointment.this, diagnosticsesList);
+                                    mDiagnosticsSpinner.setAdapter(diagnosticsAdapter);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                        }
+                }
+            }
+        });
+
+        diagnosticsRequest.open("GET", String.format("%sdiagnostics/", AppGlobals.BASE_URL));
+        diagnosticsRequest.send();
+    }
+
+    private void getTreamants() {
+        HttpRequest diagnosticsRequest = new HttpRequest(this);
+        diagnosticsRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                try {
+                                    JSONObject treatmentsObject = new JSONObject(request.getResponseText());
+                                    JSONArray treatmentsArray = treatmentsObject.getJSONArray("results");
+                                    System.out.println(treatmentsArray + "working");
+                                    for (int i = 0; i < treatmentsArray.length(); i++) {
+                                        JSONObject jsonObject = treatmentsArray.getJSONObject(i);
+                                        Treatments treatments = new Treatments();
+                                        treatments.setId(jsonObject.getInt("id"));
+                                        treatments.setName(jsonObject.getString("name"));
+                                        treatmentsArrayList.add(treatments);
+                                    }
+                                    System.out.println(treatmentsArray.length() + "length");
+                                    treatmentsAdapter = new TreatmentsAdapter(DoctorsAppointment.this, treatmentsArrayList);
+                                    mMedicationSpinner.setAdapter(treatmentsAdapter);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                        }
+                }
+            }
+        });
+
+        diagnosticsRequest.open("GET", String.format("%streatments/", AppGlobals.BASE_URL));
+        diagnosticsRequest.send();
+    }
+
+    private void getTargets() {
+        HttpRequest diagnosticsRequest = new HttpRequest(this);
+        diagnosticsRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                try {
+                                    JSONObject targetsObject = new JSONObject(request.getResponseText());
+                                    JSONArray targetsArray = targetsObject.getJSONArray("results");
+                                    System.out.println(targetsArray + "working");
+                                    for (int i = 0; i < targetsArray.length(); i++) {
+                                        JSONObject jsonObject = targetsArray.getJSONObject(i);
+                                        Targets targets = new Targets();
+                                        targets.setId(jsonObject.getInt("id"));
+                                        targets.setName(jsonObject.getString("name"));
+                                        targetsArrayList.add(targets);
+                                    }
+                                    System.out.println(targetsArray.length() + "length");
+                                    targetsAdapter = new TargetsAdapter(DoctorsAppointment.this, targetsArrayList);
+                                    mDestinationSpinner.setAdapter(targetsAdapter);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                        }
+                }
+            }
+        });
+
+        diagnosticsRequest.open("GET", String.format("%stargets/", AppGlobals.BASE_URL));
+        diagnosticsRequest.send();
     }
 }
