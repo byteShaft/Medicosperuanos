@@ -72,13 +72,13 @@
                 android:layout_height="50dp"
                 android:background="@mipmap/image_placeholder"
                 app:civ_border_color="#FFF"
-                app:civ_border_width="1dp"
                 app:civ_fill_color="@android:color/white" />
 
             <ImageView
                 android:id="@+id/available_for_chat_status"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@mipmap/ic_offline_indicator"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="10dp"
