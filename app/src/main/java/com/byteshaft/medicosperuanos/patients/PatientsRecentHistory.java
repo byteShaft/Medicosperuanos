@@ -3,18 +3,19 @@ package com.byteshaft.medicosperuanos.patients;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class PatientsRecentHistory extends AppCompatActivity {
 
     private TextView patientName;
     private TextView patientEmail;
     private TextView patientAge;
-    private ImageView patientImage;
+    private CircleImageView patientImage;
     private RecyclerView list;
 
     @Override
@@ -25,7 +26,7 @@ public class PatientsRecentHistory extends AppCompatActivity {
         patientName = (TextView) findViewById(R.id.patient_name);
         patientEmail = (TextView) findViewById(R.id.patient_email);
         patientAge = (TextView) findViewById(R.id.patient_age);
-        patientImage = (ImageView) findViewById(R.id.patient_image);
+        patientImage = (CircleImageView) findViewById(R.id.patient_image);
 
         // typeface
 
