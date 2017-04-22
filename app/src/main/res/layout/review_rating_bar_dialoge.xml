@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="2dip">
+
+    <RatingBar
+        android:id="@+id/dialog_ratingbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:clickable="true"
+        android:isIndicator="false"
+        android:numStars="5"/>
+
+    <EditText
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/errorTV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="write your review..."
+        android:maxLength="200"
+        android:id="@+id/reviewED">
+    <requestFocus />
+    </EditText>
+    
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/reviewED"
+        android:layout_gravity="center"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/cancelRateBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+        <Button
+            android:id="@+id/submitRateBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Submit"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+
+    </LinearLayout>
+    </LinearLayout>
+
+

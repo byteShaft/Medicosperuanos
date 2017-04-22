@@ -12,6 +12,16 @@ public class PatientAppointment {
     private String serviceName;
     private String state;
     private String drSpeciality;
+    private int doctorsId;
+
+    public int getDoctorsId() {
+        return doctorsId;
+    }
+
+    public void setDoctorsId(int doctorsId) {
+        this.doctorsId = doctorsId;
+    }
+
 
     public String getDrSpeciality() {
         return drSpeciality;

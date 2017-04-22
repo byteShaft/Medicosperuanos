@@ -127,6 +127,10 @@
     <string name="appointment_created">Appointment Created</string>
     <string name="account_not_activated">Account not activated. we will mail you when your account gets activated</string>
     <string name="account">Account</string>
+    <string name="review_submitted_failed">Doctor already reviewed by you</string>
+    <string name="review_failed">Review Submitted Failed !</string>
+    <string name="review_submitted">Review Submitted!</string>
+    <string name="review_submitted_successfully">You have reviewed successfully</string>
     <string name="getting_doctor_list">fetching doctors list…</string>
     <string name="getting_schedule">fetching schedule…</string>
     <string name="getting_patients">fetching patients…</string>

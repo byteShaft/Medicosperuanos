@@ -218,6 +218,11 @@ public class Helpers {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         return df.format(c.getTime());
     }
+    public static String getTime24HourFormat() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        return df.format(c.getTime());
+    }
 
     public static String getTime() {
         Calendar c = Calendar.getInstance();
