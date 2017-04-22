@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -21,6 +23,7 @@ import com.byteshaft.medicosperuanos.adapters.DiagnosticsAdapter;
 import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
 import com.byteshaft.medicosperuanos.adapters.TreatmentsAdapter;
 import com.byteshaft.medicosperuanos.gettersetter.Diagnostics;
+import com.byteshaft.medicosperuanos.gettersetter.States;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.gettersetter.Treatments;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -41,7 +44,8 @@ import java.util.List;
  */
 
 public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
-        DatePickerDialog.OnDateSetListener {
+        DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener {
 
     private Spinner mDiagnosticsSpinner;
     private Spinner mMedicationSpinner;
@@ -52,6 +56,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private EditText mReturnDateEditText;
     private EditText mExplanationEditText;
     private EditText mConclusionsEditText;
+
+    private Button mPlusButtonDiagnostics;
+    private Button mMinusButtonDiagnostics;
+    private Button mMinusButtonMedication;
+    private Button mPlusButtonMedication;
 
     private DatePickerDialog datePickerDialog;
     private TimePickerDialog mTimePickerDialog;
@@ -70,7 +79,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private String mReason;
     private String mDate;
 
-    private ArrayList<Diagnostics> diagnosticsesList;
+    private String mDiagnosticsSpinnerValue;
+    private String mMedicationSpinnerValue;
+    private String mDestinationSpinnerValue;
+
+    private ArrayList<Diagnostics> diagnosticsList;
     private DiagnosticsAdapter diagnosticsAdapter;
 
     private ArrayList<Treatments> treatmentsArrayList;
@@ -78,6 +91,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private ArrayList<Targets> targetsArrayList;
     private TargetsAdapter targetsAdapter;
+
+    private HttpRequest request;
+    private ArrayList<Integer> diagonisticsArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +103,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
         view = (View) findViewById(R.id.layout_for_name);
+        diagonisticsArrayList = new ArrayList<>();
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
         mAppointmentReason = (EditText) findViewById(R.id.appointment_reason_editText);
@@ -99,8 +116,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReturnDateEditText = (EditText) findViewById(R.id.return_date_edit_text);
         mExplanationEditText = (EditText) findViewById(R.id.explanation_edit_text);
         mConclusionsEditText = (EditText) findViewById(R.id.conclusions_edit_text);
+
         backPress = (ImageButton) findViewById(R.id.back_press);
-        backPress.setOnClickListener(this);
+        mPlusButtonDiagnostics = (Button) findViewById(R.id.plus_button_diagnostics);
+        mMinusButtonDiagnostics = (Button) findViewById(R.id.minus_button_diagnostics);
+        mPlusButtonMedication = (Button) findViewById(R.id.plus_button_medication);
+        mMinusButtonMedication = (Button) findViewById(R.id.minus_button_medication);
 
         mDateEditText.setTypeface(AppGlobals.typefaceNormal);
         mTimeEditText.setTypeface(AppGlobals.typefaceNormal);
@@ -108,7 +129,16 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mExplanationEditText.setTypeface(AppGlobals.typefaceNormal);
         mConclusionsEditText.setTypeface(AppGlobals.typefaceNormal);
 
+        backPress.setOnClickListener(this);
         mReturnDateEditText.setOnClickListener(this);
+        mDiagnosticsSpinner.setOnItemSelectedListener(this);
+        mDestinationSpinner.setOnItemSelectedListener(this);
+        mMedicationSpinner.setOnItemSelectedListener(this);
+
+        mPlusButtonDiagnostics.setOnClickListener(this);
+        mMinusButtonDiagnostics.setOnClickListener(this);
+        mPlusButtonMedication.setOnClickListener(this);
+        mMinusButtonMedication.setOnClickListener(this);
 
 
         mFname = getIntent().getStringExtra("first_name");
@@ -127,13 +157,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mTimeEditText.setEnabled(false);
         mDateEditText.setEnabled(false);
 
-        diagnosticsesList = new ArrayList<>();
+        diagnosticsList = new ArrayList<>();
         treatmentsArrayList = new ArrayList<>();
         targetsArrayList = new ArrayList<>();
         getDiagnostic();
-        getTreamants();
+        getTreatments();
         getTargets();
-
 
 
         final Calendar calendar = Calendar.getInstance();
@@ -192,6 +221,14 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case R.id.back_press:
                 onBackPressed();
                 break;
+            case R.id.plus_button_diagnostics:
+                break;
+            case R.id.minus_button_diagnostics:
+                break;
+            case R.id.plus_button_medication:
+                break;
+            case R.id.minus_button_medication:
+                break;
         }
     }
 
@@ -227,10 +264,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         Diagnostics diagnostics = new Diagnostics();
                                         diagnostics.setId(jsonObject.getInt("id"));
                                         diagnostics.setName(jsonObject.getString("name"));
-                                        diagnosticsesList.add(diagnostics);
+                                        diagnosticsList.add(diagnostics);
                                     }
                                     System.out.println(diagnosticsArray.length() + "length");
-                                    diagnosticsAdapter = new DiagnosticsAdapter(DoctorsAppointment.this, diagnosticsesList);
+                                    diagnosticsAdapter = new DiagnosticsAdapter(DoctorsAppointment.this, diagnosticsList);
                                     mDiagnosticsSpinner.setAdapter(diagnosticsAdapter);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -245,7 +282,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         diagnosticsRequest.send();
     }
 
-    private void getTreamants() {
+    private void getTreatments() {
         HttpRequest diagnosticsRequest = new HttpRequest(this);
         diagnosticsRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -315,5 +352,70 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         diagnosticsRequest.open("GET", String.format("%stargets/", AppGlobals.BASE_URL));
         diagnosticsRequest.send();
+    }
+
+    @Override
+    public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest request, int readyState) {
+
+    }
+
+    private void registerUser(int appointmentId, String conclusion, String date, String dateOfReturn,
+                              String destination, String diagnostics, String exploration, String time) {
+        request = new HttpRequest(this);
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
+        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, diagnostics, exploration, time));
+    }
+
+
+    private String getAttentionsData(String conclusion, String date, String dateOfReturn,
+                                     String destination, String diagnostics, String exploration, String time) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("conclusion", conclusion);
+            jsonObject.put("date", date);
+            jsonObject.put("date_of_return", dateOfReturn);
+            jsonObject.put("destination", destination);
+            jsonObject.put("diagnostics", diagnostics);
+            jsonObject.put("exploration", exploration);
+            jsonObject.put("time", time);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+
+    }
+
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+        switch (adapterView.getId()) {
+            case R.id.diagnostics_spinner:
+                Diagnostics diagnostics = diagnosticsList.get(position);
+                diagonisticsArrayList.add(diagnostics.getId());
+                System.out.println(diagnostics.getId());
+                break;
+            case R.id.medication_spinner:
+                Treatments treatments = treatmentsArrayList.get(position);
+                mMedicationSpinnerValue = String.valueOf(treatments.getId());
+                System.out.println(treatments.getId());
+                break;
+            case R.id.destination_spinner:
+                Targets targets = targetsArrayList.get(position);
+                mDestinationSpinnerValue = String.valueOf(targets.getId());
+                System.out.println(targets.getId());
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

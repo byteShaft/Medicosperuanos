@@ -92,6 +92,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <EditText
                 android:id="@+id/appointment_reason_editText"
                 android:layout_width="match_parent"
@@ -110,10 +111,10 @@
                 android:id="@+id/explanation_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLength="250"
                 android:hint="Exploration.(250 character max)"
                 android:inputType="textPersonName"
-                android:lines="3" />
+                android:lines="3"
+                android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -127,13 +128,14 @@
                 android:id="@+id/diagnostics_spinner_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".9">
+                android:layout_weight=".6">
 
                 <Spinner
                     android:id="@+id/diagnostics_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dp" />
+
 
                 <View
                     android:id="@+id/diagnostics_spinner_view"
@@ -143,29 +145,29 @@
                     android:background="#000" />
 
                 <Button
+                    android:id="@+id/minus_button_diagnostics"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_below="@+id/diagnostics_spinner_view"
-                    android:background="@mipmap/ic_min"
                     android:layout_marginTop="7dp"
-                    />
+                    android:background="@mipmap/ic_min" />
 
             </RelativeLayout>
 
             <RelativeLayout
-                android:layout_toRightOf="@+id/diagnostics_spinner_layout"
                 android:id="@+id/diagnostics_button_layout"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_height="match_parent">
+                android:layout_toRightOf="@+id/diagnostics_spinner_layout">
 
                 <Button
-                    android:layout_centerVertical="true"
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/plus_button"
+                    android:id="@+id/plus_button_diagnostics"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
                     android:layout_marginLeft="25dp"
+                    android:layout_marginTop="5dp"
                     android:background="@mipmap/ic_plus_blue" />
             </RelativeLayout>
         </LinearLayout>
@@ -181,7 +183,7 @@
                 android:id="@+id/medication_spinner_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight=".84">
 
                 <Spinner
                     android:id="@+id/medication_spinner"
@@ -195,13 +197,14 @@
                     android:layout_below="@+id/medication_spinner"
                     android:layout_marginRight="10dp"
                     android:background="#000" />
+
                 <Button
+                    android:id="@+id/minus_button_medication"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
                     android:layout_below="@+id/medication_spinner"
-                    android:background="@mipmap/ic_min"
                     android:layout_marginTop="5dp"
-                    />
+                    android:background="@mipmap/ic_min" />
 
             </RelativeLayout>
 
@@ -212,10 +215,10 @@
                 android:layout_gravity="center_horizontal">
 
                 <TextView
-                    android:layout_marginTop="7dp"
                     android:id="@+id/qty_textview"
                     android:layout_width="50dp"
                     android:layout_height="28dp"
+                    android:layout_marginTop="6dp"
                     android:gravity="center"
                     android:hint="Qty"
                     android:textSize="15sp" />
@@ -228,11 +231,11 @@
 
 
                 <Button
-                    android:layout_centerVertical="true"
-                    android:layout_marginTop="5dp"
-                    android:id="@+id/medication_plus_button"
+                    android:id="@+id/plus_button_medication"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginTop="7dp"
                     android:layout_toRightOf="@+id/qty_textview"
                     android:background="@mipmap/ic_plus_blue" />
             </RelativeLayout>
@@ -298,9 +301,9 @@
                 android:id="@+id/conclusions_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLength="250"
                 android:hint="Conclusions(250 character max)"
-                android:inputType="text" />
+                android:inputType="text"
+                android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
 
 
