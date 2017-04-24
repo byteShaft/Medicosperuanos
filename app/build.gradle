@@ -36,5 +36,5 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'com.github.lzyzsd:circleprogress:1.1.0@aar'
-
+    compile 'com.akexorcist:googledirectionlibrary:1.0.5'
 }

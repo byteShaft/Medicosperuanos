@@ -70,6 +70,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private ReviewAdapter reviewAdapter;
     private static DoctorDetailsActivity sInstance;
     private ProgressBar progressBar;
+    private String location;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -88,6 +89,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
         number = getIntent().getStringExtra("number");
+        location = getIntent().getStringExtra("location");
         isBlocked = getIntent().getBooleanExtra("block", false);
         final String photo = getIntent().getStringExtra("photo");
         final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
@@ -135,6 +137,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 intent.putExtra("photo", photo);
                 intent.putExtra("block", isBlocked);
                 intent.putExtra("start_time", startTime);
+                intent.putExtra("location", location);
                 startActivity(intent);
             }
         });

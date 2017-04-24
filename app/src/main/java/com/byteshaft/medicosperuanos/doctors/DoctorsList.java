@@ -224,6 +224,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
                 intent.putExtra("user", doctorDetails.getUserId());
                 intent.putExtra("photo", doctorDetails.getPhotoUrl());
+                intent.putExtra("location", doctorDetails.getLocation());
                 startActivity(intent);
             }
         });
@@ -392,6 +393,10 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+//        if (exception.getLocalizedMessage())
+        if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+            Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        }
         Helpers.dismissProgressDialog();
     }
 
