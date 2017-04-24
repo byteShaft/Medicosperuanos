@@ -80,6 +80,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private int selectedServiceId;
     private String reason;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
