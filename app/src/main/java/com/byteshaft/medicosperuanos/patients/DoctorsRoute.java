@@ -93,7 +93,6 @@ public class DoctorsRoute extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
     @Override
     public boolean onMarkerClick(Marker marker) {
         LatLng destination = marker.getPosition();
