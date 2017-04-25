@@ -52,6 +52,7 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -150,16 +151,29 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 Log.i("TAG", s.toString());
                 if (!s.toString().isEmpty()) {
                     searchList = new ArrayList<DoctorDetails>();
+                    addedDates = new ArrayList<String>();
+                    showingPosition = new HashMap<String, Integer>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, searchList);
+                    mListView.setAdapter(customAdapter);
                     for (DoctorDetails doctorDetails : doctors) {
-                        if (doctorDetails.getFirstName().contentEquals(s.toString())) {
-                            customAdapter = null;
+                        if (StringUtils.containsIgnoreCase(doctorDetails.getFirstName(),
+                                s.toString()) || StringUtils.containsIgnoreCase(doctorDetails.getLastName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(doctorDetails.getSpeciality(),
+                                        s.toString()) ) {
                             searchList.add(doctorDetails);
-                            customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                                    R.layout.doctors_search_delagete, searchList);
-                            mListView.setAdapter(customAdapter);
+                            customAdapter.notifyDataSetChanged();
 
                         }
                     }
+                } else {
+                    addedDates = new ArrayList<String>();
+                    showingPosition = new HashMap<String, Integer>();
+                    searchList = new ArrayList<DoctorDetails>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, doctors);
+                    mListView.setAdapter(customAdapter);
                 }
             }
 
