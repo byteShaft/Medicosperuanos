@@ -33,30 +33,30 @@
     </style>
 
 
-    <style name="MyAlertDialogTheme">
-        <item name="android:windowBackground">@android:color/darker_gray</item>
-        <item name="android:windowTitleStyle">@style/MyAlertDialogTitle</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>
-        <item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:textColor">@android:color/black</item>
-        <!--<item name="android:textAppearanceMedium">@style/MyAlertTextAppearance</item>-->
-        <!-- If you don't want your own button bar style use
-                @android:style/Holo.Light.ButtonBar.AlertDialog
-                and
-                ?android:attr/borderlessButtonStyle
-             instead of @style/MyButtonBar and @style/MyBorderlessButton -->
-        <!--<item name="android:buttonBarStyle">@style/MyButtonBar</item>-->
-        <item name="android:buttonBarButtonStyle">@style/MyBorderlessButton</item>
-    </style>
+    <!--<style name="MyAlertDialogTheme">-->
+        <!--<item name="android:windowBackground">@android:color/darker_gray</item>-->
+        <!--<item name="android:windowTitleStyle">@style/MyAlertDialogTitle</item>-->
+        <!--<item name="android:windowContentOverlay">@null</item>-->
+        <!--<item name="android:windowMinWidthMajor">@android:dimen/dialog_min_width_major</item>-->
+        <!--<item name="android:windowMinWidthMinor">@android:dimen/dialog_min_width_minor</item>-->
+        <!--<item name="android:windowIsFloating">true</item>-->
+        <!--<item name="android:textColor">@android:color/black</item>-->
+        <!--&lt;!&ndash;<item name="android:textAppearanceMedium">@style/MyAlertTextAppearance</item>&ndash;&gt;-->
+        <!--&lt;!&ndash; If you don't want your own button bar style use-->
+                <!--@android:style/Holo.Light.ButtonBar.AlertDialog-->
+                <!--and-->
+                <!--?android:attr/borderlessButtonStyle-->
+             <!--instead of @style/MyButtonBar and @style/MyBorderlessButton &ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:buttonBarStyle">@style/MyButtonBar</item>&ndash;&gt;-->
+        <!--<item name="android:buttonBarButtonStyle">@style/MyBorderlessButton</item>-->
+    <!--</style>-->
 
-    <style name="MyBorderlessButton">
-        <!-- Set background drawable and text size of the buttons here -->
-        <item name="android:background">@color/buttonColor</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
+    <!--<style name="MyBorderlessButton">-->
+        <!--&lt;!&ndash; Set background drawable and text size of the buttons here &ndash;&gt;-->
+        <!--<item name="android:background">@color/buttonColor</item>-->
+        <!--<item name="android:textSize">14sp</item>-->
+        <!--<item name="android:textColor">@android:color/black</item>-->
+    <!--</style>-->
 
     <style name="AppTheme.WhiteAccent">
         <item name="colorAccent">@color/progressbar_background</item> <!-- Whatever color you want-->
@@ -70,11 +70,11 @@
     <!--<item name="android:background">...</item>-->
     <!--</style>-->
 
-    <style name="MyAlertDialogTitle">
-        <item name="android:maxLines">1</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:scrollHorizontally">true</item>
-    </style>
+    <!--<style name="MyAlertDialogTitle">-->
+        <!--<item name="android:maxLines">1</item>-->
+        <!--<item name="android:textSize">20sp</item>-->
+        <!--<item name="android:scrollHorizontally">true</item>-->
+    <!--</style>-->
 
     <!--<style name="MyAlertTextAppearance">-->
     <!--&lt;!&ndash; Set text size and color of title and message here &ndash;&gt;-->
