@@ -59,6 +59,8 @@
     <string name="reset_password">Reset Password</string>
     <string name="permission_dialog_title">Location Permission Required</string>
     <string name="permission_dialog_message">In order to get address, Location permission is required. please grant it manually</string>
+    <string name="location_permission_for_route">In order to view doctors on map Location permission is required. please grant it manually</string>
+
     <string name="close">Close</string>
     <string name="permission_denied">Permission denied !</string>
     <string name="date_of_birth">Date of birth</string>

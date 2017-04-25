@@ -75,6 +75,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private boolean availableForChat;
     private static DoctorBookingActivity sInstance;
     private ProgressBar progressBar;
+    private String location;
 
     public static DoctorBookingActivity getInstance() {
         return sInstance;
@@ -147,6 +148,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
+        location = getIntent().getStringExtra("location");
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
@@ -183,7 +185,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_location:
-                startActivity(new Intent(getApplicationContext(), DoctorsLocator.class));
+                Intent intent = new Intent(getApplicationContext(), DoctorsLocator.class);
+                intent.putExtra("location", location);
+                intent.putExtra("name", drName);
+                intent.putExtra("available_for_chat", availableForChat);
+                startActivity(intent);
                 return true;
             case android.R.id.home:
                 onBackPressed();
