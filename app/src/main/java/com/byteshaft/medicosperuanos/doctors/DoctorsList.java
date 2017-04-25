@@ -2,6 +2,7 @@ package com.byteshaft.medicosperuanos.doctors;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -13,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,9 +42,10 @@ import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.gettersetter.DoctorDetails;
+import com.byteshaft.medicosperuanos.gettersetter.DoctorLocations;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
-import com.byteshaft.medicosperuanos.patients.DoctorsLocator;
+import com.byteshaft.medicosperuanos.patients.DoctorsRoute;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.FilterDialog;
 import com.byteshaft.medicosperuanos.utils.Helpers;
@@ -81,6 +84,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private ArrayList<DoctorDetails> doctors;
     private TextView noDoctor;
     private Toolbar toolbar;
+    private static final int LOCATION_PERMISSION = 1;
+    public ArrayList<DoctorLocations> locationsArrayList;
 
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
     private static DoctorsList sInstnace;
@@ -93,6 +98,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         doctors = new ArrayList<>();
         sDoctorServices = new HashMap<>();
+        locationsArrayList = new ArrayList<>();
         getDoctorList();
         sInstnace = this;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
@@ -218,6 +224,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
                 intent.putExtra("user", doctorDetails.getUserId());
                 intent.putExtra("photo", doctorDetails.getPhotoUrl());
+                intent.putExtra("location", doctorDetails.getLocation());
                 startActivity(intent);
             }
         });
@@ -260,7 +267,39 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 filterDialog.show();
                 return true;
             case R.id.action_location:
-                startActivity(new Intent(getActivity().getApplicationContext(), DoctorsLocator.class));
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
+                    alertDialogBuilder.setTitle(getResources().getString(R.string.permission_dialog_title));
+                    alertDialogBuilder.setMessage(getResources().getString(R.string.location_permission_for_route))
+                            .setCancelable(false).setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    LOCATION_PERMISSION);
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+                } else {
+                    if (Helpers.locationEnabled()) {
+                        if (locationsArrayList.size() > 0) {
+                            startActivity(new Intent(getActivity().getApplicationContext(), DoctorsRoute.class));
+                        } else {
+                            Helpers.showSnackBar(getView(), R.string.no_doctor_available);
+                        }
+                    } else {
+                        Helpers.dialogForLocationEnableManually(getActivity());
+                    }
+                }
                 return true;
             default:
                 return false;
@@ -322,6 +361,19 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                             servicesArrayList.add(service);
                                         }
                                         sDoctorServices.put(doctorDetail.getInt("id"), servicesArrayList);
+                                        DoctorLocations doctorLocations = new DoctorLocations();
+                                        doctorLocations.setId(doctorDetail.getInt("id"));
+                                        doctorLocations.setLocation(doctorDetail.getString("location"));
+                                        StringBuilder stringBuilder = new StringBuilder();
+                                        if (doctorDetail.getString("gender").equals("M")) {
+                                            stringBuilder.append("Dr.");
+                                        } else {
+                                            stringBuilder.append("Dra.");
+                                        }
+                                        doctorLocations.setName(stringBuilder.toString()+" "
+                                                +doctorDetail.getString("first_name"));
+                                        doctorLocations.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
+                                        locationsArrayList.add(doctorLocations);
                                     }
                                 }
                                 if (doctors.size() < 1) {
@@ -341,6 +393,10 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+//        if (exception.getLocalizedMessage())
+        if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+            Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        }
         Helpers.dismissProgressDialog();
     }
 

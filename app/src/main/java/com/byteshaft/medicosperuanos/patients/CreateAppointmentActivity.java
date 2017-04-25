@@ -80,50 +80,61 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private int selectedServiceId;
     private String reason;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_create_appoint);
+
         id = getIntent().getIntExtra("user", -1);
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
         drName = getIntent().getStringExtra("name");
+
         drSpecialist = getIntent().getStringExtra("specialist");
         drStars = getIntent().getFloatExtra("stars", 0);
         appointmentId = getIntent().getIntExtra("appointment_id", -1);
         Log.i("TAG", "appointmentId " + appointmentId);
+
         phonenumber = getIntent().getStringExtra("number");
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         slotTime = getIntent().getStringExtra("time_slot");
         appointmentDate = getIntent().getStringExtra("appointment_date");
+
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
+
         dateText.setText(appointmentDate);
         timeText.setText(slotTime);
+
         callButton = (ImageButton) findViewById(R.id.btn_call);
         chatButton = (ImageButton) findViewById(R.id.btn_chat);
         mDoctorImage = (CircleImageView) findViewById(R.id.doctor_image);
         mNameTextView = (TextView) findViewById(R.id.doctor_name);
+
         mSpecialityTextView = (TextView) findViewById(R.id.doctor_speciality);
         mDoctorStartTime = (TextView) findViewById(R.id.starts_time);
         mDoctorRating = (RatingBar) findViewById(R.id.user_ratings);
         status = (ImageView) findViewById(R.id.status);
+
         mAppointmentEditText = (EditText) findViewById(R.id.appointment_reason_editText);
         mSaveButton = (Button) findViewById(R.id.button_save);
         favouriteButton = (ImageButton) findViewById(R.id.btn_fav);
+        priceTotalEditText = (EditText) findViewById(R.id.tv_total);
+
         mNameTextView.setTypeface(AppGlobals.typefaceNormal);
         mSpecialityTextView.setTypeface(AppGlobals.typefaceNormal);
         mDoctorStartTime.setTypeface(AppGlobals.typefaceNormal);
-        priceTotalEditText = (EditText) findViewById(R.id.tv_total);
         priceTotalEditText.setTypeface(AppGlobals.robotoBlackItalic);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);
         favouriteButton.setOnClickListener(this);
+
         Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
         if (AppGlobals.isDoctorFavourite) {
             favouriteButton.setBackgroundResource(R.mipmap.ic_heart_fill);
@@ -133,6 +144,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
+
         final ArrayList<Services> arrayList = DoctorsList.sDoctorServices.get(id);
         if (arrayList != null && arrayList.size() > 0) {
             serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
