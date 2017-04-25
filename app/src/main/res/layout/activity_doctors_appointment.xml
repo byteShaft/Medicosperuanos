@@ -204,7 +204,7 @@
                     android:layout_height="15dp"
                     android:layout_below="@+id/medication_spinner"
                     android:layout_marginTop="5dp"
-                    android:background="@mipmap/ic_min" />
+                    android:background="@mipmap/ic_min"/>
 
             </RelativeLayout>
 
