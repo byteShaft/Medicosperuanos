@@ -56,11 +56,15 @@
                     android:padding="5dp"
                     android:text="From Date" />
 
-                <Spinner
+                <EditText
+                    android:id="@+id/start_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:editable="false"
                     android:entries="@array/date_array"
-                    android:padding="5dp" />
+                    android:padding="5dp"
+                    android:text="12-02-2017" />
 
             </LinearLayout>
 
@@ -78,11 +82,15 @@
                     android:padding="5dp"
                     android:text="To Date" />
 
-                <Spinner
+                <EditText
+                    android:id="@+id/end_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:editable="false"
                     android:entries="@array/date_array"
-                    android:padding="5dp" />
+                    android:padding="5dp"
+                    android:text="12-07-2017" />
 
             </LinearLayout>
         </LinearLayout>
@@ -99,6 +107,8 @@
                 android:text="Clinic" />
 
             <Spinner
+                android:id="@+id/clinics_spinner_filter"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Click-A" />
@@ -117,6 +127,8 @@
                 android:text="Speciality" />
 
             <Spinner
+                android:id="@+id/speciality_spinner_filter"
+                style="@style/Widget.AppCompat.Spinner.Underlined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Dermatology" />
@@ -154,8 +166,8 @@
                 style="@style/Widget.AppCompat.SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
                 android:max="100"
+                android:padding="8dp"
                 android:progress="20" />
         </LinearLayout>
 

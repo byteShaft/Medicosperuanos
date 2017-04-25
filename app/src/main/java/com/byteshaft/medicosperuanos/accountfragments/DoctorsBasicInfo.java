@@ -2,7 +2,6 @@ package com.byteshaft.medicosperuanos.accountfragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,19 +11,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.AffiliateClinicAdapter;
 import com.byteshaft.medicosperuanos.adapters.CitiesAdapter;
+import com.byteshaft.medicosperuanos.adapters.SpecialitiesAdapter;
 import com.byteshaft.medicosperuanos.adapters.StatesAdapter;
 import com.byteshaft.medicosperuanos.adapters.SubscriptionTypeAdapter;
 import com.byteshaft.medicosperuanos.doctors.Dashboard;
@@ -356,7 +354,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     }
 
     private void getAffiliateClinic() {
-
         HttpRequest affiliateClinicRequest = new HttpRequest(getActivity().getApplicationContext());
         affiliateClinicRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -397,7 +394,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     }
 
     private void getSpecialities() {
-
         HttpRequest specialitiesRequest = new HttpRequest(getActivity().getApplicationContext());
         specialitiesRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -420,7 +416,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                     }
-                                    specialitiesAdapter = new SpecialitiesAdapter(specialitiesList);
+                                    specialitiesAdapter = new SpecialitiesAdapter(getActivity(), specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
                                     mSpecialitySpinner.setSelection(specialistPosition);
                                 } catch (JSONException e) {
@@ -719,53 +715,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             alertDialog.dismiss();
         } else {
             Helpers.dismissProgressDialog();
-        }
-    }
-
-    private class ViewHolder {
-        private TextView spinnerText;
-    }
-
-    private class SpecialitiesAdapter extends BaseAdapter {
-
-        private ViewHolder viewHolder;
-        private ArrayList<Specialities> specialities;
-
-        public SpecialitiesAdapter(ArrayList<Specialities> specialities) {
-            this.specialities = specialities;
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_spinner, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.spinnerText = (TextView) convertView.findViewById(R.id.spinner_text);
-                viewHolder.spinnerText.setTypeface(AppGlobals.typefaceNormal);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-            Specialities speciality = specialities.get(position);
-            viewHolder.spinnerText.setText(speciality.getSpeciality());
-            Log.i("TAF", speciality.getSpeciality());
-            return convertView;
-        }
-
-        @Override
-        public int getCount() {
-            return specialities.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
         }
     }
 }

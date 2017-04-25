@@ -71,7 +71,8 @@ import static com.byteshaft.medicosperuanos.utils.Helpers.getFormattedTime;
  * Created by s9iper1 on 2/22/17.
  */
 
-public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private ListView mListView;
