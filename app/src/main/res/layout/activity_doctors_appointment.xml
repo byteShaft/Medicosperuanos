@@ -130,10 +130,13 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".6">
 
-                <Spinner
-                    android:id="@+id/diagnostics_spinner"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/diagnostics_TextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:drawablePadding="15dip"
+                    android:text="List of diagnostic for selection"
+                    android:drawableRight="@mipmap/dropdown"
                     android:layout_margin="2dp" />
 
 
@@ -141,7 +144,8 @@
                     android:id="@+id/diagnostics_spinner_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@+id/diagnostics_spinner"
+                    android:layout_marginRight="20dp"
+                    android:layout_below="@+id/diagnostics_TextView"
                     android:background="#000" />
 
                 <Button
@@ -183,18 +187,21 @@
                 android:id="@+id/medication_spinner_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight=".84">
+                android:layout_weight=".72">
 
-                <Spinner
-                    android:id="@+id/medication_spinner"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/medication_TextView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:text="List of medication for selection"
+                    android:drawableRight="@mipmap/dropdown"
                     android:layout_margin="2dp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_below="@+id/medication_spinner"
+                    android:layout_below="@+id/medication_TextView"
                     android:layout_marginRight="10dp"
                     android:background="#000" />
 
@@ -202,7 +209,7 @@
                     android:id="@+id/minus_button_medication"
                     android:layout_width="15dp"
                     android:layout_height="15dp"
-                    android:layout_below="@+id/medication_spinner"
+                    android:layout_below="@+id/medication_TextView"
                     android:layout_marginTop="5dp"
                     android:background="@mipmap/ic_min"/>
 
@@ -216,15 +223,14 @@
 
                 <TextView
                     android:id="@+id/qty_textview"
-                    android:layout_width="50dp"
-                    android:layout_height="28dp"
-                    android:layout_marginTop="6dp"
+                    android:layout_width="38dp"
+                    android:layout_height="25dp"
                     android:gravity="center"
                     android:hint="Qty"
-                    android:textSize="15sp" />
+                    android:textSize="12sp" />
 
                 <View
-                    android:layout_width="40dp"
+                    android:layout_width="35dp"
                     android:layout_height="1dp"
                     android:layout_below="@+id/qty_textview"
                     android:background="#000" />
