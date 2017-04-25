@@ -270,7 +270,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 if (ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.ACCESS_COARSE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
                     alertDialogBuilder.setTitle(getResources().getString(R.string.permission_dialog_title));
                     alertDialogBuilder.setMessage(getResources().getString(R.string.location_permission_for_route))
                             .setCancelable(false).setPositiveButton("Continue", new DialogInterface.OnClickListener() {
