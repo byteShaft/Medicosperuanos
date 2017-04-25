@@ -24,19 +24,13 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerHorizontal="true"
-                android:maxHeight="150dp"
-                android:maxWidth="150dp"
-                android:minHeight="100dp"
-                android:minWidth="100dp">
+                android:gravity="center">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image_view_search"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@mipmap/image_placeholder"
-                    app:civ_border_color="#FFF"
-                    app:civ_border_width="2dp"
-                    app:civ_fill_color="@android:color/white" />
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@mipmap/image_placeholder" />
 
                 <ImageView
                     android:id="@+id/status"
@@ -44,8 +38,7 @@
                     android:layout_height="15dp"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="5dp"
                     android:src="@mipmap/ic_offline_indicator" />
             </RelativeLayout>
 
@@ -75,13 +68,12 @@
 
             <android.support.v7.widget.AppCompatRatingBar
                 android:id="@+id/user_ratings"
-                style="@style/Rating_bar"
+                style="@style/Widget.AppCompat.RatingBar.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/doctor_sp"
                 android:layout_centerHorizontal="true"
-                android:numStars="5"
-                android:rating="5.0" />
+                android:numStars="5" />
 
             <ImageButton
                 android:id="@+id/favt_button"
@@ -162,15 +154,14 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:layout_below="@+id/my_layout">
+        android:layout_below="@+id/my_layout"
+        android:scrollbars="none">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.byteshaft.medicosperuanos.uihelpers.CalendarView
-                xmlns:calendarNS="http://schemas.android.com/apk/res/com.byteshaft.medicosperuanos"
+            <com.byteshaft.medicosperuanos.uihelpers.CalendarView xmlns:calendarNS="http://schemas.android.com/apk/res/com.byteshaft.medicosperuanos"
                 android:id="@+id/calendar_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -182,21 +173,20 @@
                 android:id="@+id/progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_centerHorizontal="true"
                 android:layout_below="@+id/calendar_view"
-                />
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
 
             <GridView
                 android:id="@+id/time_table"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="125dp"
                 android:layout_below="@+id/calendar_view"
                 android:layout_marginTop="10dp"
                 android:horizontalSpacing="2dp"
                 android:numColumns="4"
-                android:verticalSpacing="2dp" />
+                android:verticalSpacing="2dp"
+                android:visibility="gone" />
         </RelativeLayout>
     </ScrollView>
 
