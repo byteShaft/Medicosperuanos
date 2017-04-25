@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#474A4F</color>
     <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#C6C6C6</color>
+    <color name="colorAccent">#FF5252</color>
     <color name="header_background">#4A4A4A</color>
     <color name="buttonColor">#FF5252</color>
     <color name="progressbar_background">#FF5252</color>
