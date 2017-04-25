@@ -86,12 +86,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private Toolbar toolbar;
     private static final int LOCATION_PERMISSION = 1;
     public ArrayList<DoctorLocations> locationsArrayList;
-
+    private ArrayList<DoctorDetails> searchList;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
-    private static DoctorsList sInstnace;
+    private static DoctorsList sInstance;
 
     public static DoctorsList getInstance() {
-        return sInstnace;
+        return sInstance;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         sDoctorServices = new HashMap<>();
         locationsArrayList = new ArrayList<>();
         getDoctorList();
-        sInstnace = this;
+        sInstance = this;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
@@ -147,6 +147,20 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<DoctorDetails>();
+                    for (DoctorDetails doctorDetails : doctors) {
+                        if (doctorDetails.getFirstName().contentEquals(s.toString())) {
+                            customAdapter = null;
+                            searchList.add(doctorDetails);
+                            customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                    R.layout.doctors_search_delagete, searchList);
+                            mListView.setAdapter(customAdapter);
+
+                        }
+                    }
+                }
             }
 
             @Override
