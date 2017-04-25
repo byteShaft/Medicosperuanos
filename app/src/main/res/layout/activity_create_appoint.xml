@@ -21,27 +21,41 @@
             android:background="#3F3F3F"
             android:padding="15dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/doctor_image"
+            <RelativeLayout
+                android:id="@+id/profile_picture"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerHorizontal="true"
-                android:src="@mipmap/ic_launcher" />
+                android:maxHeight="150dp"
+                android:maxWidth="150dp"
+                android:minHeight="100dp"
+                android:minWidth="100dp">
 
-            <ImageView
-                android:id="@+id/status"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_toRightOf="@+id/doctor_image"
-                android:src="@mipmap/ic_offline_indicator" />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/doctor_image"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@mipmap/image_placeholder"
+                    app:civ_border_color="#FFF"
+                    app:civ_fill_color="@android:color/white" />
+
+                <ImageView
+                    android:id="@+id/status"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="1dp"
+                    android:layout_marginTop="1dp"
+                    android:src="@mipmap/ic_offline_indicator" />
+            </RelativeLayout>
+
 
             <TextView
                 android:id="@+id/doctor_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/doctor_image"
+                android:layout_below="@+id/profile_picture"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
@@ -77,8 +91,7 @@
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/doctor_name"
-                />
+                android:layout_alignTop="@+id/doctor_name" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -98,10 +111,10 @@
                     android:id="@+id/starts_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="1"
                     android:layout_centerHorizontal="true"
                     android:layout_centerInParent="true"
                     android:layout_toRightOf="@+id/image_time"
+                    android:maxLines="1"
                     android:textColor="@android:color/white" />
 
             </RelativeLayout>

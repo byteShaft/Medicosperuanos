@@ -1,5 +1,6 @@
 package com.byteshaft.medicosperuanos.patients;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -23,10 +24,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
@@ -67,6 +71,10 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private Toolbar toolbar;
     private HttpRequest request;
     private Adapter patientAppointmentAdapter;
+    private float mUserRating;
+    private String mUserReview;
+    private int doctorsId;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -177,6 +185,19 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
         }
         String years = Helpers.calculateAge(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
         patientAge.setText(years + " years");
+        appointmentList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PatientAppointment patientAppointment = appointments.get(position);
+                if (patientAppointment.getState().equals("accepted")) {
+                    doctorsId = patientAppointment.getDoctorsId();
+                    System.out.println(doctorsId + "doctors id");
+                    reviewRatingBarDialog();
+                }
+
+            }
+        });
+
         return mBaseView;
     }
 
@@ -236,6 +257,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                                 appointment.setDate(appointmentObject.getString("created_at"));
                                 JSONObject doctorObject = appointmentObject.getJSONObject("doctor");
                                 appointment.setDrFirstName(doctorObject.getString("first_name"));
+                                appointment.setDoctorsId(doctorObject.getInt("id"));
                                 JSONObject specialityJsonObject = doctorObject.getJSONObject("speciality");
                                 appointment.setDrSpeciality(specialityJsonObject.getString("name"));
                                 JSONArray serviceArray = appointmentObject.getJSONArray("services");
@@ -295,18 +317,18 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            PatientAppointment appointment = appointmentsList.get(position);
+            PatientAppointment patientAppointment = appointmentsList.get(position);
             SimpleDateFormat formatterFrom = new SimpleDateFormat("dd/MM/yyyy hh:mm");
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date formattedDate = null;
             try {
-                formattedDate = formatterFrom.parse(appointment.getDate());
+                formattedDate = formatterFrom.parse(patientAppointment.getDate());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
             viewHolder.appointmentDate.setText(dateFormat.format(formattedDate));
-            viewHolder.appointmentTime.setText(appointment.getAppointmentTime());
-            viewHolder.doctorName.setText(appointment.getDrFirstName() + " " + appointment.getDrSpeciality());
+            viewHolder.appointmentTime.setText(patientAppointment.getAppointmentTime());
+            viewHolder.doctorName.setText(patientAppointment.getDrFirstName() + " " + patientAppointment.getDrSpeciality());
 
             TextPaint paint = viewHolder.doctorName.getPaint();
             Rect rect = new Rect();
@@ -316,20 +338,19 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                     viewHolder.doctorName.getWidth()) {
                 Log.i("My Appointments", "Your text is too large");
                 String specialist;
-                if (appointment.getDrSpeciality().length() > 7) {
-                    specialist = appointment.getDrSpeciality().substring(0, 7
+                if (patientAppointment.getDrSpeciality().length() > 7) {
+                    specialist = patientAppointment.getDrSpeciality().substring(0, 7
                     ).trim() + "…";
                 } else {
-                    specialist = appointment.getDrSpeciality();
+                    specialist = patientAppointment.getDrSpeciality();
                 }
-                viewHolder.doctorName.setText(appointment.getDrFirstName() + " - " + specialist);
+                viewHolder.doctorName.setText(patientAppointment.getDrFirstName() + " - " + specialist);
 
             }
 
-
-            viewHolder.serviceDescription.setText(appointment.getServiceName());
-            Log.i("TAG", appointment.getState());
-            switch (appointment.getState()) {
+            viewHolder.serviceDescription.setText(patientAppointment.getServiceName());
+            Log.i("TAG", patientAppointment.getState());
+            switch (patientAppointment.getState()) {
                 case "accepted":
                     viewHolder.appointmentStatus.setText("A");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
@@ -362,5 +383,85 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
         TextView doctorName;
         TextView serviceDescription;
         TextView appointmentStatus;
+    }
+
+    public void reviewRatingBarDialog() {
+        final Dialog dialog = new Dialog(getActivity(), R.style.FullHeightDialog);
+        dialog.setContentView(R.layout.review_rating_bar_dialoge);
+        dialog.setCancelable(false);
+        Button submitBtn = (Button) dialog.findViewById(R.id.submitRateBtn);
+        Button cancelBtn = (Button) dialog.findViewById(R.id.cancelRateBtn);
+        RatingBar ratingBar = (RatingBar) dialog.findViewById(R.id.dialog_ratingbar);
+        final EditText reviewEditText = (EditText) dialog.findViewById(R.id.reviewED);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                mUserRating = rating;
+
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        submitBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mUserReview = reviewEditText.getText().toString();
+                userReview(doctorsId, mUserRating, mUserReview);
+                dialog.dismiss();
+
+            }
+        });
+        dialog.show();
+    }
+
+    private void userReview(int doctorsId, float stars, String review) {
+        request = new HttpRequest(getActivity());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_CREATED:
+                                AppGlobals.alertDialog(getActivity(), getString(R.string.review_submitted), getString(R.string.review_submitted_successfully));
+                                break;
+                            case HttpURLConnection.HTTP_BAD_REQUEST:
+                                AppGlobals.alertDialog(getActivity(), getString(R.string.review_failed), getString(R.string.review_submitted_failed));
+                                break;
+
+                        }
+                }
+
+            }
+        });
+        request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+            }
+        });
+        request.open("POST", String.format("%sdoctors/%s/review", AppGlobals.BASE_URL, doctorsId));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send(getUserReviewData(stars, review));
+        Helpers.showProgressDialog(getActivity(), "Submitting you review...");
+    }
+
+
+    private String getUserReviewData(float stars, String review) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("stars", stars);
+            jsonObject.put("message", review);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
+
     }
 }
