@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.i("TAG", "token  "+ AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.i("TAG", "token  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogTheme);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle(getResources().getString(R.string.storage_permission_dialog_title));
             alertDialogBuilder.setMessage(getResources().getString(R.string.storage_permission_message))
                     .setCancelable(false).setPositiveButton("Continue", new DialogInterface.OnClickListener() {
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_my_services) {
             loadFragment(new Services());
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogTheme);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Confirmation");
             alertDialogBuilder.setMessage("Do you really want to exit?").setCancelable(false).setPositiveButton("Yes",
                     new DialogInterface.OnClickListener() {
@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogTheme);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Confirmation");
             alertDialogBuilder.setMessage("Do you really want to logout?")
                     .setCancelable(false).setPositiveButton("Yes",

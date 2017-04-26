@@ -109,7 +109,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.dustbin_messages:
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyAlertDialogTheme);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("Confirmation");
                 alertDialogBuilder.setMessage("Do you really want to delete?")
                         .setCancelable(false).setPositiveButton("Delete",

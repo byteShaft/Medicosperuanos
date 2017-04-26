@@ -21,7 +21,7 @@
 
                 <RatingBar
                     android:id="@+id/user_ratings"
-                    style="@style/RatingBar"
+                    style="@style/Widget.AppCompat.RatingBar.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:numStars="5"/>
