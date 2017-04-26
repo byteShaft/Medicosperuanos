@@ -8,11 +8,30 @@ public class PatientAppointment {
 
     private String date;
     private String drFirstName;
+    private String drLastName;
     private String appointmentTime;
     private String serviceName;
     private String state;
     private String drSpeciality;
     private int doctorsId;
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    private String gender;
+
+    public String getDrLastName() {
+        return drLastName;
+    }
+
+    public void setDrLastName(String drLastName) {
+        this.drLastName = drLastName;
+    }
 
     public int getDoctorsId() {
         return doctorsId;

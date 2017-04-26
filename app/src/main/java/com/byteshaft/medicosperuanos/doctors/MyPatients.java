@@ -284,6 +284,7 @@ public class MyPatients extends Fragment {
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                System.out.println(request.getResponseURL());
                                 System.out.println(request.getResponseText());
                                 try {
                                     JSONObject object = new JSONObject(request.getResponseText());
