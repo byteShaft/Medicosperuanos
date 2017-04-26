@@ -92,6 +92,8 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
         startDate.setOnClickListener(this);
         endDate.setOnClickListener(this);
         closeDialog.setOnClickListener(this);
+        startDate.setText(Helpers.getDate());
+        endDate.setText(Helpers.getDate());
 
         seekBarText.setText(String.valueOf(seekBar.getProgress()));
         final Calendar calendar = Calendar.getInstance();

@@ -39,6 +39,7 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,6 +64,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private ArrayList<PatientAppointment> appointments;
     private LinearLayout searchContainer;
     private EditText toolbarSearchView;
+    private ArrayList<PatientAppointment> searchList;
 
     private TextView patientName;
     private TextView patientEmail;
@@ -124,6 +126,29 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<>();
+                    patientAppointmentAdapter = new Adapter(getActivity().getApplicationContext(), searchList);
+                    appointmentList.setAdapter(patientAppointmentAdapter);
+                    for (PatientAppointment patientAppointment : appointments) {
+                        if (StringUtils.containsIgnoreCase(patientAppointment.getDrFirstName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(patientAppointment.getDrLastName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(patientAppointment.getDrSpeciality(),
+                                        s.toString()) ) {
+                            searchList.add(patientAppointment);
+                            patientAppointmentAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                } else {
+                    searchList = new ArrayList<>();
+                    patientAppointmentAdapter = new Adapter(getActivity().getApplicationContext(),
+                            appointments);
+                    appointmentList.setAdapter(patientAppointmentAdapter);
+                }
             }
 
             @Override
@@ -257,7 +282,9 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                                 appointment.setDate(appointmentObject.getString("created_at"));
                                 JSONObject doctorObject = appointmentObject.getJSONObject("doctor");
                                 appointment.setDrFirstName(doctorObject.getString("first_name"));
+                                appointment.setDrLastName(doctorObject.getString("last_name"));
                                 appointment.setDoctorsId(doctorObject.getInt("id"));
+                                appointment.setGender(doctorObject.getString("gender"));
                                 JSONObject specialityJsonObject = doctorObject.getJSONObject("speciality");
                                 appointment.setDrSpeciality(specialityJsonObject.getString("name"));
                                 JSONArray serviceArray = appointmentObject.getJSONArray("services");
@@ -328,7 +355,16 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
             }
             viewHolder.appointmentDate.setText(dateFormat.format(formattedDate));
             viewHolder.appointmentTime.setText(patientAppointment.getAppointmentTime());
-            viewHolder.doctorName.setText(patientAppointment.getDrFirstName() + " " + patientAppointment.getDrSpeciality());
+            StringBuilder stringBuilder = new StringBuilder();
+            if (patientAppointment.getGender().equals("M")) {
+                stringBuilder.append("Dr.");
+            } else {
+                stringBuilder.append("Dra.");
+            }
+            stringBuilder.append(patientAppointment.getDrFirstName());
+            stringBuilder.append(" ");
+            stringBuilder.append(patientAppointment.getDrLastName());
+            viewHolder.doctorName.setText(stringBuilder.toString() + " " + patientAppointment.getDrSpeciality());
 
             TextPaint paint = viewHolder.doctorName.getPaint();
             Rect rect = new Rect();
