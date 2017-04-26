@@ -43,6 +43,7 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +71,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     private View mBaseView;
     private ListView mListView;
     private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
+    private ArrayList<FavoriteDoctorsList> searchList;
     private LinearLayout searchContainer;
     private CustomAdapter customAdapter;
     private Toolbar toolbar;
@@ -133,6 +135,29 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, searchList);
+                    mListView.setAdapter(customAdapter);
+                    for (FavoriteDoctorsList doctorDetails : favoriteDoctorsList) {
+                        if (StringUtils.containsIgnoreCase(doctorDetails.getDoctorsName(),
+                                s.toString()) || StringUtils.containsIgnoreCase(doctorDetails.getLastName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(doctorDetails.getSpeciality(),
+                                        s.toString()) ) {
+                            searchList.add(doctorDetails);
+                            customAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                } else {
+                    searchList = new ArrayList<>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, favoriteDoctorsList);
+                    mListView.setAdapter(customAdapter);
+                }
             }
 
             @Override
@@ -249,6 +274,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 } else {
                                     stringBuilder.append("Dra.");
                                 }
+                                myFavoriteDoctorsList.setFirstName(jsonObject.getString("first_name"));
+                                myFavoriteDoctorsList.setLastName(jsonObject.getString("last_name"));
                                 stringBuilder.append(jsonObject.getString("first_name"));
                                 stringBuilder.append(" ");
                                 stringBuilder.append(jsonObject.getString("last_name"));
@@ -374,9 +401,6 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             viewHolder.specialist.setText(favorite.getSpeciality());
             viewHolder.review.setRating(favorite.getStars());
             Helpers.getBitMap(favorite.getDoctorImage(), viewHolder.circleImageView);
-            System.out.println(favorite.getDoctorImage() + "image url");
-            TimeSlots timeSlots = slotsList.get(favorite.getId()).get(0);
-            Log.i("TAG", timeSlots.getStartTime());
             TimingAdapter timingAdapter = new TimingAdapter(slotsList.get(favorite.getId()));
             viewHolder.timingList.canScrollVertically(LinearLayoutManager.VERTICAL);
             viewHolder.timingList.setHasFixedSize(true);
