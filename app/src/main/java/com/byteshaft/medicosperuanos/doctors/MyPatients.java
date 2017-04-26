@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -43,6 +44,7 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,6 +70,7 @@ public class MyPatients extends Fragment {
     private CustomAdapter customAdapter;
     private HttpRequest request;
     private Toolbar toolbar;
+    private ArrayList<com.byteshaft.medicosperuanos.gettersetter.MyPatients> searchList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -119,6 +122,29 @@ public class MyPatients extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.delegate_my_patients, searchList);
+                    mListView.setAdapter(customAdapter);
+                    for (com.byteshaft.medicosperuanos.gettersetter.MyPatients
+                            myPatient : myPatientsList) {
+                        if (StringUtils.containsIgnoreCase(myPatient.getPatientsName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(myPatient.getPatientLastName(),
+                                s.toString())) {
+                            searchList.add(myPatient);
+                            customAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                } else {
+                    searchList = new ArrayList<>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, myPatientsList);
+                    mListView.setAdapter(customAdapter);
+                }
             }
 
             @Override
@@ -213,7 +239,7 @@ public class MyPatients extends Fragment {
                 viewHolder = new ViewHolder();
                 viewHolder.circleImageView = (CircleImageView) convertView.findViewById(R.id.profile_image_view_search);
                 viewHolder.name = (TextView) convertView.findViewById(R.id.name);
-                viewHolder.patientAge = (TextView) convertView.findViewById(R.id.patient_age);
+//                viewHolder.patientAge = (TextView) convertView.findViewById(R.id.patient_age);
                 viewHolder.distance = (TextView) convertView.findViewById(R.id.distance);
                 viewHolder.chat = (ImageButton) convertView.findViewById(R.id.chat);
                 viewHolder.call = (ImageButton) convertView.findViewById(R.id.call);
@@ -221,7 +247,7 @@ public class MyPatients extends Fragment {
                 viewHolder.status = (ImageView) convertView.findViewById(R.id.status);
 
                 viewHolder.name.setTypeface(AppGlobals.typefaceNormal);
-                viewHolder.patientAge.setTypeface(AppGlobals.typefaceNormal);
+//                viewHolder.patientAge.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
 
                 convertView.setTag(viewHolder);
@@ -229,9 +255,9 @@ public class MyPatients extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             final com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients = myPatientsList.get(position);
-            viewHolder.name.setText(myPatients.getPatientsName());
             String years = Helpers.calculateAge(myPatients.getPatientAge());
-            viewHolder.patientAge.setText("-" + " " + "(" +  years +"a)");
+            viewHolder.name.setText(myPatients.getPatientsName() + " " +
+                    "-" + " " + "(" +  years +"a)");
             String[] startLocation = myPatients.getPatientLocation().split(",");
             String[] endLocation = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION).split(",");
             viewHolder.distance.setText(" " + String.valueOf(calculationByDistance(new LatLng(Double.parseDouble(startLocation[0]),
@@ -281,23 +307,27 @@ public class MyPatients extends Fragment {
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
+                        System.out.println(request.getResponseURL());
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                System.out.println(request.getResponseURL());
                                 System.out.println(request.getResponseText());
                                 try {
                                     JSONObject object = new JSONObject(request.getResponseText());
                                     JSONArray jsonArray = object.getJSONArray("results");
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                        com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients = new com.byteshaft.medicosperuanos.gettersetter.MyPatients();
+                                        com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients =
+                                                new com.byteshaft.medicosperuanos.gettersetter.MyPatients();
                                         myPatients.setPatientId(jsonObject.getInt("id"));
-                                        myPatients.setPatientsName(jsonObject.getString("first_name") + " " + jsonObject.getString("last_name"));
+                                        myPatients.setPatientFirstName(jsonObject.getString("first_name"));
+                                        myPatients.setPatientLastName(jsonObject.getString("last_name"));
+                                        myPatients.setPatientsName(jsonObject.getString("first_name") + " " +
+                                                jsonObject.getString("last_name"));
                                         myPatients.setPatientAge(jsonObject.getString("dob"));
                                         myPatients.setPatientPhoneNumber(jsonObject.getString("phone_number_primary"));
                                         myPatients.setPatientLocation(jsonObject.getString("location"));
-                                        myPatients.setPatientImage(jsonObject.getString("photo"));
+                                        myPatients.setPatientImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
                                         myPatients.setChatStatus(jsonObject.getBoolean("available_to_chat"));
                                         myPatientsList.add(myPatients);
                                         customAdapter.notifyDataSetChanged();
@@ -351,7 +381,7 @@ public class MyPatients extends Fragment {
     class ViewHolder {
         CircleImageView circleImageView;
         TextView name;
-        TextView patientAge;
+//        TextView patientAge;
         TextView distance;
         ImageButton chat;
         ImageButton call;
