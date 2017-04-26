@@ -52,6 +52,7 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,12 +85,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private Toolbar toolbar;
     private static final int LOCATION_PERMISSION = 1;
     public ArrayList<DoctorLocations> locationsArrayList;
-
+    private ArrayList<DoctorDetails> searchList;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
-    private static DoctorsList sInstnace;
+    private static DoctorsList sInstance;
 
     public static DoctorsList getInstance() {
-        return sInstnace;
+        return sInstance;
     }
 
     @Override
@@ -98,7 +99,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         sDoctorServices = new HashMap<>();
         locationsArrayList = new ArrayList<>();
         getDoctorList();
-        sInstnace = this;
+        sInstance = this;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
@@ -145,6 +146,33 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<DoctorDetails>();
+                    addedDates = new ArrayList<String>();
+                    showingPosition = new HashMap<String, Integer>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, searchList);
+                    mListView.setAdapter(customAdapter);
+                    for (DoctorDetails doctorDetails : doctors) {
+                        if (StringUtils.containsIgnoreCase(doctorDetails.getFirstName(),
+                                s.toString()) || StringUtils.containsIgnoreCase(doctorDetails.getLastName(),
+                                s.toString()) ||
+                                StringUtils.containsIgnoreCase(doctorDetails.getSpeciality(),
+                                        s.toString()) ) {
+                            searchList.add(doctorDetails);
+                            customAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                } else {
+                    addedDates = new ArrayList<String>();
+                    showingPosition = new HashMap<String, Integer>();
+                    searchList = new ArrayList<DoctorDetails>();
+                    customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                            R.layout.doctors_search_delagete, doctors);
+                    mListView.setAdapter(customAdapter);
+                }
             }
 
             @Override
@@ -312,6 +340,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+                        if (request.getResponseText().trim().isEmpty()) {
+                            return;
+                        }
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
@@ -394,6 +425,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 //        if (exception.getLocalizedMessage())
         if (exception.getLocalizedMessage().equals("Network is unreachable")) {
             Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        }
+        switch (readyState) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+            Helpers.showSnackBar(getView(), "connection time out");
+            break;
         }
         Helpers.dismissProgressDialog();
     }

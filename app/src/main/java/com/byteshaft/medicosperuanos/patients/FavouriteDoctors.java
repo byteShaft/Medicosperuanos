@@ -28,6 +28,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -48,7 +49,11 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -60,7 +65,7 @@ import static com.byteshaft.medicosperuanos.utils.Helpers.calculationByDistance;
  */
 
 public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadyStateChangeListener,
-        HttpRequest.OnErrorListener {
+        HttpRequest.OnErrorListener, View.OnClickListener {
 
     private View mBaseView;
     private ListView mListView;
@@ -70,13 +75,22 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     private Toolbar toolbar;
     private HttpRequest request;
     private HashMap<Integer, ArrayList<TimeSlots>> slotsList;
+    private ImageButton backwardCalender;
+    private ImageButton farwardCalender;
+    private TextView currentDay;
+    private Calendar currentDate = Calendar.getInstance();
 
     @SuppressLint("UseSparseArrays")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.favourite_doctors, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.favt_doctors_list);
-        slotsList = new HashMap<>();
+        farwardCalender = (ImageButton) mBaseView.findViewById(R.id.forward_calendar);
+        backwardCalender = (ImageButton) mBaseView.findViewById(R.id.go_back_calendar);
+        currentDay = (TextView) mBaseView.findViewById(R.id.current_date);
+        updateDate();
+        farwardCalender.setOnClickListener(this);
+        backwardCalender.setOnClickListener(this);
         searchContainer = new LinearLayout(getActivity());
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -144,7 +158,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
-        geFavoriteDoctorsList(Helpers.getDate());
+        geFavoriteDoctorsList();
         favoriteDoctorsList = new ArrayList<>();
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -190,12 +204,13 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         }
     }
 
-    public void geFavoriteDoctorsList(String date) {
+    public void geFavoriteDoctorsList() {
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_favourite_doctors));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%spatient/doctors/?date=%s", AppGlobals.BASE_URL, date));
+        request.open("GET", String.format("%spatient/doctors/?date=%s", AppGlobals.BASE_URL, df.format(currentDate.getTime())));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -214,7 +229,14 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         System.out.println(request.getResponseText());
-                        System.out.println(request.getResponseURL());
+                        if (request.getResponseText().trim().isEmpty()) {
+                            return;
+                        }
+                        slotsList = new HashMap<>();
+                        favoriteDoctorsList = new ArrayList<>();
+                        customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                R.layout.favt_doc_delegate, favoriteDoctorsList);
+                        mListView.setAdapter(customAdapter);
                         try {
                             JSONArray jsonArray = new JSONArray(request.getResponseText());
                             for (int i= 0; i < jsonArray.length(); i++) {
@@ -244,27 +266,20 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                     myFavoriteDoctorsList.setTimeId(dateJObject.getInt("id"));
                                     JSONArray timeJSONArray = dateJObject.getJSONArray("time_slots");
                                     ArrayList<TimeSlots> arrayList = new ArrayList<>();
-                                    Log.e("TAG", timeJSONArray.toString());
                                     for (int k= 0; k < timeJSONArray.length(); k++) {
-                                        Log.e("TAG", "slots ");
-                                        JSONObject timeJobject = timeJSONArray.getJSONObject(k);
+                                        JSONObject timeJsonObject = timeJSONArray.getJSONObject(k);
                                         TimeSlots timeSlots = new TimeSlots();
-                                        timeSlots.setEndTime(timeJobject.getString("end_time"));
-                                        timeSlots.setStartTime(timeJobject.getString("start_time"));
-                                        timeSlots.setTaken(timeJobject.getBoolean("taken"));
-                                        timeSlots.setSlotId(timeJobject.getInt("id"));
+                                        timeSlots.setEndTime(timeJsonObject.getString("end_time"));
+                                        timeSlots.setStartTime(timeJsonObject.getString("start_time"));
+                                        timeSlots.setTaken(timeJsonObject.getBoolean("taken"));
+                                        timeSlots.setSlotId(timeJsonObject.getInt("id"));
                                         arrayList.add(timeSlots);
                                     }
-                                    Log.i("TAG", "arraylist" + arrayList);
                                     favoriteDoctorsList.add(myFavoriteDoctorsList);
                                     slotsList.put(jsonObject.getInt("id"), arrayList);
-                                    Log.e("TAG", slotsList.toString());
+                                    customAdapter.notifyDataSetChanged();
                                 }
-
                             }
-                            customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                                    R.layout.favt_doc_delegate, favoriteDoctorsList);
-                            mListView.setAdapter(customAdapter);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -272,8 +287,51 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         }
     }
 
+    private void updateDate() {
+        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy");
+        currentDay.setText(df.format(currentDate.getTime()));
+    }
 
-    class CustomAdapter extends ArrayAdapter<FavoriteDoctorsList> {
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()) {
+            case R.id.go_back_calendar:
+                Calendar calendar = (Calendar) currentDate.clone();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+                Date dateOne = null;
+                Date dateTwo = null;
+                Date dateThree = null;
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.DAY_OF_YEAR, 1);
+                Calendar cal = Calendar.getInstance();
+                try {
+                    dateOne = sdf.parse(sdf.format(calendar.getTime()));
+                    dateTwo = sdf.parse(sdf.format(c.getTime()));
+                    dateThree = sdf.parse(sdf.format(cal.getTime()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Log.i("TAG", "one " + dateOne);
+                Log.i("TAG", "two " + dateTwo);
+                Log.i("TAG", "boolean " + String.valueOf(dateOne.compareTo(dateTwo) < 0));
+                if (dateOne.compareTo(dateTwo) < 0) {
+                    Helpers.showSnackBar(getView(), R.string.cannot_go_back_from_current_date);
+                } else {
+                    currentDate.add(Calendar.DAY_OF_YEAR, -1);
+                    updateDate();
+                    geFavoriteDoctorsList();
+                }
+                break;
+            case R.id.forward_calendar:
+                currentDate.add(Calendar.DAY_OF_YEAR, 1);
+                updateDate();
+                geFavoriteDoctorsList();
+                break;
+        }
+
+    }
+
+    private class CustomAdapter extends ArrayAdapter<FavoriteDoctorsList> {
 
         private ArrayList<FavoriteDoctorsList> favoriteDoctorsList;
         private ViewHolder viewHolder;
