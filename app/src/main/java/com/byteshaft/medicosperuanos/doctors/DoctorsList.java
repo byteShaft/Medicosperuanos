@@ -67,9 +67,6 @@ import static android.view.View.GONE;
 import static com.byteshaft.medicosperuanos.utils.Helpers.calculationByDistance;
 import static com.byteshaft.medicosperuanos.utils.Helpers.getFormattedTime;
 
-/**
- * Created by s9iper1 on 2/22/17.
- */
 
 public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener {
