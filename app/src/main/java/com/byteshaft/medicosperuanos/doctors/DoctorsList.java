@@ -208,11 +208,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
         toolbar.addView(searchContainer);
-        addedDates = new ArrayList<>();
-        showingPosition = new HashMap<>();
-        customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                R.layout.doctors_search_delagete, doctors);
-        mListView.setAdapter(customAdapter);
+
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -332,6 +328,18 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         }
     }
 
+    public void getDoctorList(String startDate, String endDate, int radius, int affiliateClinicId, int specialityID) {
+        Helpers.showProgressDialog(DoctorsList.getInstance().getActivity(), DoctorsList.getInstance().getString(R.string.getting_doctor_list));
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%sdoctors/?start_date=%s&end_date=%s&radius=%s&speciality=%s&affiliate_clininc=%s",
+                AppGlobals.BASE_URL, startDate, endDate, radius, affiliateClinicId, specialityID));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
@@ -343,6 +351,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         if (request.getResponseText().trim().isEmpty()) {
                             return;
                         }
+                        addedDates = new ArrayList<>();
+                        showingPosition = new HashMap<>();
+                        doctors = new ArrayList<>();
+                        customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                R.layout.doctors_search_delagete, doctors);
+                        mListView.setAdapter(customAdapter);
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
