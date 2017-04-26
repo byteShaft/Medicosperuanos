@@ -342,6 +342,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+                        if (request.getResponseText().trim().isEmpty()) {
+                            return;
+                        }
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
@@ -424,6 +427,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 //        if (exception.getLocalizedMessage())
         if (exception.getLocalizedMessage().equals("Network is unreachable")) {
             Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        }
+        switch (readyState) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+            Helpers.showSnackBar(getView(), "connection time out");
+            break;
         }
         Helpers.dismissProgressDialog();
     }

@@ -30,6 +30,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -166,11 +167,8 @@ public class Helpers {
     public static String getAge(int year, int month, int day) {
         Calendar dob = Calendar.getInstance();
         Calendar today = Calendar.getInstance();
-
         dob.set(year, month, day);
-
         int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-
         if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
             age--;
         }
@@ -298,6 +296,13 @@ public class Helpers {
         return df.format(c.getTime());
     }
 
+    public static String getPreviousDate() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DAY_OF_YEAR, -1);
+        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy");
+        return df.format(c.getTime());
+    }
+
 
     public static void favouriteDoctorTask(int doctorId, HttpRequest.OnReadyStateChangeListener
             readyStateChangeListener, HttpRequest.OnErrorListener onErrorListener) {
@@ -309,7 +314,6 @@ public class Helpers {
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send(getDoctorsId(doctorId));
     }
-
 
     public static String getDoctorsId(int doctorId) {
         JSONObject jsonObject = new JSONObject();
@@ -331,6 +335,16 @@ public class Helpers {
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
+    }
+
+    public static String getTomorrowDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        Date tomorrow = calendar.getTime();
+        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+
+        return dateFormat.format(tomorrow);
+
     }
 
 }
