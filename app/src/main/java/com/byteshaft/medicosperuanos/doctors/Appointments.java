@@ -355,7 +355,7 @@ public class Appointments extends Fragment implements
             } else if (state.contains(AppGlobals.ACCEPTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.attended_background_color));
-            } else if (state.contains(AppGlobals.REJCTED)) {
+            } else if (state.contains(AppGlobals.REJECTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.reject_background));
             }
