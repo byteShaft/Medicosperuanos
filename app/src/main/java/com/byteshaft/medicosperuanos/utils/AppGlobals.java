@@ -90,7 +90,7 @@ public class AppGlobals extends Application {
 
     public static final String PENDING = "pending";
     public static final String ACCEPTED = "accepted";
-    public static final String REJCTED = "rejected";
+    public static final String REJECTED = "rejected";
 
 
     public static final String KEY_TOKEN = "token";

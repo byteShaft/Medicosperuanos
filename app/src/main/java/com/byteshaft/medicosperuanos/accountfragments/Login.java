@@ -204,7 +204,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                System.out.println(request.getResponseText() + "working ok kro");
+                                System.out.println(request.getResponseText());
                                 try {
                                     JSONObject jsonObject = new JSONObject(request.getResponseText());
                                     String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
