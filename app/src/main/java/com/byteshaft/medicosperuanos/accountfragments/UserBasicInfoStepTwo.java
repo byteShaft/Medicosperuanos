@@ -48,10 +48,12 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         View.OnClickListener, CompoundButton.OnCheckedChangeListener, HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnFileUploadProgressListener, HttpRequest.OnErrorListener {
     private View mBaseView;
+
     private Spinner mStateSpinner;
     private Spinner mCitySpinner;
     private Spinner mInsuranceCarrierSpinner;
     private Spinner mAffiliatedClinicsSpinner;
+
     private EditText mPhoneOneEditText;
     private EditText mPhoneTwoEditText;
     private EditText mEmergencyContactEditText;
@@ -64,6 +66,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
     private String mStatesSpinnerValueString;
     private String mCitiesSpinnerValueString;
     private String mInsuranceCarrierSpinnerValueString;
+    private String mAffiliatedClinicsSpinnerValueString = "";
     private String mNotificationCheckBoxString = "true";
     private String mNewsCheckBoxString = "true";
     private String mTermsConditionCheckBoxString;
@@ -77,15 +80,16 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
     private ArrayList<States> statesList;
     private StatesAdapter statesAdapter;
+
     private ArrayList<Cities> citiesList;
     private CitiesAdapter citiesAdapter;
 
+    private ArrayList<InsuranceCarriers> insuranceCarriersList;
+    private InsuranceCarriersAdapter insuranceCarriersAdapter;
 
     private ArrayList<AffiliateClinic> affiliateClinicsList;
     private AffiliateClinicAdapter affiliateClinicAdapter;
 
-    private ArrayList<InsuranceCarriers> insuranceCarriersList;
-    private InsuranceCarriersAdapter insuranceCarriersAdapter;
 
     private int cityPosition;
     private int statePosition;
@@ -104,9 +108,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         }
         setHasOptionsMenu(true);
 
-        getStates();
-        getInsuranceCarriers();
-        getAffiliateClinic();
         /// data list work
         statesList = new ArrayList<>();
         citiesList = new ArrayList<>();
@@ -116,7 +117,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mStateSpinner = (Spinner) mBaseView.findViewById(R.id.states_spinner);
         mCitySpinner = (Spinner) mBaseView.findViewById(R.id.cities_spinner);
         mInsuranceCarrierSpinner = (Spinner) mBaseView.findViewById(R.id.insurance_spinner);
-        mAffiliatedClinicsSpinner = (Spinner) mBaseView.findViewById(R.id.clinics_spinner);
+        mAffiliatedClinicsSpinner = (Spinner) mBaseView.findViewById(R.id.clinic_spinner_user_basic);
 
         mPhoneOneEditText = (EditText) mBaseView.findViewById(R.id.phone_one_edit_text);
         mPhoneTwoEditText = (EditText) mBaseView.findViewById(R.id.phone_two_edit_text);
@@ -132,13 +133,17 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mNotificationCheckBox.setChecked(AppGlobals.isShowNotification());
         Log.i("TAG", String.valueOf(AppGlobals.isShowNews()));
         mNewsCheckBox.setChecked(AppGlobals.isShowNews());
-
         mSaveButton = (Button) mBaseView.findViewById(R.id.save_button);
+
+        getStates();
+        getInsuranceCarriers();
+        getAffiliateClinic();
 
         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
             mTermsConditionCheckBox.setVisibility(View.GONE);
             mSaveButton.setEnabled(true);
         }
+
         mPhoneOneEditText.setTypeface(AppGlobals.typefaceNormal);
         mPhoneTwoEditText.setTypeface(AppGlobals.typefaceNormal);
         mEmergencyContactEditText.setTypeface(AppGlobals.typefaceNormal);
@@ -153,9 +158,8 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mNotificationCheckBox.setOnCheckedChangeListener(this);
         mNewsCheckBox.setOnCheckedChangeListener(this);
         mTermsConditionCheckBox.setOnCheckedChangeListener(this);
-
         mSaveButton.setOnClickListener(this);
-
+        mAffiliatedClinicsSpinner.setOnItemSelectedListener(this);
         return mBaseView;
     }
 
@@ -350,9 +354,16 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
             case R.id.insurance_spinner:
                 InsuranceCarriers insuranceCarriers = insuranceCarriersList.get(i);
                 mInsuranceCarrierSpinnerValueString = String.valueOf(insuranceCarriers.getId());
+                System.out.println(insuranceCarriers.getId());
                 AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
                         insuranceCarriers.getId());
                 break;
+            case R.id.clinic_spinner_user_basic:
+                AffiliateClinic affiliateClinic = affiliateClinicsList.get(i);
+                mAffiliatedClinicsSpinnerValueString = String.valueOf(affiliateClinic.getId());
+                System.out.println(affiliateClinic.getId());
+                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED,
+                        affiliateClinic.getId());
         }
     }
 
@@ -452,6 +463,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         data.append(FormData.TYPE_CONTENT_TEXT, "state", mStatesSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "city", mCitiesSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "insurance_carrier", mInsuranceCarrierSpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "affiliate_clinic", mAffiliatedClinicsSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", mPhoneOneEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_secondary", mPhoneTwoEditTextString);
         data.append(FormData.TYPE_CONTENT_TEXT, "emergency_contact", mEmergencyContactString);
@@ -514,6 +526,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
 
                             String insuranceCarrier = jsonObject.getString(AppGlobals.KEY_INSURANCE_CARRIER);
+                            String affiliateClinic = jsonObject.getString(AppGlobals.KEY_AFFILIATE_CLINIC);
                             String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
@@ -539,6 +552,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
 //                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC_ID, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_INSURANCE_CARRIER, insuranceCarrier);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
@@ -579,6 +593,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
 
                             String insuranceCarrier = jsonObject.getString(AppGlobals.KEY_INSURANCE_CARRIER);
+                            String affiliateClinic = jsonObject.getString(AppGlobals.KEY_AFFILIATE_CLINIC);
                             String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
@@ -603,6 +618,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
 //                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC_ID, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_INSURANCE_CARRIER, insuranceCarrier);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
