@@ -37,6 +37,7 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +56,7 @@ public class Services extends Fragment implements View.OnClickListener {
     private Button mSaveButton;
     private ServiceAdapter serviceAdapter;
     private ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList;
+    private ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> searchList;
     private int currentAdapterPosition;
 
     @Override
@@ -109,6 +111,27 @@ public class Services extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.i("TAG", s.toString());
+                if (!s.toString().isEmpty()) {
+                    searchList = new ArrayList<>();
+                    serviceAdapter = new ServiceAdapter(searchList);
+                    serviceList.setAdapter(serviceAdapter);
+                    for (com.byteshaft.medicosperuanos.gettersetter.Services services :
+                            servicesArrayList) {
+                        if (StringUtils.containsIgnoreCase(services.getServiceName(),
+                                s.toString()) || StringUtils.containsIgnoreCase(String.valueOf(
+                                        services.getServiceId()),
+                                s.toString())) {
+                            searchList.add(services);
+                            serviceAdapter.notifyDataSetChanged();
+
+                        }
+                    }
+                } else {
+                    searchList = new ArrayList<>();
+                    serviceAdapter = new ServiceAdapter(servicesArrayList);
+                    serviceList.setAdapter(serviceAdapter);
+                }
             }
 
             @Override

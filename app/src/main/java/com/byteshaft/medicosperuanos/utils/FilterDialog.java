@@ -1,8 +1,8 @@
 package com.byteshaft.medicosperuanos.utils;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +35,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
         DatePickerDialog.OnDateSetListener, AdapterView.OnItemSelectedListener {
 
     private SeekBar seekBar;
-    private Context mContext;
+    private Activity activity;
     private TextView seekBarText;
     private ImageButton closeDialog;
     private EditText startDate;
@@ -60,9 +60,9 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
     private AffiliateClinic mAffiliateClinic;
     private Specialities mSpecialities;
 
-    public FilterDialog(Context context) {
-        super(context);
-        mContext = context;
+    public FilterDialog(Activity activity) {
+        super(activity);
+        this.activity = activity;
     }
 
     @Override
@@ -181,7 +181,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         affiliateClinicsList.add(affiliateClinic);
                                     }
                                     affiliateClinicAdapter = new AffiliateClinicAdapter(
-                                            DoctorsList.getInstance().getActivity(), affiliateClinicsList);
+                                            activity, affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
                                     mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
                                 } catch (JSONException e) {
@@ -215,7 +215,8 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                     }
-                                    specialitiesAdapter = new SpecialitiesAdapter(DoctorsList.getInstance().getActivity(), specialitiesList);
+                                    specialitiesAdapter = new SpecialitiesAdapter(
+                                            activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
                                     mSpecialitySpinner.setSelection(specialistPosition);
                                 } catch (JSONException e) {

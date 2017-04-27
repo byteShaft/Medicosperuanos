@@ -6,6 +6,37 @@ package com.byteshaft.medicosperuanos.gettersetter;
 
 public class MyPatients {
 
+    private String patientsName;
+    private boolean chatStatus;
+    private String patientImage;
+    private String patientAge;
+    private String patientLocation;
+    private String patientPhoneNumber;
+    private int patientId;
+
+    public boolean isChatStatus() {
+        return chatStatus;
+    }
+
+    public String getPatientFirstName() {
+        return patientFirstName;
+    }
+
+    public void setPatientFirstName(String patientFirstName) {
+        this.patientFirstName = patientFirstName;
+    }
+
+    public String getPatientLastName() {
+        return patientLastName;
+    }
+
+    public void setPatientLastName(String patientLastName) {
+        this.patientLastName = patientLastName;
+    }
+
+    private String patientFirstName;
+    private String patientLastName;
+
     public String getPatientsName() {
         return patientsName;
     }
@@ -61,14 +92,6 @@ public class MyPatients {
     public void setPatientId(int patientId) {
         this.patientId = patientId;
     }
-
-    private String patientsName;
-    private boolean chatStatus;
-    private String patientImage;
-    private String patientAge;
-    private String patientLocation;
-    private String patientPhoneNumber;
-    private int patientId;
 
 
 }
