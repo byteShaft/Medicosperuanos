@@ -1,7 +1,9 @@
 package com.byteshaft.medicosperuanos.gettersetter;
 
 
-public class Services {
+import java.io.Serializable;
+
+public class Services implements Serializable {
 
     private int id;
     private String serviceName;

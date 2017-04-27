@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.DoctorDetailsActivity;
-import com.byteshaft.medicosperuanos.doctors.DoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -38,11 +37,13 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CreateAppointmentActivity extends AppCompatActivity implements View.OnClickListener,
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+
 
     private Button mSaveButton;
     private Spinner serviceListSpinner;
@@ -79,6 +80,11 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private String appointmentDate;
     private int selectedServiceId;
     private String reason;
+    private static CreateAppointmentActivity sInstance;
+
+    public static CreateAppointmentActivity getInstance() {
+        return sInstance;
+    }
 
 
     @Override
@@ -87,7 +93,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_create_appoint);
-
+        sInstance = this;
         id = getIntent().getIntExtra("user", -1);
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
@@ -103,6 +109,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         slotTime = getIntent().getStringExtra("time_slot");
         appointmentDate = getIntent().getStringExtra("appointment_date");
+        HashMap<Integer, ArrayList<Services>> hashMap = (HashMap<Integer, ArrayList<Services>>) getIntent().getSerializableExtra("services_array");
+        final ArrayList<Services> arrayList = hashMap.get(id);
 
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
@@ -145,7 +153,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
 
-        final ArrayList<Services> arrayList = DoctorsList.sDoctorServices.get(id);
         if (arrayList != null && arrayList.size() > 0) {
             serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
             serviceAdapter = new ServiceAdapter(arrayList);

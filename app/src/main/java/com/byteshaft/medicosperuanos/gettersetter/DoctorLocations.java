@@ -1,10 +1,12 @@
 package com.byteshaft.medicosperuanos.gettersetter;
 
+import java.io.Serializable;
+
 /**
  * Created by s9iper1 on 4/22/17.
  */
 
-public class DoctorLocations {
+public class DoctorLocations implements Serializable{
 
     private int id;
     private String name;
