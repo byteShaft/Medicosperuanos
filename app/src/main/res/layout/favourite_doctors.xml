@@ -60,6 +60,7 @@
         android:layout_margin="1dp"
         android:scrollbars="none"
         android:visibility="visible"
+        android:descendantFocusability="blocksDescendants"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

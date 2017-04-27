@@ -2,7 +2,6 @@ package com.byteshaft.medicosperuanos.patients;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -25,8 +24,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -36,6 +35,7 @@ import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.gettersetter.FavoriteDoctorsList;
+import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.TimeSlots;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.FilterDialog;
@@ -78,6 +78,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     private ImageButton farwardCalender;
     private TextView currentDay;
     private Calendar currentDate = Calendar.getInstance();
+    private HashMap<Integer, ArrayList<Services>> sFavtDoctorServices;
+    private int mainLayoutPosition = -1;
     private static FavouriteDoctors sInstance;
 
     public static FavouriteDoctors getsInstance() {
@@ -185,8 +187,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
-        toolbar.addView(searchContainer);
-        geFavoriteDoctorsList();
+//        toolbar.addView(searchContainer);
         favoriteDoctorsList = new ArrayList<>();
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -201,7 +202,24 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
             }
         });
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.i("TAG", "click");
+                mainLayoutPosition = i;
+
+            }
+        });
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+//        toolbar.removeView(searchContainer);
+        toolbar.addView(searchContainer);
+        geFavoriteDoctorsList();
+
     }
 
     @Override
@@ -273,6 +291,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                             return;
                         }
                         slotsList = new HashMap<>();
+                        sFavtDoctorServices = new HashMap<>();
                         favoriteDoctorsList = new ArrayList<>();
                         customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
                                 R.layout.favt_doc_delegate, favoriteDoctorsList);
@@ -297,10 +316,29 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 myFavoriteDoctorsList.setDoctorsName(stringBuilder.toString());
                                 myFavoriteDoctorsList.setDoctorsLocation(jsonObject.getString("location"));
                                 myFavoriteDoctorsList.setId(jsonObject.getInt("id"));
+                                myFavoriteDoctorsList.setBlocked(jsonObject.getBoolean("am_i_blocked"));
+                                myFavoriteDoctorsList.setFavorite(jsonObject.getBoolean("is_favorite"));
+                                myFavoriteDoctorsList.setLocation(jsonObject.getString("location"));
+                                myFavoriteDoctorsList.setAvailableToChat(jsonObject.getBoolean("available_to_chat"));
                                 JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
                                 myFavoriteDoctorsList.setSpeciality(specialityJsonObject.getString("name"));
                                 myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
                                 myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));
+                                JSONArray services = jsonObject.getJSONArray("services");
+                                if (services.length() > 0) {
+                                    ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList = new ArrayList<>();
+                                    for (int s = 0; s < services.length(); s++) {
+                                        JSONObject singleService = services.getJSONObject(s);
+                                        com.byteshaft.medicosperuanos.gettersetter.Services service
+                                                = new com.byteshaft.medicosperuanos.gettersetter.Services();
+                                        service.setServiceId(singleService.getInt("id"));
+                                        JSONObject internalObject = singleService.getJSONObject("service");
+                                        service.setServiceName(internalObject.getString("name"));
+                                        service.setServicePrice(singleService.getString("price"));
+                                        servicesArrayList.add(service);
+                                    }
+                                    sFavtDoctorServices.put(jsonObject.getInt("id"), servicesArrayList);
+                                }
                                 JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
                                 for (int j = 0; j < dateJSONArray.length(); j++) {
                                     JSONObject dateJObject = dateJSONArray.getJSONObject(j);
@@ -471,7 +509,31 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 @Override
                 public void onClick(View view) {
                     if (!timeSlots.isTaken()) {
-                        startActivity(new Intent(getActivity(), CreateAppointmentActivity.class));
+                        new android.os.Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.i("TAG", "Inner click");
+//                                FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(mainLayoutPosition);
+//                                Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
+//                                intent.putExtra("start_time", doctorDetails.getStartTime());
+//                                intent.putExtra("name", doctorDetails.getDoctorsName());
+//                                intent.putExtra("specialist", doctorDetails.getSpeciality());
+//                                intent.putExtra("stars", doctorDetails.getStars());
+//                                AppGlobals.isDoctorFavourite =  doctorDetails.isFavorite();
+//                                intent.putExtra("block", doctorDetails.isBlocked());
+//                                intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
+//                                intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+//                                intent.putExtra("user", doctorDetails.getId());
+//                                intent.putExtra("photo", doctorDetails.getDoctorImage());
+//                                intent.putExtra("location", doctorDetails.getLocation());
+//                                TimeSlots time = timingList.get(position);
+//                                intent.putExtra("appointment_id", time.getSlotId());
+//                                intent.putExtra("start_time", time.getStartTime());
+//                                startActivity(intent);
+
+                            }
+                        }, 500);
+
                     } else {
                         Helpers.showSnackBar(getView(), R.string.time_slot_booked);
                     }
@@ -484,12 +546,12 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             return timingList.size();
         }
 
-        class Holder extends RecyclerView.ViewHolder {
-            Button timeButton;
-
+        class Holder extends RecyclerView.ViewHolder{
+            TextView timeButton;
+            
             public Holder(View itemView) {
                 super(itemView);
-                timeButton = (Button) itemView.findViewById(R.id.time);
+                timeButton = (TextView) itemView.findViewById(R.id.time);
             }
         }
     }

@@ -340,9 +340,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                 new android.os.Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        DoctorBookingActivity.getInstance().finish();
-                                        DoctorDetailsActivity.getInstance().finish();
-                                        finish();
+                                        if (DoctorBookingActivity.getInstance() != null) {
+                                            DoctorBookingActivity.getInstance().finish();
+                                            DoctorDetailsActivity.getInstance().finish();
+                                        } else {
+                                            finish();
+                                        }
                                     }
                                 }, 500);
                                 break;
