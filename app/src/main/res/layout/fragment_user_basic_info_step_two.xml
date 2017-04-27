@@ -130,7 +130,7 @@
             android:layout_height="wrap_content" />
 
         <Spinner
-            android:id="@+id/clinic_spinner"
+            android:id="@+id/clinic_spinner_user_basic"
             style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
