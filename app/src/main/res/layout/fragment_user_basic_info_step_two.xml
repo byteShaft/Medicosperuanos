@@ -33,21 +33,10 @@
 
                 <Spinner
                     android:id="@+id/states_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/states_spinner_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/states_spinner"
-                    android:text="" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/states_spinner"
-                    android:background="#000" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -59,14 +48,10 @@
 
                 <Spinner
                     android:id="@+id/cities_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/cities_spinner"
-                    android:background="#000" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -135,29 +120,22 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/emergency_contact"
                 android:inputType="text"
-                android:maxLength="250"/>
+                android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
 
         <Spinner
             android:id="@+id/insurance_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-        <View
+        <Spinner
+            android:id="@+id/clinic_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
 
-        <!--<Spinner-->
-        <!--android:id="@+id/clinic_spinner"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="10dp" />-->
-
-        <!--<View-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:background="#000" />-->
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/check_box_layout"
@@ -209,13 +187,13 @@
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/save_button"
+            style="@style/AccentButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginTop="15dp"
             android:enabled="false"
             android:text="@string/save"
-            style="@style/AccentButton"
             android:theme="@style/MyButton" />
 
         <TextView
