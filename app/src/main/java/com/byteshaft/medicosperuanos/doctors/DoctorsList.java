@@ -84,7 +84,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private TextView noDoctor;
     private Toolbar toolbar;
     private static final int LOCATION_PERMISSION = 1;
-    public ArrayList<DoctorLocations> locationsArrayList;
+    private ArrayList<DoctorLocations> locationsArrayList;
     private ArrayList<DoctorDetails> searchList;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
     private static DoctorsList sInstance;
@@ -314,7 +314,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 } else {
                     if (Helpers.locationEnabled()) {
                         if (locationsArrayList.size() > 0) {
-                            startActivity(new Intent(getActivity().getApplicationContext(), DoctorsRoute.class));
+                            Intent intent = new Intent(getActivity().getApplicationContext(), DoctorsRoute.class);
+                            intent.putExtra("location_array", locationsArrayList);
+                            startActivity(intent);
                         } else {
                             Helpers.showSnackBar(getView(), R.string.no_doctor_available);
                         }

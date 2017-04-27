@@ -1,13 +1,19 @@
 package com.byteshaft.medicosperuanos.patients;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -15,11 +21,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -34,6 +42,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.gettersetter.DoctorLocations;
 import com.byteshaft.medicosperuanos.gettersetter.FavoriteDoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.TimeSlots;
@@ -81,6 +90,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     private HashMap<Integer, ArrayList<Services>> sFavtDoctorServices;
     private int mainLayoutPosition = -1;
     private static FavouriteDoctors sInstance;
+    private static final int LOCATION_PERMISSION = 1;
+    public ArrayList<DoctorLocations> locationsArrayList;
 
     public static FavouriteDoctors getsInstance() {
         return sInstance;
@@ -95,6 +106,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         backwardCalender = (ImageButton) mBaseView.findViewById(R.id.go_back_calendar);
         currentDay = (TextView) mBaseView.findViewById(R.id.current_date);
         sInstance = this;
+        locationsArrayList = new ArrayList<>();
         updateDate();
         farwardCalender.setOnClickListener(this);
         backwardCalender.setOnClickListener(this);
@@ -216,7 +228,6 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     @Override
     public void onResume() {
         super.onResume();
-//        toolbar.removeView(searchContainer);
         toolbar.addView(searchContainer);
         geFavoriteDoctorsList();
 
@@ -244,6 +255,41 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 filterDialog.show();
                 return true;
             case R.id.action_location:
+                if (ContextCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setTitle(getResources().getString(R.string.permission_dialog_title));
+                    alertDialogBuilder.setMessage(getResources().getString(R.string.location_permission_for_route))
+                            .setCancelable(false).setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    LOCATION_PERMISSION);
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+                } else {
+                    if (Helpers.locationEnabled()) {
+                        if (locationsArrayList.size() > 0) {
+                            Intent intent = new Intent(getActivity().getApplicationContext(), DoctorsRoute.class);
+                            intent.putExtra("location_array", locationsArrayList);
+                            startActivity(intent);
+                        } else {
+                            Helpers.showSnackBar(getView(), R.string.no_doctor_available);
+                        }
+                    } else {
+                        Helpers.dialogForLocationEnableManually(getActivity());
+                    }
+                }
                 return true;
             default:
                 return false;
@@ -339,6 +385,19 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                     }
                                     sFavtDoctorServices.put(jsonObject.getInt("id"), servicesArrayList);
                                 }
+                                DoctorLocations doctorLocations = new DoctorLocations();
+                                doctorLocations.setId(jsonObject.getInt("id"));
+                                doctorLocations.setLocation(jsonObject.getString("location"));
+                                StringBuilder string = new StringBuilder();
+                                if (jsonObject.getString("gender").equals("M")) {
+                                    string.append("Dr.");
+                                } else {
+                                    string.append("Dra.");
+                                }
+                                doctorLocations.setName(string.toString()+" "
+                                        +jsonObject.getString("first_name"));
+                                doctorLocations.setAvailableToChat(jsonObject.getBoolean("available_to_chat"));
+                                locationsArrayList.add(doctorLocations);
                                 JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
                                 for (int j = 0; j < dateJSONArray.length(); j++) {
                                     JSONObject dateJObject = dateJSONArray.getJSONObject(j);
@@ -423,7 +482,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
         @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = getActivity().getLayoutInflater()
                         .inflate(R.layout.favt_doc_delegate, parent, false);
@@ -455,9 +514,31 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             viewHolder.review.setRating(favorite.getStars());
             Helpers.getBitMap(favorite.getDoctorImage(), viewHolder.circleImageView);
             TimingAdapter timingAdapter = new TimingAdapter(slotsList.get(favorite.getId()));
+            viewHolder.timingList.setAdapter(timingAdapter);
             viewHolder.timingList.canScrollVertically(LinearLayoutManager.VERTICAL);
             viewHolder.timingList.setHasFixedSize(true);
-            viewHolder.timingList.setAdapter(timingAdapter);
+            viewHolder.timingList.addOnItemTouchListener(new TimingAdapter(slotsList.get(favorite.getId()), new TimingAdapter.OnItemClickListener() {
+                @Override
+                public void onItem(TimeSlots time) {
+                    FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(position);
+                    Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
+                    intent.putExtra("start_time", doctorDetails.getStartTime());
+                    intent.putExtra("name", doctorDetails.getDoctorsName());
+                    intent.putExtra("specialist", doctorDetails.getSpeciality());
+                    intent.putExtra("stars", doctorDetails.getStars());
+                    AppGlobals.isDoctorFavourite = doctorDetails.isFavorite();
+                    intent.putExtra("block", doctorDetails.isBlocked());
+                    intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
+                    intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+                    intent.putExtra("user", doctorDetails.getId());
+                    intent.putExtra("photo", doctorDetails.getDoctorImage());
+                    intent.putExtra("location", doctorDetails.getLocation());
+                    intent.putExtra("appointment_id", time.getSlotId());
+                    intent.putExtra("start_time", time.getStartTime());
+                    intent.putExtra("services_array", sFavtDoctorServices);
+                    startActivity(intent);
+                }
+            }));
             return convertView;
         }
 
@@ -467,7 +548,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         }
     }
 
-    private class ViewHolder {
+    private static class ViewHolder {
         CircleImageView circleImageView;
         TextView name;
         TextView specialist;
@@ -477,13 +558,29 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
     }
 
-    class TimingAdapter extends RecyclerView.Adapter<TimingAdapter.Holder> {
+    static class TimingAdapter extends RecyclerView.Adapter<TimingAdapter.Holder> implements
+            RecyclerView.OnItemTouchListener {
 
         private ArrayList<TimeSlots> timingList;
         private Holder holder;
+        private OnItemClickListener mListener;
+        private GestureDetector mGestureDetector;
+
+        public TimingAdapter(ArrayList<TimeSlots> timingList, OnItemClickListener listener) {
+            this.timingList = timingList;
+            mListener = listener;
+            mGestureDetector = new GestureDetector(AppGlobals.getContext(),
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onSingleTapUp(MotionEvent e) {
+                            return true;
+                        }
+                    });
+            Log.i("TAG", "check array " + String.valueOf(this.timingList == null));
+
+        }
 
         public TimingAdapter(ArrayList<TimeSlots> timingList) {
-            super();
             this.timingList = timingList;
         }
 
@@ -501,44 +598,44 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             final TimeSlots timeSlots = timingList.get(position);
             holder.timeButton.setText(timeSlots.getStartTime());
             if (!timeSlots.isTaken()) {
-                holder.timeButton.setBackground(getResources().getDrawable(R.drawable.normal_time_slot));
+                holder.timeButton.setBackground(AppGlobals.getContext().getResources().getDrawable(R.drawable.normal_time_slot));
             } else {
-                holder.timeButton.setBackground(getResources().getDrawable(R.drawable.pressed_time_slot));
+                holder.timeButton.setBackground(AppGlobals.getContext().getResources().getDrawable(R.drawable.pressed_time_slot));
             }
-            holder.timeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!timeSlots.isTaken()) {
-                        new android.os.Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.i("TAG", "Inner click");
-//                                FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(mainLayoutPosition);
-//                                Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
-//                                intent.putExtra("start_time", doctorDetails.getStartTime());
-//                                intent.putExtra("name", doctorDetails.getDoctorsName());
-//                                intent.putExtra("specialist", doctorDetails.getSpeciality());
-//                                intent.putExtra("stars", doctorDetails.getStars());
-//                                AppGlobals.isDoctorFavourite =  doctorDetails.isFavorite();
-//                                intent.putExtra("block", doctorDetails.isBlocked());
-//                                intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
-//                                intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
-//                                intent.putExtra("user", doctorDetails.getId());
-//                                intent.putExtra("photo", doctorDetails.getDoctorImage());
-//                                intent.putExtra("location", doctorDetails.getLocation());
-//                                TimeSlots time = timingList.get(position);
-//                                intent.putExtra("appointment_id", time.getSlotId());
-//                                intent.putExtra("start_time", time.getStartTime());
-//                                startActivity(intent);
-
-                            }
-                        }, 500);
-
-                    } else {
-                        Helpers.showSnackBar(getView(), R.string.time_slot_booked);
-                    }
-                }
-            });
+//            holder.timeButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (!timeSlots.isTaken()) {
+//                        new android.os.Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Log.i("TAG", "Inner click");
+////                                FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(mainLayoutPosition);
+////                                Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
+////                                intent.putExtra("start_time", doctorDetails.getStartTime());
+////                                intent.putExtra("name", doctorDetails.getDoctorsName());
+////                                intent.putExtra("specialist", doctorDetails.getSpeciality());
+////                                intent.putExtra("stars", doctorDetails.getStars());
+////                                AppGlobals.isDoctorFavourite =  doctorDetails.isFavorite();
+////                                intent.putExtra("block", doctorDetails.isBlocked());
+////                                intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
+////                                intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+////                                intent.putExtra("user", doctorDetails.getId());
+////                                intent.putExtra("photo", doctorDetails.getDoctorImage());
+////                                intent.putExtra("location", doctorDetails.getLocation());
+////                                TimeSlots time = timingList.get(position);
+////                                intent.putExtra("appointment_id", time.getSlotId());
+////                                intent.putExtra("start_time", time.getStartTime());
+////                                startActivity(intent);
+//
+//                            }
+//                        }, 500);
+//
+//                    } else {
+//                        Helpers.showSnackBar(getView(), R.string.time_slot_booked);
+//                    }
+//                }
+//            });
         }
 
         @Override
@@ -546,13 +643,40 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             return timingList.size();
         }
 
-        class Holder extends RecyclerView.ViewHolder{
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                Log.i("TAG", "check listener " + String.valueOf(mListener == null));
+                Log.i("TAG", "check array " + String.valueOf(timingList == null));
+                Log.i("TAG", "check item " + String.valueOf(rv.getChildPosition(childView)));
+                mListener.onItem(timingList.get(rv.getChildPosition(childView)));
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+
+        static class Holder extends RecyclerView.ViewHolder {
             TextView timeButton;
-            
+
             public Holder(View itemView) {
                 super(itemView);
                 timeButton = (TextView) itemView.findViewById(R.id.time);
             }
+        }
+
+        public interface OnItemClickListener {
+            void onItem(TimeSlots item);
         }
     }
 

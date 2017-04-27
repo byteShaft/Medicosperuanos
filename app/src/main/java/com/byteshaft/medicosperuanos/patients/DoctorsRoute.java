@@ -8,8 +8,8 @@ import android.util.Log;
 import android.view.MenuItem;
 
 import com.byteshaft.medicosperuanos.R;
-import com.byteshaft.medicosperuanos.doctors.DoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.DoctorLocations;
+import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 /**
  * Created by husnain on 2/23/17.
  */
@@ -31,6 +33,7 @@ public class DoctorsRoute extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private LatLng latLng;
+    private ArrayList<DoctorLocations> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,8 @@ public class DoctorsRoute extends AppCompatActivity implements OnMapReadyCallbac
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Doctors");
         setContentView(R.layout.activity_doctors_route);
+        ArrayList<Services> hashMap = (ArrayList<Services>) getIntent().getSerializableExtra("services_array");
+        arrayList = (ArrayList<DoctorLocations>) getIntent().getSerializableExtra("location_array");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -71,7 +76,7 @@ public class DoctorsRoute extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMarkerClickListener(this);
-        for (DoctorLocations doctorLocations : DoctorsList.getInstance().locationsArrayList) {
+        for (DoctorLocations doctorLocations : arrayList) {
             String[] location = doctorLocations.getLocation().split(",");
             latLng = new LatLng(Double.parseDouble(location[0]), Double.parseDouble(location[1]));
             BitmapDescriptor bitmap;
