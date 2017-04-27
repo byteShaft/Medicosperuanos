@@ -621,7 +621,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             e.printStackTrace();
                         }
                         break;
-
                 }
         }
 

@@ -61,9 +61,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.byteshaft.medicosperuanos.utils.Helpers.calculationByDistance;
 
-/**
- * Created by s9iper1 on 3/1/17.
- */
 
 public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener, View.OnClickListener {
@@ -81,6 +78,11 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
     private ImageButton farwardCalender;
     private TextView currentDay;
     private Calendar currentDate = Calendar.getInstance();
+    private static FavouriteDoctors sInstance;
+
+    public static FavouriteDoctors getsInstance() {
+        return sInstance;
+    }
 
     @SuppressLint("UseSparseArrays")
     @Override
@@ -90,6 +92,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         farwardCalender = (ImageButton) mBaseView.findViewById(R.id.forward_calendar);
         backwardCalender = (ImageButton) mBaseView.findViewById(R.id.go_back_calendar);
         currentDay = (TextView) mBaseView.findViewById(R.id.current_date);
+        sInstance = this;
         updateDate();
         farwardCalender.setOnClickListener(this);
         backwardCalender.setOnClickListener(this);
@@ -146,7 +149,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 s.toString()) || StringUtils.containsIgnoreCase(doctorDetails.getLastName(),
                                 s.toString()) ||
                                 StringUtils.containsIgnoreCase(doctorDetails.getSpeciality(),
-                                        s.toString()) ) {
+                                        s.toString())) {
                             searchList.add(doctorDetails);
                             customAdapter.notifyDataSetChanged();
 
@@ -219,7 +222,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             case R.id.action_search:
                 return true;
             case R.id.action_filter:
-                FilterDialog filterDialog = new FilterDialog(getActivity());
+                FilterDialog filterDialog = new FilterDialog(getActivity(), true);
                 filterDialog.show();
                 return true;
             case R.id.action_location:
@@ -236,6 +239,18 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.open("GET", String.format("%spatient/doctors/?date=%s", AppGlobals.BASE_URL, df.format(currentDate.getTime())));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
+    public void getFavDoctorList(String startDate, String endDate, int radius, int affiliateClinicId, int specialityID) {
+        Helpers.showProgressDialog(getActivity(), FavouriteDoctors.getsInstance().getString(R.string.getting_doctor_list));
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%sdoctors/?start_date=%s&end_date=%s&radius=%s&speciality=%s&affiliate_clininc=%s",
+                AppGlobals.BASE_URL, startDate, endDate, radius, affiliateClinicId, specialityID));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -264,7 +279,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                         mListView.setAdapter(customAdapter);
                         try {
                             JSONArray jsonArray = new JSONArray(request.getResponseText());
-                            for (int i= 0; i < jsonArray.length(); i++) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 com.byteshaft.medicosperuanos.gettersetter.FavoriteDoctorsList myFavoriteDoctorsList
                                         = new com.byteshaft.medicosperuanos.gettersetter.FavoriteDoctorsList();
@@ -287,13 +302,13 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
                                 myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));
                                 JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
-                                for (int j= 0; j < dateJSONArray.length(); j++) {
+                                for (int j = 0; j < dateJSONArray.length(); j++) {
                                     JSONObject dateJObject = dateJSONArray.getJSONObject(j);
                                     myFavoriteDoctorsList.setSchduleDate(dateJObject.getString("date"));
                                     myFavoriteDoctorsList.setTimeId(dateJObject.getInt("id"));
                                     JSONArray timeJSONArray = dateJObject.getJSONArray("time_slots");
                                     ArrayList<TimeSlots> arrayList = new ArrayList<>();
-                                    for (int k= 0; k < timeJSONArray.length(); k++) {
+                                    for (int k = 0; k < timeJSONArray.length(); k++) {
                                         JSONObject timeJsonObject = timeJSONArray.getJSONObject(k);
                                         TimeSlots timeSlots = new TimeSlots();
                                         timeSlots.setEndTime(timeJsonObject.getString("end_time"));
@@ -321,7 +336,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.go_back_calendar:
                 Calendar calendar = (Calendar) currentDate.clone();
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
@@ -469,7 +484,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             return timingList.size();
         }
 
-        class Holder extends RecyclerView.ViewHolder{
+        class Holder extends RecyclerView.ViewHolder {
             Button timeButton;
 
             public Holder(View itemView) {
@@ -478,7 +493,6 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
             }
         }
     }
-
 
 
 }
