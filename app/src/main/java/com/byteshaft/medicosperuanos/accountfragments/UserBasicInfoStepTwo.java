@@ -116,7 +116,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mStateSpinner = (Spinner) mBaseView.findViewById(R.id.states_spinner);
         mCitySpinner = (Spinner) mBaseView.findViewById(R.id.cities_spinner);
         mInsuranceCarrierSpinner = (Spinner) mBaseView.findViewById(R.id.insurance_spinner);
-        mAffiliatedClinicsSpinner = (Spinner) mBaseView.findViewById(R.id.clinic_spinner);
+        mAffiliatedClinicsSpinner = (Spinner) mBaseView.findViewById(R.id.clinics_spinner);
 
         mPhoneOneEditText = (EditText) mBaseView.findViewById(R.id.phone_one_edit_text);
         mPhoneTwoEditText = (EditText) mBaseView.findViewById(R.id.phone_two_edit_text);
@@ -582,13 +582,13 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
-                            String chatStatus = jsonObject.getString(AppGlobals.KEY_CHAT_STATUS);
+                            boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
                             String state = jsonObject.getString(AppGlobals.KEY_STATE);
                             String city = jsonObject.getString(AppGlobals.KEY_CITY);
                             String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
-                            String showNews = jsonObject.getString(AppGlobals.KEY_SHOW_NEWS);
+                            boolean showNews = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NEWS);
 
-                            String showNotification = jsonObject.getString(AppGlobals.KEY_SHOW_NOTIFICATION);
+                            boolean showNotification = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NOTIFICATION);
                             String emergencyContact = jsonObject.getString(AppGlobals.KEY_EMERGENCY_CONTACT);
 
                             //saving values
@@ -606,12 +606,12 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CHAT_STATUS, chatStatus);
+                            AppGlobals.saveChatStatus(chatStatus);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_STATE, state);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CITY, city);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, docId);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NEWS, showNews);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SHOW_NOTIFICATION, showNotification);
+                            AppGlobals.saveNewsState(showNews);
+                            AppGlobals.saveNotificationState(showNotification);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, emergencyContact);
                             Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
