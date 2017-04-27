@@ -285,7 +285,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             case R.id.action_search:
                 return true;
             case R.id.action_filter:
-                FilterDialog filterDialog = new FilterDialog(getActivity());
+                FilterDialog filterDialog = new FilterDialog(getActivity(), false);
                 filterDialog.show();
                 return true;
             case R.id.action_location:
