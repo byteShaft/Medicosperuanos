@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -21,6 +20,7 @@ import com.byteshaft.medicosperuanos.adapters.SpecialitiesAdapter;
 import com.byteshaft.medicosperuanos.doctors.DoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.AffiliateClinic;
 import com.byteshaft.medicosperuanos.gettersetter.Specialities;
+import com.byteshaft.medicosperuanos.patients.FavouriteDoctors;
 import com.byteshaft.requests.HttpRequest;
 
 import org.json.JSONArray;
@@ -59,9 +59,11 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
     private boolean isStartDate;
     private AffiliateClinic mAffiliateClinic;
     private Specialities mSpecialities;
+    private boolean isFavList = true;
 
-    public FilterDialog(Activity activity) {
+    public FilterDialog(Activity activity, boolean isFavList) {
         super(activity);
+        this.isFavList = isFavList;
         this.activity = activity;
     }
 
@@ -146,16 +148,26 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                 endDate.setText(Helpers.getDate());
                 break;
             case R.id.button_apply_filters:
-                Log.e(" Pppppppppp", mAffiliateClinic.getId() + "  " + mSpecialities.getSpecialitiesId());
                 String sDate = startDate.getText().toString();
                 String eDate = endDate.getText().toString();
-                DoctorsList.getInstance().getDoctorList(
-                        sDate,
-                        eDate,
-                        seekBar.getProgress(),
-                        mAffiliateClinic.getId(),
-                        mSpecialities.getSpecialitiesId());
-                dismiss();
+
+                if (!isFavList) {
+                    DoctorsList.getInstance().getDoctorList(
+                            sDate,
+                            eDate,
+                            seekBar.getProgress(),
+                            mAffiliateClinic.getId(),
+                            mSpecialities.getSpecialitiesId());
+                    dismiss();
+                } else {
+                    System.out.println("Ok kr k form fav list");
+                    FavouriteDoctors.getsInstance().getFavDoctorList(sDate,
+                            eDate,
+                            seekBar.getProgress(),
+                            mAffiliateClinic.getId(),
+                            mSpecialities.getSpecialitiesId());
+                    dismiss();
+                }
                 break;
         }
 
