@@ -97,7 +97,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
 
         seekBarText.setText(String.valueOf(seekBar.getProgress()));
         final Calendar calendar = Calendar.getInstance();
-        datePickerDialog = new DatePickerDialog(DoctorsList.getInstance().getActivity(),
+        datePickerDialog = new DatePickerDialog(activity,
                 this,
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),

@@ -22,6 +22,63 @@ public class FavoriteDoctorsList {
     private int id;
     private String firstName;
     private String lastName;
+    private boolean isBlocked;
+
+    public boolean isAvailableToChat() {
+        return availableToChat;
+    }
+
+    public void setAvailableToChat(boolean availableToChat) {
+        this.availableToChat = availableToChat;
+    }
+
+    private boolean availableToChat;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    private String location;
+
+    public String getPrimaryPhoneNumber() {
+        return primaryPhoneNumber;
+    }
+
+    public void setPrimaryPhoneNumber(String primaryPhoneNumber) {
+        this.primaryPhoneNumber = primaryPhoneNumber;
+    }
+
+    private String primaryPhoneNumber;
+
+    public String getScheduleDate() {
+        return scheduleDate;
+    }
+
+    public void setScheduleDate(String scheduleDate) {
+        this.scheduleDate = scheduleDate;
+    }
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    private boolean isFavorite;
 
     public String getLastName() {
         return lastName;
