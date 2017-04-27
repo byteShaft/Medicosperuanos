@@ -33,14 +33,10 @@
 
                 <Spinner
                     android:id="@+id/states_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/states_spinner"
-                    android:background="#000" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -52,14 +48,9 @@
 
                 <Spinner
                     android:id="@+id/cities_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/cities_spinner"
-                    android:background="#000" />
             </RelativeLayout>
         </LinearLayout>
 
@@ -176,39 +167,27 @@
 
         <Spinner
             android:id="@+id/speciality_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/speciality_spinner"
-            android:background="#000" />
 
         <Spinner
             android:id="@+id/clinics_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/clinics_spinner"
-            android:background="#000" />
 
         <Spinner
             android:id="@+id/subscriptions_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_below="@+id/subscriptions_spinner"
-            android:background="#000" />
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/check_box_layout"
@@ -229,8 +208,8 @@
                 <CheckBox
                     android:id="@+id/notifications_check_box"
                     android:layout_width="match_parent"
-                    android:checked="true"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:text="@string/notifications" />
             </RelativeLayout>
 
@@ -243,9 +222,9 @@
 
                 <CheckBox
                     android:id="@+id/news_check_box"
-                    android:checked="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:text="@string/news" />
             </RelativeLayout>
         </LinearLayout>
