@@ -27,7 +27,6 @@ import com.byteshaft.medicosperuanos.adapters.DiagnosticsAdapter;
 import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
 import com.byteshaft.medicosperuanos.adapters.TreatmentsAdapter;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
-import com.byteshaft.medicosperuanos.gettersetter.Diagnostics;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.gettersetter.Treatments;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -101,6 +100,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private ListView mdeiacationDiagnosticListView;
     private DiagnosticMedicationAdapter diagnosticMedicationAdapter;
 
+    private ArrayList<DiagnosticMedication> mMedicationArrayList;
+    private ArrayList<DiagnosticMedication> mDiagnosticArrayList;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,8 +172,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         diagnosticsMedicationList = new ArrayList<>();
         treatmentsArrayList = new ArrayList<>();
         targetsArrayList = new ArrayList<>();
-//        getDiagnostic();
-//        getTreatments();
+        mMedicationArrayList = new ArrayList<>();
+        mDiagnosticArrayList = new ArrayList<>();
         getTargets();
 
 
@@ -366,6 +371,15 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         ImageButton arrowUpButton = (ImageButton) dialog.findViewById(R.id.arrow_up);
         ImageButton arrowDownButton = (ImageButton) dialog.findViewById(R.id.arrow_down);
         mdeiacationDiagnosticListView = (ListView) dialog.findViewById(R.id.medication_diagnostic_search_list_view);
+        mdeiacationDiagnosticListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DiagnosticMedication diagnosticMedication = diagnosticsMedicationList.get(position);
+                if (mMedicationArrayList.contains(diagnosticMedication))
+                mMedicationArrayList.add(diagnosticMedication);
+
+            }
+        });
         arrowUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
