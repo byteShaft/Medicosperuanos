@@ -93,6 +93,9 @@ public class AppGlobals extends Application {
     public static final String REJECTED = "rejected";
 
 
+    private static final String SERVICE_KEY = "iServiceON";
+    public static final String KEY__FCM_TOKEN = "token";
+
     public static final String KEY_TOKEN = "token";
     public static final String USER_ACTIVATION_KEY = "activation_key";
     public static final int LOCATION_ENABLE = 3;
@@ -283,6 +286,17 @@ public class AppGlobals extends Application {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getInt(key, -1);
     }
+
+    // TODO: 28/04/2017 FCM
+//    public static void saveState(boolean state) {
+//        SharedPreferences sharedPreferences = getPreferenceManager();
+//        sharedPreferences.edit().putBoolean(SERVICE_KEY, state).apply();
+//    }
+//
+//    public static boolean isServiceOn() {
+//        SharedPreferences sharedPreferences = getPreferenceManager();
+//        return sharedPreferences.getBoolean(SERVICE_KEY, false);
+//    }
 
     public static void buttonEffect(View button) {
         button.setOnTouchListener(new View.OnTouchListener() {

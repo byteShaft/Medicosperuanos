@@ -1,18 +1,30 @@
 package com.byteshaft.medicosperuanos.gettersetter;
 
-public class Agenda {
-    String createdAt;
-    String date;
-    int doctorId;
-    String startTIme;
-    String endTime;
-    int agendaId;
-    String reaseon;
-    String agendaState;
+import java.io.Serializable;
+import java.util.ArrayList;
 
-    String firstName;
-    String lastName;
-    String photoUrl;
+public class Agenda implements Serializable{
+    private String createdAt;
+    private String date;
+    private int doctorId;
+    private String startTIme;
+    private String endTime;
+    private int agendaId;
+    private String reason;
+    private String agendaState;
+    private String firstName;
+    private String lastName;
+    private String photoUrl;
+
+    public ArrayList<Services> getPatientServices() {
+        return patientServices;
+    }
+
+    public void setPatientServices(ArrayList<Services> patientServices) {
+        this.patientServices = patientServices;
+    }
+
+    private ArrayList<Services> patientServices;
 
     public boolean isAvailAbleForChat() {
         return availAbleForChat;
@@ -106,12 +118,12 @@ public class Agenda {
         this.agendaId = agendaId;
     }
 
-    public String getReaseon() {
-        return reaseon;
+    public String getReason() {
+        return reason;
     }
 
-    public void setReaseon(String reaseon) {
-        this.reaseon = reaseon;
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public String getAgendaState() {

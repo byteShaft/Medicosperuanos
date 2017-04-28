@@ -23,7 +23,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.byteshaft.medicosperuanos.R;
-import com.byteshaft.medicosperuanos.gettersetter.*;
+import com.byteshaft.medicosperuanos.gettersetter.Agenda;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.patients.DoctorsAppointment;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -40,7 +40,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -55,7 +54,6 @@ public class Appointments extends Fragment implements
     private HttpRequest request;
     private ArrayList<Agenda> agendaArrayList;
     private Adapter arrayAdapter;
-    public HashMap<Integer, ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services>> patientServices;
     private static Appointments sInstance;
 
     public static Appointments getInstance() {
@@ -70,7 +68,6 @@ public class Appointments extends Fragment implements
                 .setTitle(getResources().getString(R.string.appointments));
         mListView = (SwipeMenuListView) mBaseView.findViewById(R.id.listView);
         HashSet<Date> events = new HashSet<>();
-        patientServices = new HashMap<>();
         events.add(new Date());
         com.byteshaft.medicosperuanos.uihelpers.CalendarView calendarView = (
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
@@ -144,11 +141,12 @@ public class Appointments extends Fragment implements
                 Agenda agenda = agendaArrayList.get(i);
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
                 intent.putExtra("id", agenda.getDoctorId());
-                intent.putExtra("reason", agenda.getReaseon());
+                intent.putExtra("reason", agenda.getReason());
                 intent.putExtra("first_name", agenda.getFirstName());
                 intent.putExtra("last_name", agenda.getLastName());
                 intent.putExtra("age", agenda.getDateOfBirth());
                 intent.putExtra("date", agenda.getDate());
+                intent.putExtra("services", agenda.getPatientServices());
                 startActivity(intent);
             }
         });
@@ -264,7 +262,7 @@ public class Appointments extends Fragment implements
                                 agenda.setCreatedAt(agendaObject.getString("created_at"));
                                 agenda.setDate(agendaObject.getString("date"));
                                 agenda.setAgendaState(agendaObject.getString("state"));
-                                agenda.setReaseon(agendaObject.getString("reason"));
+                                agenda.setReason(agendaObject.getString("reason"));
                                 JSONObject doctorJsonObject = agendaObject.getJSONObject("doctor");
                                 agenda.setDoctorId(doctorJsonObject.getInt("id"));
 
@@ -282,7 +280,7 @@ public class Appointments extends Fragment implements
                                     service.setServiceName(serviceMainObject.getString("name"));
                                     servicesArrayList.add(service);
                                 }
-                                patientServices.put(doctorJsonObject.getInt("id"), servicesArrayList);
+                                agenda.setPatientServices(servicesArrayList);
                                 agendaArrayList.add(agenda);
                                 if (arrayAdapter == null) {
                                     arrayAdapter = new Adapter(getActivity(), agendaArrayList);
@@ -358,7 +356,7 @@ public class Appointments extends Fragment implements
             String age = Helpers.calculateAge(agenda.getDateOfBirth());
             String name = agenda.getFirstName() + " " + agenda.getLastName();
             viewHolder.nameAge.setText(name + " (" + age + "a)");
-            viewHolder.reason.setText(agenda.getReaseon());
+            viewHolder.reason.setText(agenda.getReason());
             SimpleDateFormat formatter_from = new SimpleDateFormat("HH:mm:ss");
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
             try {
