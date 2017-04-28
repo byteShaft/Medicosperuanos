@@ -4,7 +4,10 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +32,6 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
@@ -40,15 +42,28 @@ import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.zfdang.multiple_images_selector.SelectorSettings;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -109,6 +124,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private ArrayList<DiagnosticMedication> searchListForDiagonistics;
     private ArrayList<DiagnosticMedication> searchListForMedications;
 
+    private static final int REQUEST_CODE = 123;
+    private ArrayList<String> imagesArray;
+
+    private String mPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +153,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedMedicationList = new ArrayList<>();
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
+        imagesArray = new ArrayList<>();
 
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
@@ -191,6 +212,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mDateEditText.setEnabled(false);
         getTargets();
 
+        Fresco.initialize(getApplicationContext());
 
         final Calendar calendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(DoctorsAppointment.this,
@@ -208,6 +230,25 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
                     }
                 }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+// get selected images from selector
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+                assert imagesArray != null;
+
+                // show results in textview
+                StringBuffer sb = new StringBuffer();
+                sb.append(String.format("Totally %d images selected:", imagesArray.size())).append("\n");
+                for (String result : imagesArray) {
+                    sb.append(result).append("\n");
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -233,14 +274,72 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+                takeScreenshot();
                 break;
             case R.id.attach_icon:
-                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+                ImageToPdf();
+//                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
+//                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
+//                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
+//                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
+//                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
+//                startActivityForResult(intent, REQUEST_CODE);
                 break;
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void takeScreenshot() {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + "medicosperuanos.jpg";
+
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void ImageToPdf() {
+        Document document = new Document();
+        String path = android.os.Environment.getExternalStorageDirectory().toString();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(path + "/medicosperuanos.pdf"));
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        document.open();
+        Image image = null;
+        try {
+            image = Image.getInstance(mPath);
+        } catch (BadElementException | IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            float width = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+            float height = document.getPageSize().getHeight() - document.topMargin() - document.bottomMargin();
+            image.scaleToFit(width, height);
+            document.add(new Paragraph(path + "medicosperuanos screen capture"));
+            document.add(image);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        document.close();
     }
 
     @Override

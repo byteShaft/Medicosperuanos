@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".utils.AppGlobals"
@@ -83,7 +84,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".patients.DoctorsAppointment"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
+        <activity
+            android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".patients.PatientsRecentHistory"
             android:windowSoftInputMode="adjustResize" />
