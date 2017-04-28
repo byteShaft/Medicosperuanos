@@ -21,6 +21,8 @@ import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class PatientDetails extends AppCompatActivity implements View.OnClickListener {
 
     private TextView patientName;
@@ -31,6 +33,26 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private EditText docId;
     private EditText birthDate;
     private EditText patientAddress;
+    private CircleImageView circleImageView;
+    private EditText phonePrimary;
+    private EditText phoneSecondary;
+    private EditText stateEditText;
+    private EditText cityEditText;
+    private EditText insuranceCarrierEditText;
+    private EditText emergencyContact;
+
+    private String patientNameString;
+    private String patientAgeString;
+    private String docIdString;
+    private String patientAddressString;
+    private String circleImageViewString;
+    private String phonePrimaryString;
+    private String phoneSecondaryString;
+    private String stateEditTextString;
+    private String cityEditTextString;
+    private String insuranceCarrierEditTextString;
+    private String emergencyContactString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +60,82 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_patient_details);
+
         patientName = (TextView) findViewById(R.id.patient_name_);
         patientAge = (TextView) findViewById(R.id.patient_age_);
+        docId = (EditText) findViewById(R.id.doc_id);
+        birthDate = (EditText) findViewById(R.id.birth_date);
+
+        patientAddress = (EditText) findViewById(R.id.patient_address);
+        circleImageView = (CircleImageView) findViewById(R.id.patient_image);
+        phonePrimary = (EditText) findViewById(R.id.Phone_primary);
+        phoneSecondary = (EditText) findViewById(R.id.Phone_secondary);
+
+        stateEditText = (EditText) findViewById(R.id.state_Edit_text);
+        cityEditText = (EditText) findViewById(R.id.city_Edit_text);
+        insuranceCarrierEditText = (EditText) findViewById(R.id.insurance_carrier);
+        emergencyContact = (EditText) findViewById(R.id.emergency_contact_);
+
         callButton = (ImageButton) findViewById(R.id.call_button_);
         chatButton = (ImageButton) findViewById(R.id.chat_button_);
         appointmentButton = (Button) findViewById(R.id.button_appointment);
 
+        patientNameString = getIntent().getStringExtra("name");
+        docIdString = getIntent().getStringExtra("identity_document");
+        patientAddressString = getIntent().getStringExtra("address");
+        circleImageViewString = getIntent().getStringExtra("photo");
+
+        phonePrimaryString = getIntent().getStringExtra("phone_primary");
+        phoneSecondaryString = getIntent().getStringExtra("phone_secondary");
+        stateEditTextString = getIntent().getStringExtra("state");
+        cityEditTextString = getIntent().getStringExtra("city");
+
+        insuranceCarrierEditTextString = getIntent().getStringExtra("insurance_carrier");
+        patientAgeString = getIntent().getStringExtra("dob");
+        emergencyContactString = getIntent().getStringExtra("emergency_contact");
+
+        patientName.setText(patientNameString);
+        String years = Helpers.calculateAge(patientAgeString);
+        patientAge.setText(years +" " + "years");
+        Helpers.getBitMap(circleImageViewString, circleImageView);
+
+        emergencyContact.setText(emergencyContactString);
+        docId.setText(docIdString);
+        birthDate.setText(patientAgeString);
+        patientAddress.setText(patientAddressString);
+
+        stateEditText.setText(stateEditTextString);
+        cityEditText.setText(cityEditTextString);
+        insuranceCarrierEditText.setText(insuranceCarrierEditTextString);
+        phonePrimary.setText(phonePrimaryString);
+        phoneSecondary.setText(phoneSecondaryString);
+
+        docId.setEnabled(false);
+        birthDate.setEnabled(false);
+        patientAddress.setEnabled(false);
+        stateEditText.setEnabled(false);
+        cityEditText.setEnabled(false);
+        phonePrimary.setEnabled(false);
+        phoneSecondary.setEnabled(false);
+        emergencyContact.setEnabled(false);
+        insuranceCarrierEditText.setEnabled(false);
+
+
         patientName.setTypeface(AppGlobals.typefaceNormal);
         patientAge.setTypeface(AppGlobals.typefaceNormal);
         appointmentButton.setTypeface(AppGlobals.typefaceNormal);
+        phonePrimary.setTypeface(AppGlobals.typefaceNormal);
+        phoneSecondary.setTypeface(AppGlobals.typefaceNormal);
+        emergencyContact.setTypeface(AppGlobals.typefaceNormal);
+        insuranceCarrierEditText.setTypeface(AppGlobals.typefaceNormal);
+        cityEditText.setTypeface(AppGlobals.typefaceNormal);
+        stateEditText.setTypeface(AppGlobals.typefaceNormal);
+        patientAddress.setTypeface(AppGlobals.typefaceNormal);
+        birthDate.setTypeface(AppGlobals.typefaceNormal);
+        docId.setTypeface(AppGlobals.typefaceNormal);
+
+
         appointmentButton.setOnClickListener(this);
-        docId = (EditText) findViewById(R.id.doc_id);
-        birthDate = (EditText) findViewById(R.id.birth_date);
-        patientAddress = (EditText) findViewById(R.id.patient_address);
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
     }
@@ -79,7 +164,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CALL_PHONE},
                             AppGlobals.CALL_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phonePrimaryString));
                     startActivity(intent);
                 }
 
@@ -98,7 +183,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
             case AppGlobals.CALL_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "03120676767"));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phonePrimaryString));
                     if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
