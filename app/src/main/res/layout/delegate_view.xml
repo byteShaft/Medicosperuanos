@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/id_text_view"
@@ -15,13 +14,14 @@
         android:textColor="@android:color/black" />
 
     <TextView
-        android:id="@+id/diagnostic_list_text_view"
+        android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:layout_marginTop="5dp"
         android:layout_marginLeft="15dp"
         android:layout_toRightOf="@+id/id_text_view"
-        android:text="Diagnostic List"
+        android:text="Diagonistics"
         android:textColor="@android:color/black" />
+
 </RelativeLayout>

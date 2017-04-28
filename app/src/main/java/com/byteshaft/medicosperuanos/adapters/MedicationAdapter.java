@@ -3,27 +3,29 @@ package com.byteshaft.medicosperuanos.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
-import com.byteshaft.medicosperuanos.gettersetter.Cities;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 
 import java.util.ArrayList;
 
-public class DiagnosticMedicationAdapter extends ArrayAdapter {
+/**
+ * Created by s9iper1 on 4/28/17.
+ */
+
+public class MedicationAdapter extends ArrayAdapter {
 
     private ViewHolder viewHolder;
     private ArrayList<DiagnosticMedication> diagnosticMedications;
     private Activity activity;
 
-    public DiagnosticMedicationAdapter(Context context, Activity activity , ArrayList<DiagnosticMedication> diagnosticMedications) {
-        super(context, R.layout.delegate_diagnostic_medication);
+    public MedicationAdapter(Context context, Activity activity , ArrayList<DiagnosticMedication> diagnosticMedications) {
+        super(context, R.layout.delegate_diagnostic);
         this.activity = activity;
         this.diagnosticMedications = diagnosticMedications;
     }
@@ -32,10 +34,11 @@ public class DiagnosticMedicationAdapter extends ArrayAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = activity.getLayoutInflater().inflate(R.layout.delegate_diagnostic_medication, parent, false);
+            convertView = activity.getLayoutInflater().inflate(R.layout.delegate_medication, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.idTextView = (TextView) convertView.findViewById(R.id.id_text_view);
             viewHolder.diagnosticListTextView = (TextView) convertView.findViewById(R.id.diagnostic_list_text_view);
+            viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.check_box);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -63,5 +66,6 @@ public class DiagnosticMedicationAdapter extends ArrayAdapter {
     public class ViewHolder {
         TextView idTextView;
         TextView diagnosticListTextView;
+        CheckBox checkBox;
     }
 }

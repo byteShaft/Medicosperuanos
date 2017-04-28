@@ -350,6 +350,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                         if (DoctorBookingActivity.getInstance() != null) {
                                             DoctorBookingActivity.getInstance().finish();
                                             DoctorDetailsActivity.getInstance().finish();
+                                            finish();
                                         } else {
                                             finish();
                                         }

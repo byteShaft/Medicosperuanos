@@ -23,7 +23,8 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.byteshaft.medicosperuanos.R;
-import com.byteshaft.medicosperuanos.gettersetter.Agenda;
+import com.byteshaft.medicosperuanos.gettersetter.*;
+import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.patients.DoctorsAppointment;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
@@ -39,6 +40,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -53,21 +55,28 @@ public class Appointments extends Fragment implements
     private HttpRequest request;
     private ArrayList<Agenda> agendaArrayList;
     private Adapter arrayAdapter;
+    public HashMap<Integer, ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services>> patientServices;
+    private static Appointments sInstance;
+
+    public static Appointments getInstance() {
+        return sInstance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.appointments, container, false);
+        sInstance = this;
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.appointments));
         mListView = (SwipeMenuListView) mBaseView.findViewById(R.id.listView);
         HashSet<Date> events = new HashSet<>();
+        patientServices = new HashMap<>();
         events.add(new Date());
         com.byteshaft.medicosperuanos.uihelpers.CalendarView calendarView = (
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
         calendarView.updateCalendar(events);
         TextView dateTextview = (TextView) calendarView.findViewById(R.id.calendar_date_display);
-        Log.i("TAG", dateTextview.getText().toString());
         dateTextview.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
         Helpers.showProgressDialog(getActivity(), "Please wait...");
@@ -134,6 +143,7 @@ public class Appointments extends Fragment implements
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Agenda agenda = agendaArrayList.get(i);
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
+                intent.putExtra("id", agenda.getDoctorId());
                 intent.putExtra("reason", agenda.getReaseon());
                 intent.putExtra("first_name", agenda.getFirstName());
                 intent.putExtra("last_name", agenda.getLastName());
@@ -207,13 +217,11 @@ public class Appointments extends Fragment implements
                     case 0:
                         String rejected = "rejected";
                         updateAppointmentStatus(rejected, agenda.getAgendaId(), position);
-                        Log.i("TAG", "Rejected");
                         return true;
                     // tick
                     case 1:
                         String accepted = "accepted";
                         updateAppointmentStatus(accepted, agenda.getAgendaId(), position);
-                        Log.i("TAG", "Accepted");
                         return true;
                     default:
                         return false;
@@ -243,7 +251,6 @@ public class Appointments extends Fragment implements
                                 JSONObject patientDetailsObject = agendaObject.getJSONObject("patient");
 
                                 /// getting patient details
-                                Log.i("PatientDetails", patientDetailsObject.toString());
 
                                 Agenda agenda = new Agenda();
                                 agenda.setFirstName(patientDetailsObject.getString("first_name"));
@@ -253,7 +260,6 @@ public class Appointments extends Fragment implements
                                         "http://localhost", AppGlobals.SERVER_IP));
                                 agenda.setAvailAbleForChat(
                                         patientDetailsObject.getBoolean("available_to_chat"));
-                                //// -------- /////////
 
                                 agenda.setCreatedAt(agendaObject.getString("created_at"));
                                 agenda.setDate(agendaObject.getString("date"));
@@ -261,8 +267,22 @@ public class Appointments extends Fragment implements
                                 agenda.setReaseon(agendaObject.getString("reason"));
                                 JSONObject doctorJsonObject = agendaObject.getJSONObject("doctor");
                                 agenda.setDoctorId(doctorJsonObject.getInt("id"));
+
                                 agenda.setAgendaId(agendaObject.getInt("id"));
                                 agenda.setStartTIme(agendaObject.getString("start_time"));
+                                JSONArray services = agendaObject.getJSONArray("services");
+                                ArrayList<Services> servicesArrayList = new ArrayList<>();
+                                for (int k = 0; k < services.length(); k++) {
+                                    JSONObject serviceObject = services.getJSONObject(k);
+                                    Services service = new Services();
+                                    service.setId(serviceObject.getInt("id"));
+                                    service.setPrice(String.valueOf(serviceObject.getInt("price")));
+                                    service.setDescription(serviceObject.getString("description"));
+                                    JSONObject serviceMainObject = serviceObject.getJSONObject("service");
+                                    service.setServiceName(serviceMainObject.getString("name"));
+                                    servicesArrayList.add(service);
+                                }
+                                patientServices.put(doctorJsonObject.getInt("id"), servicesArrayList);
                                 agendaArrayList.add(agenda);
                                 if (arrayAdapter == null) {
                                     arrayAdapter = new Adapter(getActivity(), agendaArrayList);
@@ -270,7 +290,7 @@ public class Appointments extends Fragment implements
                                 } else {
                                     arrayAdapter.notifyDataSetChanged();
                                 }
-                                Log.i("TagONE ", agendaObject.toString());
+
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -326,7 +346,6 @@ public class Appointments extends Fragment implements
             }
             // setting values
             Agenda agenda = agendaArrayList.get(position);
-            System.out.println("Photo Url: " + agenda.getPhotoUrl());
             Helpers.getBitMap(String.format(AppGlobals.SERVER_IP + "%s", agenda.getPhotoUrl()), viewHolder.patientImage);
 
             if (agenda.isAvailAbleForChat()) {
