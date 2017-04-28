@@ -351,7 +351,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
                         break;
-                    case HttpRequest.STATE_DONE:
                     case HttpURLConnection.HTTP_CREATED:
                         Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.appointment_created));
                         new android.os.Handler().postDelayed(new Runnable() {
@@ -360,6 +359,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                 if (DoctorBookingActivity.getInstance() != null) {
                                     DoctorBookingActivity.getInstance().finish();
                                     DoctorDetailsActivity.getInstance().finish();
+                                    finish();
                                 } else {
                                     finish();
                                 }
@@ -405,7 +405,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                     dismiss();
                     amount = 0;
                     for (Map.Entry<Integer, Integer> entry : selectedServicesArrayList.entrySet()) {
-//                        System.out.println(entry.getKey() + "/" + entry.getValue());
                         for (Services services : arrayList) {
                             if (entry.getValue() == services.getServiceId()) {
                                 amount = amount + Integer.valueOf(services.getServicePrice());

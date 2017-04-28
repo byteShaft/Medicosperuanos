@@ -1,5 +1,7 @@
 package com.byteshaft.medicosperuanos.gettersetter;
 
+import com.akexorcist.googledirection.model.Step;
+
 /**
  * Created by husnain on 4/4/17.
  */
@@ -12,7 +14,72 @@ public class MyPatients {
     private String patientAge;
     private String patientLocation;
     private String patientPhoneNumber;
+    private String patientFirstName;
+    private String patientLastName;
+    private String patientPhoneNumberSecondary;
+    private String patientSate;
+    private String patientCity;
     private int patientId;
+    private String patientAddress;
+    private String patientInsuranceCarrier;
+    private String patientEmergencyContact;
+    private String patientIdentityDocument;
+
+    public String getPatientPhoneNumberSecondary() {
+        return patientPhoneNumberSecondary;
+    }
+
+    public void setPatientPhoneNumberSecondary(String patientPhoneNumberSecondary) {
+        this.patientPhoneNumberSecondary = patientPhoneNumberSecondary;
+    }
+
+    public String getPatientSate() {
+        return patientSate;
+    }
+
+    public void setPatientSate(String patientSate) {
+        this.patientSate = patientSate;
+    }
+
+    public String getPatientCity() {
+        return patientCity;
+    }
+
+    public void setPatientCity(String patientCity) {
+        this.patientCity = patientCity;
+    }
+
+    public String getPatientAddress() {
+        return patientAddress;
+    }
+
+    public void setPatientAddress(String patientAddress) {
+        this.patientAddress = patientAddress;
+    }
+
+    public String getPatientInsuranceCarrier() {
+        return patientInsuranceCarrier;
+    }
+
+    public void setPatientInsuranceCarrier(String patientInsuranceCarrier) {
+        this.patientInsuranceCarrier = patientInsuranceCarrier;
+    }
+
+    public String getPatientEmergencyContact() {
+        return patientEmergencyContact;
+    }
+
+    public void setPatientEmergencyContact(String patientEmergencyContact) {
+        this.patientEmergencyContact = patientEmergencyContact;
+    }
+
+    public String getPatientIdentityDocument() {
+        return patientIdentityDocument;
+    }
+
+    public void setPatientIdentityDocument(String patientIdentityDocument) {
+        this.patientIdentityDocument = patientIdentityDocument;
+    }
 
     public boolean isChatStatus() {
         return chatStatus;
@@ -33,9 +100,6 @@ public class MyPatients {
     public void setPatientLastName(String patientLastName) {
         this.patientLastName = patientLastName;
     }
-
-    private String patientFirstName;
-    private String patientLastName;
 
     public String getPatientsName() {
         return patientsName;

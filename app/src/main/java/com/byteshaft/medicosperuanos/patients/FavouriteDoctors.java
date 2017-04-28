@@ -408,8 +408,10 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                     for (int k = 0; k < timeJSONArray.length(); k++) {
                                         JSONObject timeJsonObject = timeJSONArray.getJSONObject(k);
                                         TimeSlots timeSlots = new TimeSlots();
-                                        timeSlots.setEndTime(timeJsonObject.getString("end_time"));
-                                        timeSlots.setStartTime(timeJsonObject.getString("start_time"));
+                                        timeSlots.setEndTime(Helpers.getFormattedTime(
+                                                timeJsonObject.getString("end_time")));
+                                        timeSlots.setStartTime(Helpers.getFormattedTime(
+                                                timeJsonObject.getString("start_time")));
                                         timeSlots.setTaken(timeJsonObject.getBoolean("taken"));
                                         timeSlots.setSlotId(timeJsonObject.getInt("id"));
                                         arrayList.add(timeSlots);

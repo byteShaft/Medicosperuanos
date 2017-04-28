@@ -66,6 +66,12 @@
             </RelativeLayout>
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/checkbox_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
         <TextView
             android:id="@+id/request_text_view"
             android:layout_width="wrap_content"
@@ -74,19 +80,7 @@
             android:text="Requested services"
             android:textSize="15sp" />
 
-        <CheckBox
-            android:id="@+id/services_check_box_one"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="Services" />
-
-        <CheckBox
-            android:id="@+id/services_check_box_two"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="Services" />
+        </LinearLayout>
 
 
         <android.support.design.widget.TextInputLayout
@@ -130,7 +124,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".6">
 
-                <TextView
+                <Spinner
                     android:id="@+id/diagnostics_TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -144,17 +138,18 @@
                     android:id="@+id/diagnostics_spinner_view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginRight="20dp"
                     android:layout_below="@+id/diagnostics_TextView"
                     android:background="#000" />
 
-                <Button
-                    android:id="@+id/minus_button_diagnostics"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_below="@+id/diagnostics_spinner_view"
-                    android:layout_marginTop="7dp"
-                    android:background="@mipmap/ic_min" />
+                <!--<Button-->
+                    <!--android:id="@+id/minus_button_diagnostics"-->
+                    <!--android:layout_width="15dp"-->
+                    <!--android:layout_height="15dp"-->
+                    <!--android:layout_below="@+id/diagnostics_spinner_view"-->
+                    <!--android:layout_marginTop="7dp"-->
+                    <!--android:background="@mipmap/ic_min" />-->
 
             </RelativeLayout>
 
@@ -185,11 +180,11 @@
 
             <RelativeLayout
                 android:id="@+id/medication_spinner_layout"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight=".72">
 
-                <TextView
+                <Spinner
                     android:id="@+id/medication_TextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -201,17 +196,18 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
                     android:layout_below="@+id/medication_TextView"
                     android:layout_marginRight="10dp"
                     android:background="#000" />
 
-                <Button
-                    android:id="@+id/minus_button_medication"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_below="@+id/medication_TextView"
-                    android:layout_marginTop="5dp"
-                    android:background="@mipmap/ic_min"/>
+                <!--<Button-->
+                    <!--android:id="@+id/minus_button_medication"-->
+                    <!--android:layout_width="15dp"-->
+                    <!--android:layout_height="15dp"-->
+                    <!--android:layout_below="@+id/medication_TextView"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:background="@mipmap/ic_min"/>-->
 
             </RelativeLayout>
 
