@@ -456,7 +456,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                     View checkBoxView = listView.getChildAt(pos);
 
                     if (checkBoxView != null) {
-                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
                         if (b) {
                             if (selectedServicesArrayList.size() < 5) {
                                 selectedServicesArrayList.put(position, services.getServiceId());
