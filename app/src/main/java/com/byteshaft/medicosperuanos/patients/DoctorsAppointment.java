@@ -33,7 +33,6 @@ import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
-import com.byteshaft.medicosperuanos.doctors.Appointments;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
@@ -59,8 +58,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener {
 
-    private Spinner mDiagnosticsTextView;
-    private Spinner mMedicationTextView;
+    private Spinner mDiagnosticsSpinner;
+    private Spinner mMedicationSpinner;
     private Spinner mDestinationSpinner;
 
     private EditText mDateEditText;
@@ -108,7 +107,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private int id = -1;
     private ArrayList<DiagnosticMedication> searchListForDiagnostics;
     private ArrayList<DiagnosticMedication> searchListForMedications;
-    private DiagnosticSpinnerAdapter diagonisticSpinnerAdapter;
+    private DiagnosticSpinnerAdapter diagnosticSpinnerAdapter;
+    private MedicationSpinnerAdapter medicationSpinnerAdapter;
+
+    private TextView quantityTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +128,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         diagnosticsList = new ArrayList<>();
         medicationList = new ArrayList<>();
@@ -138,8 +141,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
         mAppointmentReason = (EditText) findViewById(R.id.appointment_reason_editText);
-        mDiagnosticsTextView = (Spinner) findViewById(R.id.diagnostics_TextView);
-        mMedicationTextView = (Spinner) findViewById(R.id.medication_TextView);
+        mDiagnosticsSpinner = (Spinner) findViewById(R.id.diagnostics_spinner);
+        mMedicationSpinner = (Spinner) findViewById(R.id.medication_spinner);
         mDestinationSpinner = (Spinner) findViewById(R.id.destination_spinner);
 
         mDateEditText = (EditText) findViewById(R.id.date_edit_text);
@@ -152,8 +155,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mPlusButtonDiagnostics = (Button) findViewById(R.id.plus_button_diagnostics);
         mPlusButtonMedication = (Button) findViewById(R.id.plus_button_medication);
         checkBoxLayout = (LinearLayout) findViewById(R.id.checkbox_layout);
+        quantityTextView = (TextView) findViewById(R.id.qty_textview);
         int counter = 0;
-        for (Services services : Appointments.getInstance().patientServices.get(id)) {
+        for (Services services : arrayList) {
+            Log.i("TAG", "services");
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(services.getServiceName());
             checkBox.setTextSize(16);
@@ -174,9 +179,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         backPress.setOnClickListener(this);
         mReturnDateEditText.setOnClickListener(this);
-//        mDiagnosticsTextView.setOnClickListener(this);
+//        mDiagnosticsSpinner.setOnClickListener(this);
         mDestinationSpinner.setOnItemSelectedListener(this);
-//        mMedicationTextView.setOnClickListener(this);
+//        mMedicationSpinner.setOnClickListener(this);
 
         mPlusButtonDiagnostics.setOnClickListener(this);
         mPlusButtonMedication.setOnClickListener(this);
@@ -209,7 +214,23 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
                     }
                 }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
-        diagonisticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+        diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+        mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
+        medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
+        mMedicationSpinner.setAdapter(medicationSpinnerAdapter);
+
+        mMedicationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                DiagnosticMedication diagnosticMedication = selectedMedicationList.get(i);
+                quantityTextView.setText(String.valueOf(diagnosticMedication.getQuantity()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
     }
 
@@ -261,9 +282,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case R.id.plus_button_medication:
                 medicationDiagnosticsDialog(false);
                 break;
-            case R.id.medication_TextView:
+            case R.id.medication_spinner:
                 break;
-            case R.id.diagnostics_TextView:
+            case R.id.diagnostics_spinner:
                 break;
         }
     }
@@ -384,30 +405,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         if (value) {
             diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(), diagnosticsList);
             medicationDiagnosticListView.setAdapter(diagnosticAdapter);
-            medicationDiagnosticListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DiagnosticMedication diagnosticMedication = medicationList.get(position);
-//                if (mMedicationArrayList.contains(diagnosticMedication))
-//                mMedicationArrayList.add(diagnosticMedication);
-                }
-            });
         } else {
             medicationAdapter = new MedicationAdapter(getApplicationContext(), medicationList);
             medicationDiagnosticListView.setAdapter(medicationAdapter);
-            medicationDiagnosticListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (value) {
-                        DiagnosticMedication diagnosticMedication = diagnosticsList.get(position);
-//                if (mMedicationArrayList.contains(diagnosticMedication))
-//                mMedicationArrayList.add(diagnosticMedication);
-                    } else {
-
-                    }
-
-                }
-            });
         }
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -484,6 +484,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+                medicationSpinnerAdapter.notifyDataSetChanged();
+                diagnosticSpinnerAdapter.notifyDataSetChanged();
+                mDiagnosticsSpinner.setSelection(0);
+                mMedicationSpinner.setSelection(0);
             }
         });
         dialog.show();
@@ -655,6 +659,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.check_box);
                viewHolder.idTextView.setTypeface(AppGlobals.typefaceNormal);
                viewHolder.diagnosticListTextView.setTypeface(AppGlobals.typefaceNormal);
+               viewHolder.minus = (ImageButton) convertView.findViewById(R.id.minus);
+               viewHolder.quantity = (TextView) convertView.findViewById(R.id.quantity);
+               viewHolder.add = (ImageButton) convertView.findViewById(R.id.plus);
                convertView.setTag(viewHolder);
                viewHolder.checkBox.setTag(position);
            } else {
@@ -668,6 +675,25 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
            } else {
                viewHolder.checkBox.setChecked(false);
            }
+           viewHolder.quantity.setText(String.valueOf(diagnostic.getQuantity()));
+           viewHolder.add.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   Log.i("TAG", "click");
+                   diagnostic.setQuantity(diagnostic.getQuantity()+1);
+                   notifyDataSetChanged();
+               }
+           });
+           viewHolder.minus.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   if (diagnostic.getQuantity() > 0) {
+                       diagnostic.setQuantity(diagnostic.getQuantity() - 1);
+                       notifyDataSetChanged();
+                   }
+
+               }
+           });
            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                @Override
                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -706,6 +732,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
            TextView idTextView;
            TextView diagnosticListTextView;
            CheckBox checkBox;
+           ImageButton minus;
+           ImageButton add;
+           TextView quantity;
+
        }
    }
 
@@ -757,12 +787,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
        }
    }
 
-    private class MedicationpinnerAdapter extends BaseAdapter {
+    private class MedicationSpinnerAdapter extends BaseAdapter {
 
         private ViewHolder viewHolder;
         private ArrayList<DiagnosticMedication> diagnosticMedicationArrayList;
 
-        public MedicationpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
+        public MedicationSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
             this.diagnosticMedicationArrayList = diagnosticMedicationArrayList;
         }
 
