@@ -141,6 +141,6 @@
     <string name="no_services">No Service</string>
     <string name="no_services_message">No Service set by this doctor</string>
     <string name="schedule_is_not_set_by_any_of_your_favorite_doctors">Schedule is not set by any of your favorite doctors</string>
-
+    <string name="select_service">Select Service</string>
 </resources>
 

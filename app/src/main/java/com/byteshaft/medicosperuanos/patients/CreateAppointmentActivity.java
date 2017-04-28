@@ -1,6 +1,8 @@
 package com.byteshaft.medicosperuanos.patients;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,15 +15,17 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.DoctorDetailsActivity;
@@ -38,6 +42,7 @@ import org.json.JSONObject;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -46,7 +51,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
 
     private Button mSaveButton;
-    private Spinner serviceListSpinner;
+    private TextView serviceListSpinner;
     private ImageButton callButton;
     private ImageButton chatButton;
     private EditText mAppointmentEditText;
@@ -80,7 +85,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private String appointmentDate;
     private int selectedServiceId;
     private String reason;
+    private ArrayList<Services> arrayList;
+    private HashMap<Integer, Integer> selectedServicesArrayList;
+    private ListView listView;
+    private int amount = 0;
     private static CreateAppointmentActivity sInstance;
+
 
     public static CreateAppointmentActivity getInstance() {
         return sInstance;
@@ -110,7 +120,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         slotTime = getIntent().getStringExtra("time_slot");
         appointmentDate = getIntent().getStringExtra("appointment_date");
         HashMap<Integer, ArrayList<Services>> hashMap = (HashMap<Integer, ArrayList<Services>>) getIntent().getSerializableExtra("services_array");
-        final ArrayList<Services> arrayList = hashMap.get(id);
+        arrayList = hashMap.get(id);
 
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
@@ -118,6 +128,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         dateText.setText(appointmentDate);
         timeText.setText(slotTime);
 
+        serviceListSpinner = (TextView) findViewById(R.id.service_spinner);
         callButton = (ImageButton) findViewById(R.id.btn_call);
         chatButton = (ImageButton) findViewById(R.id.btn_chat);
         mDoctorImage = (CircleImageView) findViewById(R.id.doctor_image);
@@ -142,6 +153,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         chatButton.setOnClickListener(this);
         mSaveButton.setOnClickListener(this);
         favouriteButton.setOnClickListener(this);
+        serviceListSpinner.setOnClickListener(this);
+        selectedServicesArrayList = new HashMap<>();
 
         Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
         if (AppGlobals.isDoctorFavourite) {
@@ -153,26 +166,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         dateText.setText(Helpers.getDate());
         timeText.setText(Helpers.getTime());
 
-        if (arrayList != null && arrayList.size() > 0) {
-            serviceListSpinner = (Spinner) findViewById(R.id.service_spinner);
-            serviceAdapter = new ServiceAdapter(arrayList);
-            serviceListSpinner.setAdapter(serviceAdapter);
-            serviceListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    Services service = arrayList.get(i);
-                    selectedServiceId = service.getServiceId();
-                    priceTotalEditText.setText(service.getServicePrice());
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-                }
-            });
-        } else {
-            Helpers.alertDialog(this, getResources().getString(R.string.no_services),
-                    getResources().getString(R.string.no_services_message), null);
-        }
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
@@ -187,7 +180,13 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
             chatButton.setEnabled(false);
         }
         Helpers.getBitMap(drPhoto, mDoctorImage);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("On resume Called !");
+        priceTotalEditText.setText(String.valueOf(amount));
     }
 
     @Override
@@ -243,38 +242,48 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                     });
                 } else {
                     Helpers.unFavouriteDoctorTask(id, new HttpRequest.OnReadyStateChangeListener() {
-                                @Override
-                                public void onReadyStateChange(HttpRequest request, int readyState) {
-                                    switch (readyState) {
-                                        case HttpRequest.STATE_DONE:
-                                            switch (request.getStatus()) {
-                                                case HttpURLConnection.HTTP_NO_CONTENT:
-                                                    favouriteButton.setEnabled(true);
-                                                    AppGlobals.isDoctorFavourite = false;
-                                                    favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
+                        @Override
+                        public void onReadyStateChange(HttpRequest request, int readyState) {
+                            switch (readyState) {
+                                case HttpRequest.STATE_DONE:
+                                    switch (request.getStatus()) {
+                                        case HttpURLConnection.HTTP_NO_CONTENT:
+                                            favouriteButton.setEnabled(true);
+                                            AppGlobals.isDoctorFavourite = false;
+                                            favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
 
-                                            }
                                     }
+                            }
 
-                                }
-                            }, new HttpRequest.OnErrorListener() {
-                                @Override
-                                public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-                                    favouriteButton.setEnabled(true);
-                                }
-                            });
+                        }
+                    }, new HttpRequest.OnErrorListener() {
+                        @Override
+                        public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                            favouriteButton.setEnabled(true);
+                        }
+                    });
                 }
                 break;
 
             case R.id.button_save:
                 String appointmentReason = mAppointmentEditText.getText().toString();
-                System.out.println(appointmentReason  + "working");
-                if (appointmentReason != null && !appointmentReason.trim().isEmpty()) {
-                    patientsAppointment(appointmentReason, selectedServiceId);
-                } else {
-                    Helpers.showSnackBar(findViewById(android.R.id.content),
-                            getResources().getString(R.string.please_enter_appointment_reason));
+                System.out.println(appointmentReason + "working");
+                if (selectedServicesArrayList.size() < 1) {
+                    Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.select_service));
+                    return;
                 }
+                if (appointmentReason != null && !appointmentReason.trim().isEmpty()) {
+                    patientsAppointment(appointmentReason);
+                } else {
+                    mAppointmentEditText.setError(getResources().getString(R.string.please_enter_appointment_reason));
+//                    Helpers.showSnackBar(findViewById(android.R.id.content),
+//                            getResources().getString(R.string.please_enter_appointment_reason));
+                }
+                break;
+            case R.id.service_spinner:
+                DoctorServicesDialog dialog = new DoctorServicesDialog(CreateAppointmentActivity.this);
+                dialog.setTitle("Select Services");
+                dialog.show();
         }
     }
 
@@ -304,32 +313,33 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         }
     }
 
-    private void patientsAppointment(String appointmentReason, int serviceId) {
+    private void patientsAppointment(String appointmentReason) {
         Helpers.showProgressDialog(this, "Getting appointment");
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.open("POST", String.format("%sdoctors/%s/schedule/%s/get-appointment",
-                AppGlobals.BASE_URL,id,  appointmentId));
+                AppGlobals.BASE_URL, id, appointmentId));
         Log.i("TAG", "id " + appointmentId);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        request.send(getAppointmentData(appointmentReason, serviceId));
-        Log.i("TAG", getAppointmentData(appointmentReason, serviceId));
+        request.send(getAppointmentData(appointmentReason));
+        Log.i("TAG", getAppointmentData(appointmentReason));
     }
 
-    private String getAppointmentData(String appointmentReason, int serviceId) {
+    private String getAppointmentData(String appointmentReason) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("reason", appointmentReason);
             JSONArray jsonArray = new JSONArray();
-            jsonArray.put(serviceId);
+            for (Map.Entry<Integer, Integer> entry : selectedServicesArrayList.entrySet()) {
+                jsonArray.put(entry.getValue());
+            }
             jsonObject.put("services", jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return jsonObject.toString();
-
     }
 
     @Override
@@ -342,22 +352,21 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         Log.i("TAG", "response " + request.getResponseText());
                         break;
                     case HttpRequest.STATE_DONE:
-                            case HttpURLConnection.HTTP_CREATED:
-                                Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.appointment_created));
-                                new android.os.Handler().postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (DoctorBookingActivity.getInstance() != null) {
-                                            DoctorBookingActivity.getInstance().finish();
-                                            DoctorDetailsActivity.getInstance().finish();
-                                        } else {
-                                            finish();
-                                        }
-                                    }
-                                }, 500);
-                                break;
+                    case HttpURLConnection.HTTP_CREATED:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.appointment_created));
+                        new android.os.Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (DoctorBookingActivity.getInstance() != null) {
+                                    DoctorBookingActivity.getInstance().finish();
+                                    DoctorDetailsActivity.getInstance().finish();
+                                } else {
+                                    finish();
+                                }
+                            }
+                        }, 500);
+                        break;
                 }
-
         }
 
     }
@@ -368,10 +377,55 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
     }
 
-    private class ServiceAdapter extends BaseAdapter {
+    private class DoctorServicesDialog extends Dialog implements View.OnClickListener {
+        private Button positiveButton;
+        private Button negativeButton;
+
+        public DoctorServicesDialog(Activity activity) {
+            super(activity);
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.dialog_doctor_services);
+            serviceAdapter = new ServiceAdapter(arrayList);
+            listView = (ListView) findViewById(R.id.doctor_service_list);
+            positiveButton = (Button) findViewById(R.id.positive_button);
+            negativeButton = (Button) findViewById(R.id.negative_button);
+            positiveButton.setOnClickListener(this);
+            negativeButton.setOnClickListener(this);
+            listView.setAdapter(serviceAdapter);
+        }
+
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()) {
+                case R.id.positive_button:
+                    dismiss();
+                    amount = 0;
+                    for (Map.Entry<Integer, Integer> entry : selectedServicesArrayList.entrySet()) {
+//                        System.out.println(entry.getKey() + "/" + entry.getValue());
+                        for (Services services : arrayList) {
+                            if (entry.getValue() == services.getServiceId()) {
+                                amount = amount + Integer.valueOf(services.getServicePrice());
+                            }
+                        }
+                    }
+                    priceTotalEditText.setText(String.valueOf(amount));
+                    break;
+                case R.id.negative_button:
+                    dismiss();
+                    break;
+            }
+        }
+    }
+
+
+    public class ServiceAdapter extends BaseAdapter {
 
         private ArrayList<Services> arrayList;
-        private ViewHolder viewHolder;
+        private ServiceViewHolder viewHolder;
 
         public ServiceAdapter(ArrayList<Services> arrayList) {
             super();
@@ -379,18 +433,50 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.service_delegate, parent, false);
-                viewHolder = new ViewHolder();
+                viewHolder = new ServiceViewHolder();
                 viewHolder.serviceName = (TextView) convertView.findViewById(R.id.service_name);
+                viewHolder.servicePrice = (TextView) convertView.findViewById(R.id.doc_service_price);
+                viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.checkbox_doc_service);
                 convertView.setTag(viewHolder);
+                viewHolder.checkBox.setTag(position);
             } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+                viewHolder = (ServiceViewHolder) convertView.getTag();
             }
-            Services services = arrayList.get(position);
+            final Services services = arrayList.get(position);
             Log.i("TAG", "service id " + services.getServiceId());
             viewHolder.serviceName.setText(services.getServiceName());
+            viewHolder.servicePrice.setText(services.getServicePrice());
+            final View finalConvertView = convertView;
+            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    int pos = (int) viewHolder.checkBox.getTag();
+                    View checkBoxView = listView.getChildAt(pos);
+
+                    if (checkBoxView != null) {
+                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
+                        if (b) {
+                            if (selectedServicesArrayList.size() < 5) {
+                                selectedServicesArrayList.put(position, services.getServiceId());
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Max limit is 4", Toast.LENGTH_SHORT).show();
+                                compoundButton.setChecked(false);
+
+                            }
+                        } else {
+                            selectedServicesArrayList.remove(position);
+                        }
+                    }
+                }
+            });
+            if (selectedServicesArrayList.containsKey(position)) {
+                viewHolder.checkBox.setChecked(true);
+            } else {
+                viewHolder.checkBox.setChecked(false);
+            }
             return convertView;
         }
 
@@ -409,7 +495,11 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
             return 0;
         }
     }
-    private class ViewHolder {
+
+    public class ServiceViewHolder {
         TextView serviceName;
+        TextView servicePrice;
+        CheckBox checkBox;
     }
+
 }
