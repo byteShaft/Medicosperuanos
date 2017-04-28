@@ -106,8 +106,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private MedicationAdapter medicationAdapter;
     private LinearLayout checkBoxLayout;
     private int id = -1;
-    private ArrayList<DiagnosticMedication> searchListForDiagonistics;
+    private ArrayList<DiagnosticMedication> searchListForDiagnostics;
     private ArrayList<DiagnosticMedication> searchListForMedications;
+    private DiagnosticSpinnerAdapter diagonisticSpinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,6 +209,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
                     }
                 }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
+        diagonisticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+
     }
 
     @Override
@@ -417,21 +420,21 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Log.i("TAG", charSequence.toString());
                 if (value) {
                     if (!charSequence.toString().isEmpty()) {
-                        searchListForDiagonistics = new ArrayList<>();
+                        searchListForDiagnostics = new ArrayList<>();
                         diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(),
-                                searchListForDiagonistics);
+                                searchListForDiagnostics);
                         medicationDiagnosticListView.setAdapter(diagnosticAdapter);
                         for (DiagnosticMedication diagnosticMedication : diagnosticsList) {
                             if (StringUtils.containsIgnoreCase(diagnosticMedication.getDiagnosticMedication(),
                                     charSequence.toString()) || StringUtils.containsIgnoreCase(String.valueOf(diagnosticMedication.getId()),
                                     charSequence.toString()) ) {
-                                searchListForDiagonistics.add(diagnosticMedication);
+                                searchListForDiagnostics.add(diagnosticMedication);
                                 diagnosticAdapter.notifyDataSetChanged();
 
                             }
                         }
                     } else {
-                        searchListForDiagonistics = new ArrayList<>();
+                        searchListForDiagnostics = new ArrayList<>();
                         diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(),
                                 diagnosticsList);
                         medicationDiagnosticListView.setAdapter(diagnosticAdapter);
@@ -706,12 +709,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
        }
    }
 
-   private class DiagonisticSpinnerAdapter extends BaseAdapter {
+   private class DiagnosticSpinnerAdapter extends BaseAdapter {
 
        private ViewHolder viewHolder;
        private ArrayList<DiagnosticMedication> diagnosticMedicationArrayList;
 
-       public DiagonisticSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
+       public DiagnosticSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
            this.diagnosticMedicationArrayList = diagnosticMedicationArrayList;
        }
 
@@ -733,18 +736,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
        @Override
        public View getView(int i, View view, ViewGroup viewGroup) {
            if (view == null) {
-               view = getLayoutInflater().inflate(R.layout.delegate_view, viewGroup, false);
+               view = getLayoutInflater().inflate(R.layout.delegate_view_diagonistics, viewGroup, false);
                viewHolder = new ViewHolder();
                viewHolder.id = (TextView) view.findViewById(R.id.id_text_view);
                viewHolder.textView = (TextView) view.findViewById(R.id.text);
                view.setTag(viewHolder);
            } else {
                viewHolder = (ViewHolder) view.getTag();
-               DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
-               viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
-               viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
            }
-
+           DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
+           viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
+           viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
            return view;
        }
 
@@ -754,4 +756,52 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
        }
    }
+
+    private class MedicationpinnerAdapter extends BaseAdapter {
+
+        private ViewHolder viewHolder;
+        private ArrayList<DiagnosticMedication> diagnosticMedicationArrayList;
+
+        public MedicationpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
+            this.diagnosticMedicationArrayList = diagnosticMedicationArrayList;
+        }
+
+        @Override
+        public int getCount() {
+            return diagnosticMedicationArrayList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            if (view == null) {
+                view = getLayoutInflater().inflate(R.layout.delegate_view_medication, viewGroup, false);
+                viewHolder = new ViewHolder();
+                viewHolder.id = (TextView) view.findViewById(R.id.id_text_view);
+                viewHolder.textView = (TextView) view.findViewById(R.id.text);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
+            viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
+            viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
+            return view;
+        }
+
+        private class ViewHolder {
+            TextView id;
+            TextView textView;
+
+        }
+    }
 }
