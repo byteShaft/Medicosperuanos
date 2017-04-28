@@ -1,0 +1,37 @@
+{
+  "project_info": {
+    "project_number": "245879769579",
+    "firebase_url": "https://projectdoctor-159511.firebaseio.com",
+    "project_id": "projectdoctor-159511",
+    "storage_bucket": "projectdoctor-159511.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245879769579:android:b9b546571616ac66",
+        "android_client_info": {
+          "package_name": "com.byteshaft.medicosperuanos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzvEWmdTftIt4kBEmW6pOkOwuFfzeLUOA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
