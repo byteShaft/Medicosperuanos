@@ -20,7 +20,7 @@
             android:padding="15dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/patient_image_"
+                android:id="@+id/patient_image"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerHorizontal="true"
@@ -30,7 +30,7 @@
                 android:id="@+id/patient_name_"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/patient_image_"
+                android:layout_below="@+id/patient_image"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="2dp"
                 android:text="Anne Miller"
@@ -54,7 +54,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentEnd="true"
-                android:layout_below="@+id/patient_image_"
+                android:layout_below="@+id/patient_image"
                 android:layout_marginRight="10dp"
                 android:background="@mipmap/ic_chat"
                 android:theme="@style/MyButton" />
@@ -65,7 +65,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_alignParentStart="true"
-                android:layout_below="@+id/patient_image_"
+                android:layout_below="@+id/patient_image"
                 android:layout_marginLeft="10dp"
                 android:background="@mipmap/ic_call"
                 android:theme="@style/MyButton" />
@@ -104,18 +104,19 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="DocID" />
-
-                <EditText
-                    android:id="@+id/doc_id"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:text="12121212" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
 
+                    <EditText
+                        android:id="@+id/doc_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="DocID"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
 
 
@@ -127,17 +128,19 @@
                 android:orientation="vertical">
 
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Birth Date" />
-
-                <EditText
-                    android:id="@+id/birth_date"
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:text="12121212" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/birth_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Birth Date"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -147,20 +150,22 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/layout_one"
             android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
             android:orientation="vertical">
 
-            <TextView
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Address" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
 
-            <EditText
-                android:id="@+id/patient_address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:editable="false"
-                android:text="Some Address" />
+                <EditText
+                    android:id="@+id/patient_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Address"
+                    android:textSize="15sp" />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -180,21 +185,33 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="State" />
-
-                <Spinner
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:text="12121212" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
 
-                <EditText
+                    <EditText
+                        android:id="@+id/state_Edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="State"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Phone-1" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/Phone_primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/phone_1"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
 
             </LinearLayout>
 
@@ -207,22 +224,34 @@
                 android:orientation="vertical">
 
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="City" />
-
-                <Spinner
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:editable="false"
-                    android:text="12121212" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/city_Edit_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="City"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
 
 
-                <EditText
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Phone-2" />
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        android:id="@+id/Phone_secondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/phone_2"
+                        android:textSize="15sp" />
+                </android.support.design.widget.TextInputLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -234,22 +263,33 @@
             android:layout_marginRight="20dp"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/emergency_contact_"
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Emergency Contact" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
 
-            <TextView
-                android:id="@+id/tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Insurance carrier" />
+                <EditText
+                    android:id="@+id/emergency_contact_"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/emergency_contact"
+                    android:textSize="15sp" />
+            </android.support.design.widget.TextInputLayout>
 
-            <EditText
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Insurance carrier-1" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp">
+
+                <EditText
+                    android:id="@+id/insurance_carrier"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Insurance Carrier"
+                    android:textSize="15sp" />
+            </android.support.design.widget.TextInputLayout>
         </LinearLayout>
     </RelativeLayout>
 
