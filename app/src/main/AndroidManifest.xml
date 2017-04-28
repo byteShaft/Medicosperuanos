@@ -83,7 +83,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".patients.DoctorsAppointment"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".patients.PatientsRecentHistory"
             android:windowSoftInputMode="adjustResize" />
@@ -95,7 +95,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".patients.CreateAppointmentActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".messages.ConversationActivity"
             android:windowSoftInputMode="adjustResize" />

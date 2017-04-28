@@ -6,5 +6,6 @@
     android:padding="15dp"
     android:maxLines="1"
     android:textSize="14sp"
+    android:textAlignment="center"
     android:background="@drawable/normal_time_slot"
     xmlns:android="http://schemas.android.com/apk/res/android" />
