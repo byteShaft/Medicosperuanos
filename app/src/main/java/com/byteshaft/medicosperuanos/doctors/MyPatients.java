@@ -133,7 +133,7 @@ public class MyPatients extends Fragment {
                         if (StringUtils.containsIgnoreCase(myPatient.getPatientsName(),
                                 s.toString()) ||
                                 StringUtils.containsIgnoreCase(myPatient.getPatientLastName(),
-                                s.toString())) {
+                                        s.toString())) {
                             searchList.add(myPatient);
                             customAdapter.notifyDataSetChanged();
 
@@ -190,7 +190,20 @@ public class MyPatients extends Fragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startActivity(new Intent(getActivity().getApplicationContext(), PatientDetails.class));
+                com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients = myPatientsList.get(i);
+                Intent intent = new Intent(getActivity(), PatientDetails.class);
+                intent.putExtra("identity_document", myPatients.getPatientIdentityDocument());
+                intent.putExtra("dob", myPatients.getPatientAge());
+                intent.putExtra("address", myPatients.getPatientAddress());
+                intent.putExtra("state", myPatients.getPatientSate());
+                intent.putExtra("city", myPatients.getPatientCity());
+                intent.putExtra("phone_primary", myPatients.getPatientPhoneNumber());
+                intent.putExtra("phone_secondary", myPatients.getPatientPhoneNumberSecondary());
+                intent.putExtra("photo", myPatients.getPatientImage());
+                intent.putExtra("name", myPatients.getPatientsName());
+                intent.putExtra("emergency_contact", myPatients.getPatientEmergencyContact());
+                intent.putExtra("insurance_carrier", myPatients.getPatientInsuranceCarrier());
+                startActivity(intent);
             }
         });
         return mBaseView;
@@ -256,8 +269,8 @@ public class MyPatients extends Fragment {
             }
             final com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients = myPatientsList.get(position);
             String years = Helpers.calculateAge(myPatients.getPatientAge());
-            viewHolder.name.setText(myPatients.getPatientsName() + " " +
-                    "-" + " " + "(" +  years +"a)");
+            viewHolder.name.setText(myPatients.getPatientsName() + "" +
+                    "-" + "" + "(" + years + "a)");
             String[] startLocation = myPatients.getPatientLocation().split(",");
             String[] endLocation = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION).split(",");
             viewHolder.distance.setText(" " + String.valueOf(calculationByDistance(new LatLng(Double.parseDouble(startLocation[0]),
@@ -319,13 +332,27 @@ public class MyPatients extends Fragment {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients =
                                                 new com.byteshaft.medicosperuanos.gettersetter.MyPatients();
+
+                                        JSONObject insuranceCarrier = jsonObject.getJSONObject("insurance_carrier");
+                                        myPatients.setPatientInsuranceCarrier((insuranceCarrier.getString("name")));
+
+                                        JSONObject state = jsonObject.getJSONObject("state");
+                                        myPatients.setPatientSate((state.getString("name")));
+
+                                        JSONObject city = jsonObject.getJSONObject("city");
+                                        myPatients.setPatientCity((city.getString("name")));
+
                                         myPatients.setPatientId(jsonObject.getInt("id"));
+                                        myPatients.setPatientAddress(jsonObject.getString("address"));
+                                        myPatients.setPatientEmergencyContact(jsonObject.getString("emergency_contact"));
+                                        myPatients.setPatientIdentityDocument(jsonObject.getString("identity_document"));
                                         myPatients.setPatientFirstName(jsonObject.getString("first_name"));
                                         myPatients.setPatientLastName(jsonObject.getString("last_name"));
                                         myPatients.setPatientsName(jsonObject.getString("first_name") + " " +
                                                 jsonObject.getString("last_name"));
                                         myPatients.setPatientAge(jsonObject.getString("dob"));
                                         myPatients.setPatientPhoneNumber(jsonObject.getString("phone_number_primary"));
+                                        myPatients.setPatientPhoneNumberSecondary(jsonObject.getString("phone_number_secondary"));
                                         myPatients.setPatientLocation(jsonObject.getString("location"));
                                         myPatients.setPatientImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
                                         myPatients.setChatStatus(jsonObject.getBoolean("available_to_chat"));
@@ -337,7 +364,7 @@ public class MyPatients extends Fragment {
                                 }
                                 break;
                             case HttpURLConnection.HTTP_UNAUTHORIZED:
-                            Helpers.dismissProgressDialog();
+                                Helpers.dismissProgressDialog();
                                 try {
                                     Helpers.showSnackBar(getView(), new JSONObject(request.getResponseText()).getString("detail"));
                                 } catch (JSONException e) {
@@ -381,7 +408,7 @@ public class MyPatients extends Fragment {
     class ViewHolder {
         CircleImageView circleImageView;
         TextView name;
-//        TextView patientAge;
+        //        TextView patientAge;
         TextView distance;
         ImageButton chat;
         ImageButton call;
