@@ -233,12 +233,15 @@
             android:text="Services"
             android:textSize="16sp" />
 
-        <Spinner
+        <TextView
             android:id="@+id/service_spinner"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/txt_service"
-            android:layout_marginTop="6dp" />
+            android:layout_marginTop="6dp"
+            android:clickable="true"
+            android:text="Select Required Services" />
 
         <EditText
             android:id="@+id/appointment_reason_editText"
