@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
@@ -43,12 +45,11 @@ import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
-
 import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -140,6 +141,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle(R.string.my_patient_details);
+        getAppointmentDetails();
         setContentView(R.layout.activity_doctors_appointment);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
@@ -153,7 +155,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
         position = getIntent().getIntExtra("position", -1);
-        Log.i("TAG", " id " + id);
         ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         diagnosticsList = new ArrayList<>();
@@ -187,7 +188,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         saveButton.setOnClickListener(this);
         int counter = 0;
         for (Services services : arrayList) {
-            Log.i("TAG", "services");
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(services.getServiceName());
             checkBox.setTextSize(16);
@@ -326,8 +326,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 //                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
 //                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
 //                startActivityForResult(intent, REQUEST_CODE);
-                break;
-
+                    break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -336,37 +335,25 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private void takeScreenshot() {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-
         try {
             mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
-
             View v1 = getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
             v1.setDrawingCacheEnabled(false);
-
             File imageFile = new File(mPath);
-
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
-            openScreenshot(imageFile);
+            screenShotShareAndImageToPdfDialog();
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(intent);
-    }
-
-    private void ImageToPdf() {
+    private void imageToPdf() {
         Document document = new Document();
         String path = android.os.Environment.getExternalStorageDirectory().toString();
         try {
@@ -391,6 +378,32 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             e.printStackTrace();
         }
         document.close();
+    }
+
+    private void screenShotShareAndImageToPdfDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Share&Export!");
+        alertDialogBuilder.setMessage("You can Share screen capture and Export to Pdf!")
+        .setCancelable(true).setPositiveButton("Share Image",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        Uri uri = Uri.parse("file://" + mPath);
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                        shareIntent.setType("image/jpeg");
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, "Share image File"));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton("Convert to Pdf", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                imageToPdf();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -426,6 +439,35 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             mReturnDateEditText.setText(i2 + "/" + (i1+1) + "/" + i);
         System.out.println(i2 + "/" + (i1+1) + "/" + i);
 
+    }
+
+    private void getAppointmentDetails() {
+        HttpRequest appointmentDetails = new HttpRequest(this);
+        appointmentDetails.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                Log.e("GET", request.getResponseText());
+                                break;
+
+
+                        }
+                }
+            }
+        });
+        appointmentDetails.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                exception.printStackTrace();
+                Log.e("TAG", exception.getLocalizedMessage());
+            }
+        });
+        String url = String.format("%sdoctor/appointment/%s/attention", AppGlobals.BASE_URL, id);
+        appointmentDetails.open("GET", url);
+        appointmentDetails.send();
     }
 
     private void getTargets() {
@@ -473,7 +515,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.i("TAG", "work " + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
         request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
     }
 
@@ -487,7 +528,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
-                Log.i("TAG", request.getResponseURL());
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", request.getResponseURL());
@@ -578,7 +618,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                Log.i("TAG", charSequence.toString());
                 if (value) {
                     if (!charSequence.toString().isEmpty()) {
                         searchListForDiagnostics = new ArrayList<>();
@@ -745,7 +784,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     int pos = (int) viewHolder.checkBox.getTag();
-                    Log.i("TAG", "position "+ position);
                     View checkBoxView = medicationDiagnosticListView.getChildAt(pos);
                     if (checkBoxView != null) {
                         if (b) {
@@ -758,7 +796,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     }
                 }
             });
-            Log.i("TAG", selectedDiagnostic.toString());
             if (selectedDiagnostic.containsKey(position)) {
                 viewHolder.checkBox.setChecked(true);
             } else {
@@ -830,7 +867,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
            viewHolder.add.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
-                   Log.i("TAG", "click");
                    diagnostic.setQuantity(diagnostic.getQuantity()+1);
                    notifyDataSetChanged();
                }

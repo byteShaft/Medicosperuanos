@@ -62,9 +62,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="2dp"
                 android:layout_weight="2"
-                android:backgroundTint="#d3d6db"
+                android:backgroundTint="@color/normal_rating_bar"
+                android:progressTint="@color/activated_rating_bar"
                 android:numStars="5"
-                android:progressTint="#7e848c"
                 android:rating="4"
                 android:stepSize="1.0" />
 
