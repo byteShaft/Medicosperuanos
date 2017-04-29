@@ -191,15 +191,23 @@
 
             </LinearLayout>
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/medication_button_layout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:layout_gravity="bottom">
+                android:layout_gravity="bottom"
+                android:gravity="bottom"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/qty_textview"
+                    android:id="@+id/qty_text_view"
                     android:layout_width="38dp"
                     android:layout_height="25dp"
                     android:gravity="center"
@@ -209,8 +217,9 @@
                 <View
                     android:layout_width="35dp"
                     android:layout_height="1dp"
-                    android:layout_below="@+id/qty_textview"
+                    android:layout_below="@+id/qty_text_view"
                     android:background="#000" />
+                </LinearLayout>
 
 
                 <Button
@@ -219,9 +228,9 @@
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:layout_marginTop="7dp"
-                    android:layout_toRightOf="@+id/qty_textview"
+                    android:layout_toRightOf="@+id/qty_text_view"
                     android:background="@mipmap/ic_plus_blue" />
-            </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

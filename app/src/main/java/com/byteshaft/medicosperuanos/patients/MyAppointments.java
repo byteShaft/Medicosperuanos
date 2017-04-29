@@ -82,7 +82,6 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
         setHasOptionsMenu(true);
-        getPatientAppointments();
         searchContainer = new LinearLayout(getActivity());
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -224,6 +223,12 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
         });
 
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPatientAppointments();
     }
 
     @Override

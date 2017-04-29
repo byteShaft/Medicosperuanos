@@ -146,6 +146,7 @@ public class Appointments extends Fragment implements
                 intent.putExtra("age", agenda.getDateOfBirth());
                 intent.putExtra("date", agenda.getDate());
                 intent.putExtra("services", agenda.getPatientServices());
+                intent.putExtra("position", i);
                 startActivity(intent);
             }
         });
@@ -162,7 +163,7 @@ public class Appointments extends Fragment implements
         request.send();
     }
 
-    private void updateAppointmentStatus(final String state, int id, final int position) {
+    public void updateAppointmentStatus(final String state, int id, final int position) {
         HttpRequest request = new HttpRequest(getActivity());
         request.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
@@ -212,13 +213,11 @@ public class Appointments extends Fragment implements
                 switch (index) {
                     // close
                     case 0:
-                        String rejected = "rejected";
-                        updateAppointmentStatus(rejected, agenda.getAgendaId(), position);
+                        updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
                         return true;
                     // tick
                     case 1:
-                        String accepted = "accepted";
-                        updateAppointmentStatus(accepted, agenda.getAgendaId(), position);
+                        updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
                         return true;
                     default:
                         return false;
@@ -374,6 +373,9 @@ public class Appointments extends Fragment implements
             } else if (state.contains(AppGlobals.REJECTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.reject_background));
+            } else if (state.contains(AppGlobals.ATTENDED)) {
+                viewHolder.appointmentState.setBackgroundColor(
+                        getResources().getColor(R.color.attended_background));
             }
             return convertView;
         }

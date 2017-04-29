@@ -44,15 +44,12 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
-import com.zfdang.multiple_images_selector.SelectorSettings;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -137,6 +134,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private ArrayList<String> imagesArray;
 
     private String mPath;
+    private int position = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +152,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        position = getIntent().getIntExtra("position", -1);
         Log.i("TAG", " id " + id);
         ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
@@ -183,7 +182,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mPlusButtonDiagnostics = (Button) findViewById(R.id.plus_button_diagnostics);
         mPlusButtonMedication = (Button) findViewById(R.id.plus_button_medication);
         checkBoxLayout = (LinearLayout) findViewById(R.id.checkbox_layout);
-        quantityTextView = (TextView) findViewById(R.id.qty_textview);
+        quantityTextView = (TextView) findViewById(R.id.qty_text_view);
         saveButton = (AppCompatButton) findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
         int counter = 0;
@@ -224,7 +223,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mTimeEditText.setEnabled(false);
         mDateEditText.setEnabled(false);
         getTargets();
-        Fresco.initialize(getApplicationContext());
+//        Fresco.initialize(getApplicationContext());
         final Calendar calendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(DoctorsAppointment.this,
                 this,
@@ -279,7 +278,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 // get selected images from selector
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+//                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
                 assert imagesArray != null;
 
                 // show results in textview
@@ -321,12 +320,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.attach_icon:
 //                ImageToPdf();
-                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
-                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
-                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
-                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
-                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
-                startActivityForResult(intent, REQUEST_CODE);
+//                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
+//                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
+//                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
+//                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
+//                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
+//                startActivityForResult(intent, REQUEST_CODE);
                 break;
 
         }
@@ -466,6 +465,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         diagnosticsRequest.send();
     }
 
+    private void sendAttentionData(int appointmentId, String conclusion, String date, String dateOfReturn,
+                              String destination, String exploration, String time) {
+        request = new HttpRequest(this);
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.i("TAG", "work " + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+    }
+
+
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
 
@@ -484,21 +496,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     case HttpURLConnection.HTTP_BAD_REQUEST:
                         Log.i("TAG", request.getResponseText());
                         break;
+                    case HttpURLConnection.HTTP_CREATED:
+                        Appointments.getInstance().updateAppointmentStatus(AppGlobals.ATTENDED,id, position);
+                        finish();
+                        break;
                 }
         }
 
-    }
-
-    private void sendAttentionData(int appointmentId, String conclusion, String date, String dateOfReturn,
-                              String destination, String exploration, String time) {
-        request = new HttpRequest(this);
-        request.setOnReadyStateChangeListener(this);
-        request.setOnErrorListener(this);
-        request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
-        request.setRequestHeader("Authorization", "Token " +
-                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.i("TAG", "work " + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
-        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
     }
 
 
@@ -556,8 +560,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         dialog.getWindow().setLayout(width, height);
         dialog.setCancelable(true);
         EditText searchEditText = (EditText) dialog.findViewById(R.id.search_edit_text);
-        ImageButton arrowUpButton = (ImageButton) dialog.findViewById(R.id.arrow_up);
-        ImageButton arrowDownButton = (ImageButton) dialog.findViewById(R.id.arrow_down);
         TextView okTextView = (TextView) dialog.findViewById(R.id.ok_textV_view);
         medicationDiagnosticListView = (ListView) dialog.
                 findViewById(R.id.medication_diagnostic_search_list_view);
@@ -628,17 +630,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
             }
         });
-        arrowUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-        arrowDownButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
         okTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -740,7 +732,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 viewHolder.diagnosticListTextView = (TextView) convertView.findViewById(R.id.diagnostic_list_text_view);
                 viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.check_box);
                 viewHolder.idTextView.setTypeface(AppGlobals.typefaceNormal);
-                viewHolder.diagnosticListTextView.setTypeface(AppGlobals.typefaceNormal);
+                viewHolder.diagnosticListTextView.setTypeface(AppGlobals.robotoBold);
                 convertView.setTag(viewHolder);
                 viewHolder.checkBox.setTag(position);
             } else {
@@ -817,7 +809,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                viewHolder.diagnosticListTextView = (TextView) convertView.findViewById(R.id.diagnostic_list_text_view);
                viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.check_box);
                viewHolder.idTextView.setTypeface(AppGlobals.typefaceNormal);
-               viewHolder.diagnosticListTextView.setTypeface(AppGlobals.typefaceNormal);
+               viewHolder.diagnosticListTextView.setTypeface(AppGlobals.robotoBold);
                viewHolder.minus = (ImageButton) convertView.findViewById(R.id.minus);
                viewHolder.quantity = (TextView) convertView.findViewById(R.id.quantity);
                viewHolder.add = (ImageButton) convertView.findViewById(R.id.plus);
