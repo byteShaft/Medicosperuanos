@@ -42,6 +42,7 @@ dependencies {
     compile 'com.itextpdf:itextpdf:5.1.1'
     compile 'com.google.firebase:firebase-core:10.2.1'
     compile 'com.google.firebase:firebase-messaging:10.2.1'
+    compile 'com.zfdang.multiple-images-selector:multiple-images-selector:1.1.3'
 }
 
 
