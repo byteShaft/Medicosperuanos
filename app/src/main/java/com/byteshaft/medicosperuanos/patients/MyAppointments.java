@@ -434,6 +434,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     public void reviewRatingBarDialog() {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.review_rating_bar_dialoge);
+        dialog.setTitle("Review");
         dialog.setCancelable(false);
         Button submitBtn = (Button) dialog.findViewById(R.id.submitRateBtn);
         Button cancelBtn = (Button) dialog.findViewById(R.id.cancelRateBtn);
