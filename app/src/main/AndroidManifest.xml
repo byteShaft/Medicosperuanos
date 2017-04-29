@@ -83,7 +83,7 @@
             android:name=".doctors.DoctorDetailsActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".patients.DoctorsAppointment"
+            android:name=".doctors.DoctorsAppointment"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
