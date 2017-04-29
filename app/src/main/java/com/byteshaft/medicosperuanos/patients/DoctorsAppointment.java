@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -41,12 +42,11 @@ import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
-import com.facebook.drawee.backends.pipeline.Fresco;
+
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
-import com.zfdang.multiple_images_selector.SelectorSettings;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -126,6 +126,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private MedicationSpinnerAdapter medicationSpinnerAdapter;
 
     private TextView quantityTextView;
+    private TextView saveButton;
+    private int selectedTargetId = -1;
 
     private static final int REQUEST_CODE = 123;
     private ArrayList<String> imagesArray;
@@ -148,6 +150,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        Log.i("TAG", " id " + id);
         ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         diagnosticsList = new ArrayList<>();
@@ -177,6 +180,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mPlusButtonMedication = (Button) findViewById(R.id.plus_button_medication);
         checkBoxLayout = (LinearLayout) findViewById(R.id.checkbox_layout);
         quantityTextView = (TextView) findViewById(R.id.qty_textview);
+        saveButton = (AppCompatButton) findViewById(R.id.save_button);
+        saveButton.setOnClickListener(this);
         int counter = 0;
         for (Services services : arrayList) {
             Log.i("TAG", "services");
@@ -200,9 +205,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         backPress.setOnClickListener(this);
         mReturnDateEditText.setOnClickListener(this);
-//        mDiagnosticsSpinner.setOnClickListener(this);
         mDestinationSpinner.setOnItemSelectedListener(this);
-//        mMedicationSpinner.setOnClickListener(this);
 
         mPlusButtonDiagnostics.setOnClickListener(this);
         mPlusButtonMedication.setOnClickListener(this);
@@ -217,9 +220,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mTimeEditText.setEnabled(false);
         mDateEditText.setEnabled(false);
         getTargets();
-
-        Fresco.initialize(getApplicationContext());
-
+//        Fresco.initialize(getApplicationContext());
         final Calendar calendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(DoctorsAppointment.this,
                 this,
@@ -253,6 +254,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
             }
         });
+        mDestinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Targets targets = targetsArrayList.get(i);
+                selectedTargetId = targets.getId();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
     }
 
@@ -261,7 +275,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 // get selected images from selector
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+//                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
                 assert imagesArray != null;
 
                 // show results in textview
@@ -385,6 +399,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.diagnostics_spinner:
                 break;
+            case R.id.save_button:
+                sendAttentionData(id, mConclusionsEditText.getText().toString(), mDateEditText.getText().toString(),
+                        mReturnDateEditText.getText().toString(),
+                        String.valueOf(selectedTargetId), mExplanationEditText.getText().toString(),
+                        mTimeEditText.getText().toString());
+                break;
         }
     }
 
@@ -425,6 +445,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                break;
+
 
                         }
                 }
@@ -441,28 +463,56 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseText());
+                        break;
+                    case HttpURLConnection.HTTP_BAD_REQUEST:
+                        Log.i("TAG", request.getResponseText());
+                        break;
+                }
+        }
 
     }
 
-    private void registerUser(int appointmentId, String conclusion, String date, String dateOfReturn,
-                              String destination, String diagnostics, String exploration, String time) {
+    private void sendAttentionData(int appointmentId, String conclusion, String date, String dateOfReturn,
+                              String destination, String exploration, String time) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
-        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, diagnostics, exploration, time));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.i("TAG", "work " + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
     }
 
 
     private String getAttentionsData(String conclusion, String date, String dateOfReturn,
-                                     String destination, String diagnostics, String exploration, String time) {
+                                     String destination, String exploration, String time) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("conclusion", conclusion);
             jsonObject.put("date", date);
             jsonObject.put("date_of_return", dateOfReturn);
             jsonObject.put("destination", destination);
-            jsonObject.put("diagnostics", diagnostics);
+            JSONArray jsonArray = new JSONArray();
+            for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
+                JSONObject diagnosticObject = new JSONObject();
+//                diagnosticObject.put("diagnostics", diagnosticMedication.getId());
+                jsonArray.put(diagnosticMedication.getId());
+            }
+            jsonObject.put("diagnostics", jsonArray);
+            JSONArray treatmentArray = new JSONArray();
+            for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+                JSONObject treatmentObject = new JSONObject();
+                treatmentObject.put("treatment", diagnosticMedication.getId());
+                treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+                treatmentArray.put(treatmentObject);
+            }
+            jsonObject.put("treatments", treatmentArray);
             jsonObject.put("exploration", exploration);
             jsonObject.put("time", time);
         } catch (JSONException e) {
