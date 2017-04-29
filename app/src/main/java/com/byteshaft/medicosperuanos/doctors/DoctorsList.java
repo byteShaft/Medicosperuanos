@@ -159,7 +159,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                 s.toString()) || StringUtils.containsIgnoreCase(doctorDetails.getLastName(),
                                 s.toString()) ||
                                 StringUtils.containsIgnoreCase(doctorDetails.getSpeciality(),
-                                        s.toString()) ) {
+                                        s.toString())) {
                             searchList.add(doctorDetails);
                             customAdapter.notifyDataSetChanged();
 
@@ -240,7 +240,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 intent.putExtra("name", stringBuilder.toString());
                 intent.putExtra("specialist", doctorDetails.getSpeciality());
                 intent.putExtra("stars", doctorDetails.getReviewStars());
-                AppGlobals.isDoctorFavourite =  doctorDetails.isFavouriteDoctor();
+                AppGlobals.isDoctorFavourite = doctorDetails.isFavouriteDoctor();
                 intent.putExtra("block", doctorDetails.isBlocked());
                 intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
                 intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
@@ -286,6 +286,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 return true;
             case R.id.action_filter:
                 FilterDialog filterDialog = new FilterDialog(getActivity(), false);
+                filterDialog.setTitle(null);
                 filterDialog.show();
                 return true;
             case R.id.action_location:
@@ -415,8 +416,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                         } else {
                                             stringBuilder.append("Dra.");
                                         }
-                                        doctorLocations.setName(stringBuilder.toString()+" "
-                                                +doctorDetail.getString("first_name"));
+                                        doctorLocations.setName(stringBuilder.toString() + " "
+                                                + doctorDetail.getString("first_name"));
                                         doctorLocations.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                         locationsArrayList.add(doctorLocations);
                                     }
@@ -444,8 +445,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         }
         switch (readyState) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
-            Helpers.showSnackBar(getView(), "connection time out");
-            break;
+                Helpers.showSnackBar(getView(), "connection time out");
+                break;
         }
         Helpers.dismissProgressDialog();
     }
@@ -487,7 +488,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 viewHolder.distance.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.availableTime.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.date.setTypeface(AppGlobals.typefaceNormal);
-                
+
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

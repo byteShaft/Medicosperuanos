@@ -144,6 +144,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         favouriteButton = (ImageButton) findViewById(R.id.btn_fav);
         priceTotalEditText = (EditText) findViewById(R.id.tv_total);
 
+
         mNameTextView.setTypeface(AppGlobals.typefaceNormal);
         mSpecialityTextView.setTypeface(AppGlobals.typefaceNormal);
         mDoctorStartTime.setTypeface(AppGlobals.typefaceNormal);

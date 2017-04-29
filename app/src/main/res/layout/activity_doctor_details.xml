@@ -78,10 +78,12 @@
 
         <RatingBar
             android:id="@+id/user_ratings"
-            style="@style/Widget.AppCompat.RatingBar.Small"
+            style="?android:ratingBarStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/doctor_sp"
+            android:backgroundTint="@color/normal_rating_bar"
+            android:progressTint="@color/activated_rating_bar"
             android:layout_centerHorizontal="true"
             android:numStars="5"
             android:rating="3" />
