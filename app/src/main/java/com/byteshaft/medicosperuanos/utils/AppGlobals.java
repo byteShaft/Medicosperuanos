@@ -91,6 +91,7 @@ public class AppGlobals extends Application {
     public static final String PENDING = "pending";
     public static final String ACCEPTED = "accepted";
     public static final String REJECTED = "rejected";
+    public static final String ATTENDED = "attended";
 
 
     private static final String SERVICE_KEY = "iServiceON";

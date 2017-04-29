@@ -25,7 +25,6 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.gettersetter.Agenda;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
-import com.byteshaft.medicosperuanos.patients.DoctorsAppointment;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
@@ -140,13 +139,14 @@ public class Appointments extends Fragment implements
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Agenda agenda = agendaArrayList.get(i);
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
-                intent.putExtra("id", agenda.getDoctorId());
+                intent.putExtra("id", agenda.getAgendaId());
                 intent.putExtra("reason", agenda.getReason());
                 intent.putExtra("first_name", agenda.getFirstName());
                 intent.putExtra("last_name", agenda.getLastName());
                 intent.putExtra("age", agenda.getDateOfBirth());
                 intent.putExtra("date", agenda.getDate());
                 intent.putExtra("services", agenda.getPatientServices());
+                intent.putExtra("position", i);
                 startActivity(intent);
             }
         });
@@ -163,7 +163,7 @@ public class Appointments extends Fragment implements
         request.send();
     }
 
-    private void updateAppointmentStatus(final String state, int id, final int position) {
+    public void updateAppointmentStatus(final String state, int id, final int position) {
         HttpRequest request = new HttpRequest(getActivity());
         request.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
@@ -213,13 +213,11 @@ public class Appointments extends Fragment implements
                 switch (index) {
                     // close
                     case 0:
-                        String rejected = "rejected";
-                        updateAppointmentStatus(rejected, agenda.getAgendaId(), position);
+                        updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
                         return true;
                     // tick
                     case 1:
-                        String accepted = "accepted";
-                        updateAppointmentStatus(accepted, agenda.getAgendaId(), position);
+                        updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
                         return true;
                     default:
                         return false;
@@ -375,6 +373,9 @@ public class Appointments extends Fragment implements
             } else if (state.contains(AppGlobals.REJECTED)) {
                 viewHolder.appointmentState.setBackgroundColor(
                         getResources().getColor(R.color.reject_background));
+            } else if (state.contains(AppGlobals.ATTENDED)) {
+                viewHolder.appointmentState.setBackgroundColor(
+                        getResources().getColor(R.color.attended_background));
             }
             return convertView;
         }
