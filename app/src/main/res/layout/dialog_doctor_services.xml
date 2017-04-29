@@ -28,6 +28,12 @@
             android:textAllCaps="false"
             android:textColor="@color/buttonColor" />
 
+        <View
+            android:layout_gravity="center"
+            android:layout_width="1dp"
+            android:background="@color/colorAccent"
+            android:layout_height="15dp"/>
+
         <Button
             android:id="@+id/positive_button"
             android:layout_width="0dp"

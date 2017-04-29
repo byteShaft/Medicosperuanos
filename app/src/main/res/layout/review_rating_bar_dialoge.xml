@@ -14,16 +14,17 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:backgroundTint="@color/normal_rating_bar"
-        android:progressTint="@color/activated_rating_bar"
         android:clickable="true"
         android:isIndicator="false"
-        android:numStars="5" />
+        android:numStars="5"
+        android:progressTint="@color/activated_rating_bar" />
 
     <EditText
         android:id="@+id/reviewED"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/errorTV"
+        android:layout_margin="4dp"
         android:layout_marginTop="5dp"
         android:hint="write your review..."
         android:maxLength="200">
@@ -45,16 +46,26 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_weight="1"
+            android:background="@null"
             android:text="Cancel"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/buttonColor" />
+
+        <View
+            android:layout_gravity="center"
+            android:layout_width="1dp"
+            android:background="@color/colorAccent"
+            android:layout_height="15dp"/>
 
         <Button
             android:id="@+id/submitRateBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@null"
             android:text="Submit"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/buttonColor" />
 
     </LinearLayout>
 </LinearLayout>
