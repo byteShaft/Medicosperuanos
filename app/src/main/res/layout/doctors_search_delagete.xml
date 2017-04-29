@@ -106,12 +106,14 @@
 
                 <RatingBar
                     android:id="@+id/rating_bar"
-                    style="@style/Widget.AppCompat.RatingBar.Small"
+                    style="?android:ratingBarStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
                     android:layout_marginTop="2dp"
+                    android:backgroundTint="@color/normal_rating_bar"
                     android:numStars="5"
+                    android:progressTint="@color/activated_rating_bar"
                     android:rating="3" />
 
             </LinearLayout>
@@ -151,11 +153,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:textSize="13sp"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/open_details"
                 android:drawableTop="@mipmap/ic_schedule"
-                />
+                android:textSize="13sp" />
 
             <ImageButton
                 android:id="@+id/open_details"
