@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
@@ -40,6 +42,7 @@ import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
+import com.byteshaft.medicosperuanos.introscreen.IntroScreen;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
@@ -320,7 +323,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 takeScreenshot();
                 break;
             case R.id.attach_icon:
-//                ImageToPdf();
                 Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
                 intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
                 intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
@@ -345,29 +347,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
             v1.setDrawingCacheEnabled(false);
-
             File imageFile = new File(mPath);
-
             FileOutputStream outputStream = new FileOutputStream(imageFile);
             int quality = 100;
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
-            openScreenshot(imageFile);
+            screenShotShareAndImageToPdfDialog();
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void openScreenshot(File imageFile) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.fromFile(imageFile);
-        intent.setDataAndType(uri, "image/*");
-        startActivity(intent);
-    }
-
-    private void ImageToPdf() {
+    private void imageToPdf() {
         Document document = new Document();
         String path = android.os.Environment.getExternalStorageDirectory().toString();
         try {
@@ -392,6 +384,32 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             e.printStackTrace();
         }
         document.close();
+    }
+
+    private void screenShotShareAndImageToPdfDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("Share&Export!");
+        alertDialogBuilder.setMessage("You can Share screen capture and Export to Pdf!")
+        .setCancelable(true).setPositiveButton("Share Image",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        Uri uri = Uri.parse("file://" + mPath);
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                        shareIntent.setType("image/jpeg");
+                        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(shareIntent, "Share image File"));
+                    }
+                });
+        alertDialogBuilder.setNegativeButton("Convert to Pdf", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                imageToPdf();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
