@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/all_review_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp" />
+
+    <View
+        android:id="@+id/sp_view"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/all_review_list"
+        android:layout_gravity="center"
+        android:background="@color/colorAccent" />
+
+    <Button
+        android:id="@+id/close_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sp_view"
+        android:background="@null"
+        android:text="Close"
+        android:textAllCaps="false"
+        android:textColor="@color/buttonColor" />
+
+</RelativeLayout>
