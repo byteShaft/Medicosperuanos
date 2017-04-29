@@ -86,9 +86,6 @@
             android:name=".doctors.DoctorsAppointment"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
-            android:name="com.zfdang.multiple_images_selector.ImagesSelectorActivity"
-            android:configChanges="orientation|screenSize"/>
-        <activity
             android:name=".patients.PatientsRecentHistory"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -103,6 +100,14 @@
         <activity
             android:name=".messages.ConversationActivity"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"
+            android:theme="@style/MultipleImageSelectTheme">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <uses-library android:name="com.google.android.maps" />
     </application>

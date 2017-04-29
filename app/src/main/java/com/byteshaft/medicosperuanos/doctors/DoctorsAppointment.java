@@ -45,6 +45,8 @@ import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
+import com.darsh.multipleimageselect.helpers.Constants;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -73,7 +75,7 @@ import java.util.HashMap;
 
 public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
         DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
-        HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener {
+        HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener, HttpRequest.OnFileUploadProgressListener {
 
     private Spinner mDiagnosticsSpinner;
     private Spinner mMedicationSpinner;
@@ -138,6 +140,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private int position = -1;
     private int updateId = -1;
     private ArrayList<Services> arrayList;
+    private ArrayList<String> imagesArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -278,25 +281,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-// get selected images from selector
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-//                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
-                assert imagesArray != null;
-
-                // show results in textview
-                StringBuffer sb = new StringBuffer();
-                sb.append(String.format("Totally %d images selected:", imagesArray.size())).append("\n");
-                for (String result : imagesArray) {
-                    sb.append(result).append("\n");
-                    System.out.println(imagesArray);
-                }
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 
     @Override
     protected void onResume() {
@@ -324,6 +308,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 takeScreenshot();
                 break;
             case R.id.attach_icon:
+                Intent intent = new Intent(this, AlbumSelectActivity.class);
+                intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 4);
+                startActivityForResult(intent, Constants.REQUEST_CODE);
 //                ImageToPdf();
 //                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
 //                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
@@ -334,6 +321,21 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == Constants.REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            //The array list has the image paths of the selected images
+            imagesArrayList = new ArrayList<>();
+            ArrayList<com.darsh.multipleimageselect.models.Image> images =
+                    data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
+            for (com.darsh.multipleimageselect.models.Image image: images) {
+                Log.i("TAG", image.path);
+                imagesArrayList.add(image.path);
+            }
+
+        }
     }
 
 
@@ -596,15 +598,29 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
+        request.setOnFileUploadProgressListener(this);
         request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        try {
+            Log.i("TAG", "Data" + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+            request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+
+    }
+
+    @Override
+    public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
+        double progress = (loaded / (double) total) * 100;
+        Log.i("TAG", String.valueOf(progress));
+
 
     }
 
@@ -631,7 +647,43 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
 
     private String getAttentionsData(String conclusion, String date, String dateOfReturn,
-                                     String destination, String exploration, String time) {
+                                     String destination, String exploration, String time) throws JSONException {
+
+        // new
+//        FormData data = new FormData();
+//        data.append(FormData.TYPE_CONTENT_TEXT, "conclusion", conclusion);
+//        data.append(FormData.TYPE_CONTENT_TEXT, "date", date);
+//        data.append(FormData.TYPE_CONTENT_TEXT, "date_of_return", dateOfReturn);
+//        data.append(FormData.TYPE_CONTENT_TEXT, "destination", destination);
+//        JSONArray jsonArray = new JSONArray();
+//        for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
+//            jsonArray.put(diagnosticMedication.getId());
+//        }
+//        data.append(FormData.TYPE_CONTENT_TEXT, "diagnostics", jsonArray.toString());
+//        JSONArray treatmentArray = new JSONArray();
+//        for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+//            JSONObject treatmentObject = new JSONObject();
+//            treatmentObject.put("treatment", diagnosticMedication.getId());
+//            treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+//            treatmentArray.put(treatmentObject);
+//        }
+//        data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
+//        data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
+//        data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
+//        StringBuilder stringBuilder = new StringBuilder();
+//        int counter = 0;
+//        for (String path : imagesArrayList) {
+//            stringBuilder.append(path);
+//            if (counter < 4) {
+//                stringBuilder.append(",");
+//            }
+//            counter++;
+//        }
+//        data.append(FormData.TYPE_CONTENT_FILE,"photos" , stringBuilder.toString());
+//        return data;
+
+        /// previous
+
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("conclusion", conclusion);
@@ -835,7 +887,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         diagnosticsRequest.send();
     }
 
-   private class DiagnosticAdapter extends ArrayAdapter {
+    private class DiagnosticAdapter extends ArrayAdapter {
 
         private ViewHolder viewHolder;
         private ArrayList<DiagnosticMedication> diagnosticMedications;

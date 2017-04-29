@@ -38,4 +38,17 @@
 
     <color name="normal_rating_bar_internal">#7E848C</color>
     <color name="activated_rating_bar_internal">#D3D6DB</color>
+
+    // selector colors
+
+    <color name="multiple_image_select_primary">@color/colorPrimary</color>
+    <color name="multiple_image_select_primaryDark">@color/colorPrimaryDark</color>
+    <color name="multiple_image_select_primaryLight">#D1C4E9</color>
+    <color name="multiple_image_select_accent">@color/colorAccent</color>
+    <color name="multiple_image_select_primaryText">#212121</color>
+    <color name="multiple_image_select_secondaryText">#727272</color>
+    <color name="multiple_image_select_divider">#B6B6B6</color>
+    <color name="multiple_image_select_toolbarPrimaryText">#FFFFFF</color>
+    <color name="multiple_image_select_albumTextBackground">#99FFFFFF</color>
+    <color name="multiple_image_select_imageSelectBackground">#000000</color>
 </resources>
