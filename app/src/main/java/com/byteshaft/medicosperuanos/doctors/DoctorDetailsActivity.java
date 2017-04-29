@@ -106,8 +106,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         callButton = (ImageButton) findViewById(R.id.call_button);
         chatButton = (ImageButton) findViewById(R.id.message_button);
         heartButton = (ImageButton) findViewById(R.id.heart_button);
-        status = (ImageView) findViewById(R.id.status);
+        bookingButton = (Button) findViewById(R.id.button_book);
+        showallReviewButton = (Button) findViewById(R.id.review_all_button);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        status = (ImageView) findViewById(R.id.status);
         progressBar.setVisibility(View.GONE);
 
         // setting typeface
@@ -120,12 +122,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
+        showallReviewButton.setOnClickListener(this);
         if (isBlocked) {
             chatButton.setEnabled(false);
         }
         heartButton.setOnClickListener(this);
-        bookingButton = (Button) findViewById(R.id.button_book);
-        showallReviewButton = (Button) findViewById(R.id.review_all_button);
         textClock = (TextView) findViewById(R.id.clock);
         textClock.setText(startTime);
         textClock.setTypeface(AppGlobals.typefaceNormal);
@@ -195,6 +196,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.review_all_button:
+                System.out.println("OK review");
+
+                break;
             case R.id.call_button:
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.CALL_PHONE)
