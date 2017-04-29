@@ -38,7 +38,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.byteshaft.medicosperuanos.R;
-import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
+import com.byteshaft.medicosperuanos.adapters.ViewHolder;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
@@ -136,12 +136,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private String mPath;
     private int position = -1;
+    private int updateId = -1;
+    private ArrayList<Services> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setTitle(R.string.my_patient_details);
-        getAppointmentDetails();
         setContentView(R.layout.activity_doctors_appointment);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
@@ -155,7 +156,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
         position = getIntent().getIntExtra("position", -1);
-        ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
+        arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         diagnosticsList = new ArrayList<>();
         medicationList = new ArrayList<>();
@@ -186,19 +187,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         quantityTextView = (TextView) findViewById(R.id.qty_text_view);
         saveButton = (AppCompatButton) findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
-        int counter = 0;
-        for (Services services : arrayList) {
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setText(services.getServiceName());
-            checkBox.setTextSize(16);
-            checkBox.setTypeface(AppGlobals.typefaceNormal);
-            checkBox.setId(services.getId());
-            if (counter == 0) {
-                checkBox.setChecked(true);
-            }
-            checkBoxLayout.addView(checkBox);
-            counter++;
-        }
+        showCheckbox(arrayList);
 
         mDateEditText.setTypeface(AppGlobals.typefaceNormal);
         mTimeEditText.setTypeface(AppGlobals.typefaceNormal);
@@ -271,6 +260,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
         });
 
+    }
+
+    private void showCheckbox(ArrayList<Services> arrayList) {
+        int counter = 0;
+        for (Services services : arrayList) {
+            CheckBox checkBox = new CheckBox(this);
+            checkBox.setText(services.getServiceName());
+            checkBox.setTextSize(16);
+            checkBox.setTypeface(AppGlobals.typefaceNormal);
+            checkBox.setId(services.getId());
+            if (counter == 0) {
+                checkBox.setChecked(true);
+            }
+            checkBoxLayout.addView(checkBox);
+            counter++;
+        }
     }
 
     @Override
@@ -448,12 +453,83 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
+                        Log.e("GET", request.getResponseURL());
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 Log.e("GET", request.getResponseText());
+                                if (!request.getResponseText().trim().isEmpty()) {
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(request.getResponseText());
+                                        updateId = jsonObject.getInt("id");
+                                        JSONObject destinationObject = jsonObject.getJSONObject("destination");
+                                        selectedTargetId = destinationObject.getInt("id");
+                                        JSONArray jsonArray = jsonObject.getJSONArray("diagnostics");
+                                        for (int i = 0; i < jsonArray.length(); i++) {
+                                            JSONObject diagnosticObject = jsonArray.getJSONObject(i);
+                                            DiagnosticMedication diagnosticMedication =
+                                                    new DiagnosticMedication();
+                                            diagnosticMedication.setId(diagnosticObject.getInt("id"));
+                                            diagnosticMedication.setDiagnosticMedication(diagnosticObject
+                                                    .getString("name"));
+                                            selectedDiagnosticsList.add(diagnosticMedication);
+                                        }
+                                        JSONObject appointmentObject = jsonObject.getJSONObject("appointment");
+                                        JSONArray services = appointmentObject.getJSONArray("services");
+                                        arrayList = new ArrayList<>();
+                                        for (int k = 0; k < services.length(); k++) {
+                                            JSONObject serviceObject = services.getJSONObject(k);
+                                            Services service = new Services();
+                                            service.setId(serviceObject.getInt("id"));
+                                            service.setPrice(String.valueOf(serviceObject.getInt("price")));
+                                            service.setDescription(serviceObject.getString("description"));
+                                            JSONObject serviceMainObject = serviceObject.getJSONObject("service");
+                                            service.setServiceName(serviceMainObject.getString("name"));
+                                            arrayList.add(service);
+                                        }
+                                        String exploration = jsonObject.getString("exploration");
+                                        String dateOfReturn = jsonObject.getString("date_of_return");
+                                        String conclusion = jsonObject.getString("conclusion");
+                                        mExplanationEditText.setText(exploration);
+                                        mConclusionsEditText.setText(conclusion);
+                                        mReturnDateEditText.setText(dateOfReturn);
+                                        JSONArray treatmentsArray =  jsonObject.getJSONArray("treatments");
+                                            for (int i = 0; i < treatmentsArray.length(); i++) {
+                                                JSONObject treatment = treatmentsArray.getJSONObject(i);
+                                                DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
+                                                diagnosticMedication.setQuantity(treatment.getInt("quantity"));
+                                                JSONObject treatmentDetail = treatment.getJSONObject("treatment");
+                                                diagnosticMedication.setId(treatmentDetail.getInt("id"));
+                                                diagnosticMedication.setDiagnosticMedication(treatmentDetail.getString("name"));
+                                                selectedMedicationList.add(diagnosticMedication);
+                                            }
+                                        for (int k = 0; k < diagnosticsList.size(); k++) {
+                                            DiagnosticMedication diagnosticMedication =
+                                                    diagnosticsList.get(k);
+                                            for (DiagnosticMedication diagnosticMedication1: selectedDiagnosticsList) {
+                                                if (diagnosticMedication.getId() == diagnosticMedication1.getId()) {
+                                                    selectedDiagnostic.put(k, diagnosticMedication.getId());
+                                                }
+                                            }
+
+                                        }
+                                        for (int o = 0; o < medicationList.size(); o++) {
+                                            DiagnosticMedication diagnosticMedication =
+                                                    medicationList.get(o);
+                                            Log.i("TAG", " innner loop  " + diagnosticMedication.getId());
+                                            for (DiagnosticMedication diagnosticMedication1: selectedMedicationList) {
+                                                Log.i("TAG", " inner loop condition  " + diagnosticMedication.getId());
+                                                if (diagnosticMedication.getId() == diagnosticMedication1.getId()) {
+                                                    Log.i("TAG", " size " + diagnosticMedication.getId());
+                                                    selectedMedication.put(o, diagnosticMedication.getId());
+                                                }
+                                            }
+                                        }
+                                        Log.i("TAG", "selected medication " + selectedMedication);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
-
-
                         }
                 }
             }
@@ -465,8 +541,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Log.e("TAG", exception.getLocalizedMessage());
             }
         });
-        String url = String.format("%sdoctor/appointment/%s/attention", AppGlobals.BASE_URL, id);
+        String url = String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, id);
         appointmentDetails.open("GET", url);
+        appointmentDetails.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         appointmentDetails.send();
     }
 
@@ -491,8 +569,14 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         targetsArrayList.add(targets);
                                     }
                                     System.out.println(targetsArray.length() + "length");
-                                    targetsAdapter = new TargetsAdapter(DoctorsAppointment.this, targetsArrayList);
+                                    targetsAdapter = new TargetsAdapter(targetsArrayList);
                                     mDestinationSpinner.setAdapter(targetsAdapter);
+                                    for (int i = 0; i < targetsArrayList.size(); i++) {
+                                        Targets targets = targetsArrayList.get(i);
+                                        if (targets.getId() == selectedTargetId) {
+                                            mDestinationSpinner.setSelection(i);
+                                        }
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -681,7 +765,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
         });
         dialog.show();
-
     }
 
 
@@ -730,7 +813,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 try {
                                     JSONObject treatmentsObject = new JSONObject(request.getResponseText());
                                     JSONArray treatmentsArray = treatmentsObject.getJSONArray("results");
-                                    System.out.println(treatmentsArray + "working");
+                                    System.out.println(treatmentsArray + "treatment");
                                     for (int i = 0; i < treatmentsArray.length(); i++) {
                                         JSONObject jsonObject = treatmentsArray.getJSONObject(i);
                                         DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
@@ -741,6 +824,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                getAppointmentDetails();
 
                         }
                 }
@@ -1018,7 +1102,48 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         private class ViewHolder {
             TextView id;
             TextView textView;
-
         }
     }
+
+    private class TargetsAdapter extends BaseAdapter {
+
+        private ViewHolder viewHolder;
+        private ArrayList<Targets> targetsArrayList;
+
+        public TargetsAdapter(ArrayList<Targets> targetsArrayList) {
+            this.targetsArrayList = targetsArrayList;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getLayoutInflater().inflate(R.layout.delegate_spinner, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.spinnerText = (TextView) convertView.findViewById(R.id.spinner_text);
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            Targets targets = targetsArrayList.get(position);
+            viewHolder.spinnerText.setText(targets.getName());
+            return convertView;
+        }
+
+        @Override
+        public int getCount() {
+            return targetsArrayList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+    }
+
 }
