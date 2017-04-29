@@ -213,7 +213,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PatientAppointment patientAppointment = appointments.get(position);
-                if (patientAppointment.getState().equals("accepted")) {
+                if (patientAppointment.getState().equals(AppGlobals.ATTENDED)) {
                     doctorsId = patientAppointment.getDoctorsId();
                     System.out.println(doctorsId + "doctors id");
                     reviewRatingBarDialog();
@@ -392,20 +392,25 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
             viewHolder.serviceDescription.setText(patientAppointment.getServiceName());
             Log.i("TAG", patientAppointment.getState());
             switch (patientAppointment.getState()) {
-                case "accepted":
+                case AppGlobals.ACCEPTED:
                     viewHolder.appointmentStatus.setText("A");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.attended_background_color));
                     break;
-                case "rejected":
+                case AppGlobals.REJECTED:
                     viewHolder.appointmentStatus.setText("C");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.cancel_background_color));
                     break;
-                case "pending":
+                case AppGlobals.PENDING:
                     viewHolder.appointmentStatus.setText("P");
                     viewHolder.appointmentStatus.setBackgroundColor(getResources()
                             .getColor(R.color.pending_background_color));
+                    break;
+                case AppGlobals.ATTENDED:
+                    viewHolder.appointmentStatus.setText("A");
+                    viewHolder.appointmentStatus.setBackgroundColor(getResources()
+                            .getColor(R.color.attended_background));
                     break;
 
             }
