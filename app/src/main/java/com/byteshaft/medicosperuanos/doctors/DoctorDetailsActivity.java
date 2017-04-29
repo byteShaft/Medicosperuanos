@@ -1,6 +1,8 @@
 package com.byteshaft.medicosperuanos.doctors;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -197,9 +199,9 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.review_all_button:
-//                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
-//                reviewDialog.setTitle("All Reviews");
-//                reviewDialog.show();
+                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
+                reviewDialog.setTitle("All Reviews");
+                reviewDialog.show();
 
                 break;
             case R.id.call_button:
@@ -419,27 +421,27 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
 
-//    private class AllReviewDialog extends Dialog {
-//        private Button closeButton;
-//
-//        public AllReviewDialog(Activity activity) {
-//            super(activity);
-//        }
-//
-//        @Override
-//        protected void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            setContentView(R.layout.dialog_all_review);
-//            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
-//            reviewList = (ListView) findViewById(R.id.all_review_list);
-//            closeButton = (Button) findViewById(R.id.close_dialog);
-//            closeButton.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    dismiss();
-//                }
-//            });
-//            reviewList.setAdapter(reviewAdapter);
-//        }
-//    }
+    private class AllReviewDialog extends Dialog {
+        private Button closeButton;
+
+        public AllReviewDialog(Activity activity) {
+            super(activity);
+        }
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.dialog_all_review);
+            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
+            reviewList = (ListView) findViewById(R.id.all_review_list);
+            closeButton = (Button) findViewById(R.id.close_dialog);
+            closeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dismiss();
+                }
+            });
+            reviewList.setAdapter(reviewAdapter);
+        }
+    }
 }
