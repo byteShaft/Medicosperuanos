@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -43,12 +44,15 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
+import com.zfdang.multiple_images_selector.SelectorSettings;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -220,7 +224,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mTimeEditText.setEnabled(false);
         mDateEditText.setEnabled(false);
         getTargets();
-//        Fresco.initialize(getApplicationContext());
+        Fresco.initialize(getApplicationContext());
         final Calendar calendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(DoctorsAppointment.this,
                 this,
@@ -275,7 +279,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 // get selected images from selector
         if (requestCode == REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-//                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
                 assert imagesArray != null;
 
                 // show results in textview
@@ -283,6 +287,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 sb.append(String.format("Totally %d images selected:", imagesArray.size())).append("\n");
                 for (String result : imagesArray) {
                     sb.append(result).append("\n");
+                    System.out.println(imagesArray);
                 }
             }
         }
@@ -315,13 +320,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 takeScreenshot();
                 break;
             case R.id.attach_icon:
-                ImageToPdf();
-//                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
-//                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
-//                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
-//                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
-//                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
-//                startActivityForResult(intent, REQUEST_CODE);
+//                ImageToPdf();
+                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
+                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
+                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
+                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
+                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
 
         }
@@ -334,7 +339,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
 
         try {
-            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + "medicosperuanos.jpg";
+            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
 
             View v1 = getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
@@ -348,9 +353,18 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
+            openScreenshot(imageFile);
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    private void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
     }
 
     private void ImageToPdf() {
@@ -410,13 +424,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-        if (!isSetForReturn) {
-            mDateEditText.setText(i2 + "/" + i1 + "/" + i);
-            isSetForReturn = true;
-        } else {
-            mReturnDateEditText.setText(i2 + "/" + i1 + "/" + i);
-            isSetForReturn = false;
-        }
+            mReturnDateEditText.setText(i2 + "/" + (i1+1) + "/" + i);
+        System.out.println(i2 + "/" + (i1+1) + "/" + i);
+
     }
 
     private void getTargets() {
