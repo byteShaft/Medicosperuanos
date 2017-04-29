@@ -1,4 +1,4 @@
-package com.byteshaft.medicosperuanos.patients;
+package com.byteshaft.medicosperuanos.doctors;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -465,8 +465,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", request.getResponseURL());
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseURL());
                         Log.i("TAG", request.getResponseText());
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
@@ -500,8 +502,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             jsonObject.put("destination", destination);
             JSONArray jsonArray = new JSONArray();
             for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
-                JSONObject diagnosticObject = new JSONObject();
-//                diagnosticObject.put("diagnostics", diagnosticMedication.getId());
                 jsonArray.put(diagnosticMedication.getId());
             }
             jsonObject.put("diagnostics", jsonArray);

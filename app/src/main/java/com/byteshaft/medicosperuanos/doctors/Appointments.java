@@ -25,7 +25,6 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.gettersetter.Agenda;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
-import com.byteshaft.medicosperuanos.patients.DoctorsAppointment;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
@@ -140,7 +139,7 @@ public class Appointments extends Fragment implements
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Agenda agenda = agendaArrayList.get(i);
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
-                intent.putExtra("id", agenda.getDoctorId());
+                intent.putExtra("id", agenda.getAgendaId());
                 intent.putExtra("reason", agenda.getReason());
                 intent.putExtra("first_name", agenda.getFirstName());
                 intent.putExtra("last_name", agenda.getLastName());
