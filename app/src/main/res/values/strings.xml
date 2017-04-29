@@ -135,6 +135,7 @@
     <string name="review_submitted_successfully">You have reviewed successfully</string>
     <string name="getting_doctor_list">fetching doctors list…</string>
     <string name="getting_schedule">fetching schedule…</string>
+    <string name="setting_up_schedule">setting up schedule…</string>
     <string name="getting_patients">fetching patients…</string>
     <string name="getting_favourite_doctors">fetching favourite doctor</string>
     <string name="fetching_my_appointments">fetching…</string>

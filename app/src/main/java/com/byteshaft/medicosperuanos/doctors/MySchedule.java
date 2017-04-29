@@ -294,7 +294,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     }
 
     private void sendSchedule() {
-        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_schedule));
+        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.setting_up_schedule));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
