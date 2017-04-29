@@ -45,7 +45,8 @@ import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class DoctorDetailsActivity extends AppCompatActivity implements View.OnClickListener,
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private TextView doctorName;
     private TextView doctorSpeciality;
@@ -112,6 +113,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         // setting typeface
         doctorName.setTypeface(AppGlobals.typefaceNormal);
         doctorSpeciality.setTypeface(AppGlobals.typefaceNormal);
+
+        AppGlobals.buttonEffect(chatButton);
+        AppGlobals.buttonEffect(callButton);
+        AppGlobals.buttonEffect(heartButton);
 
         callButton.setOnClickListener(this);
         chatButton.setOnClickListener(this);
