@@ -4,10 +4,15 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -29,11 +34,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.TargetsAdapter;
-import com.byteshaft.medicosperuanos.doctors.Appointments;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
@@ -41,14 +44,29 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.zfdang.multiple_images_selector.ImagesSelectorActivity;
+import com.zfdang.multiple_images_selector.SelectorSettings;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -59,8 +77,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener {
 
-    private Spinner mDiagnosticsTextView;
-    private Spinner mMedicationTextView;
+    private Spinner mDiagnosticsSpinner;
+    private Spinner mMedicationSpinner;
     private Spinner mDestinationSpinner;
 
     private EditText mDateEditText;
@@ -106,8 +124,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private MedicationAdapter medicationAdapter;
     private LinearLayout checkBoxLayout;
     private int id = -1;
-    private ArrayList<DiagnosticMedication> searchListForDiagonistics;
+    private ArrayList<DiagnosticMedication> searchListForDiagnostics;
     private ArrayList<DiagnosticMedication> searchListForMedications;
+    private DiagnosticSpinnerAdapter diagnosticSpinnerAdapter;
+    private MedicationSpinnerAdapter medicationSpinnerAdapter;
+
+    private TextView quantityTextView;
+    private TextView saveButton;
+    private int selectedTargetId = -1;
+
+    private static final int REQUEST_CODE = 123;
+    private ArrayList<String> imagesArray;
+
+    private String mPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +154,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        Log.i("TAG", " id " + id);
+        ArrayList<Services> arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         diagnosticsList = new ArrayList<>();
         medicationList = new ArrayList<>();
@@ -133,12 +164,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedMedicationList = new ArrayList<>();
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
+        imagesArray = new ArrayList<>();
 
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
         mAppointmentReason = (EditText) findViewById(R.id.appointment_reason_editText);
-        mDiagnosticsTextView = (Spinner) findViewById(R.id.diagnostics_TextView);
-        mMedicationTextView = (Spinner) findViewById(R.id.medication_TextView);
+        mDiagnosticsSpinner = (Spinner) findViewById(R.id.diagnostics_spinner);
+        mMedicationSpinner = (Spinner) findViewById(R.id.medication_spinner);
         mDestinationSpinner = (Spinner) findViewById(R.id.destination_spinner);
 
         mDateEditText = (EditText) findViewById(R.id.date_edit_text);
@@ -151,8 +183,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mPlusButtonDiagnostics = (Button) findViewById(R.id.plus_button_diagnostics);
         mPlusButtonMedication = (Button) findViewById(R.id.plus_button_medication);
         checkBoxLayout = (LinearLayout) findViewById(R.id.checkbox_layout);
+        quantityTextView = (TextView) findViewById(R.id.qty_textview);
+        saveButton = (AppCompatButton) findViewById(R.id.save_button);
+        saveButton.setOnClickListener(this);
         int counter = 0;
-        for (Services services : Appointments.getInstance().patientServices.get(id)) {
+        for (Services services : arrayList) {
+            Log.i("TAG", "services");
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(services.getServiceName());
             checkBox.setTextSize(16);
@@ -173,9 +209,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         backPress.setOnClickListener(this);
         mReturnDateEditText.setOnClickListener(this);
-//        mDiagnosticsTextView.setOnClickListener(this);
         mDestinationSpinner.setOnItemSelectedListener(this);
-//        mMedicationTextView.setOnClickListener(this);
 
         mPlusButtonDiagnostics.setOnClickListener(this);
         mPlusButtonMedication.setOnClickListener(this);
@@ -190,8 +224,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mTimeEditText.setEnabled(false);
         mDateEditText.setEnabled(false);
         getTargets();
-
-
+        Fresco.initialize(getApplicationContext());
         final Calendar calendar = Calendar.getInstance();
         datePickerDialog = new DatePickerDialog(DoctorsAppointment.this,
                 this,
@@ -208,6 +241,57 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
                     }
                 }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
+        diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+        mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
+        medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
+        mMedicationSpinner.setAdapter(medicationSpinnerAdapter);
+
+        mMedicationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                DiagnosticMedication diagnosticMedication = selectedMedicationList.get(i);
+                quantityTextView.setText(String.valueOf(diagnosticMedication.getQuantity()));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        mDestinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Targets targets = targetsArrayList.get(i);
+                selectedTargetId = targets.getId();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+// get selected images from selector
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                imagesArray = data.getStringArrayListExtra(SelectorSettings.SELECTOR_RESULTS);
+                assert imagesArray != null;
+
+                // show results in textview
+                StringBuffer sb = new StringBuffer();
+                sb.append(String.format("Totally %d images selected:", imagesArray.size())).append("\n");
+                for (String result : imagesArray) {
+                    sb.append(result).append("\n");
+                    System.out.println(imagesArray);
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -233,14 +317,81 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+                takeScreenshot();
                 break;
             case R.id.attach_icon:
-                Toast.makeText(this, "working", Toast.LENGTH_SHORT).show();
+//                ImageToPdf();
+                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
+                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
+                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
+                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
+                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
+                startActivityForResult(intent, REQUEST_CODE);
                 break;
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void takeScreenshot() {
+        Date now = new Date();
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+
+            View v1 = getWindow().getDecorView().getRootView();
+            v1.setDrawingCacheEnabled(true);
+            Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
+            v1.setDrawingCacheEnabled(false);
+
+            File imageFile = new File(mPath);
+
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            int quality = 100;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            openScreenshot(imageFile);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
+    }
+
+    private void ImageToPdf() {
+        Document document = new Document();
+        String path = android.os.Environment.getExternalStorageDirectory().toString();
+        try {
+            PdfWriter.getInstance(document, new FileOutputStream(path + "/medicosperuanos.pdf"));
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        document.open();
+        Image image = null;
+        try {
+            image = Image.getInstance(mPath);
+        } catch (BadElementException | IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            float width = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+            float height = document.getPageSize().getHeight() - document.topMargin() - document.bottomMargin();
+            image.scaleToFit(width, height);
+            document.add(new Paragraph(path + "medicosperuanos screen capture"));
+            document.add(image);
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+        document.close();
     }
 
     @Override
@@ -258,22 +409,24 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case R.id.plus_button_medication:
                 medicationDiagnosticsDialog(false);
                 break;
-            case R.id.medication_TextView:
+            case R.id.medication_spinner:
                 break;
-            case R.id.diagnostics_TextView:
+            case R.id.diagnostics_spinner:
+                break;
+            case R.id.save_button:
+                sendAttentionData(id, mConclusionsEditText.getText().toString(), mDateEditText.getText().toString(),
+                        mReturnDateEditText.getText().toString(),
+                        String.valueOf(selectedTargetId), mExplanationEditText.getText().toString(),
+                        mTimeEditText.getText().toString());
                 break;
         }
     }
 
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-        if (!isSetForReturn) {
-            mDateEditText.setText(i2 + "/" + i1 + "/" + i);
-            isSetForReturn = true;
-        } else {
-            mReturnDateEditText.setText(i2 + "/" + i1 + "/" + i);
-            isSetForReturn = false;
-        }
+            mReturnDateEditText.setText(i2 + "/" + (i1+1) + "/" + i);
+        System.out.println(i2 + "/" + (i1+1) + "/" + i);
+
     }
 
     private void getTargets() {
@@ -302,6 +455,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                                break;
+
 
                         }
                 }
@@ -318,28 +473,56 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onReadyStateChange(HttpRequest request, int readyState) {
+        switch (readyState) {
+            case HttpRequest.STATE_DONE:
+                switch (request.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseText());
+                        break;
+                    case HttpURLConnection.HTTP_BAD_REQUEST:
+                        Log.i("TAG", request.getResponseText());
+                        break;
+                }
+        }
 
     }
 
-    private void registerUser(int appointmentId, String conclusion, String date, String dateOfReturn,
-                              String destination, String diagnostics, String exploration, String time) {
+    private void sendAttentionData(int appointmentId, String conclusion, String date, String dateOfReturn,
+                              String destination, String exploration, String time) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
-        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, diagnostics, exploration, time));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.i("TAG", "work " + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
     }
 
 
     private String getAttentionsData(String conclusion, String date, String dateOfReturn,
-                                     String destination, String diagnostics, String exploration, String time) {
+                                     String destination, String exploration, String time) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("conclusion", conclusion);
             jsonObject.put("date", date);
             jsonObject.put("date_of_return", dateOfReturn);
             jsonObject.put("destination", destination);
-            jsonObject.put("diagnostics", diagnostics);
+            JSONArray jsonArray = new JSONArray();
+            for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
+                JSONObject diagnosticObject = new JSONObject();
+//                diagnosticObject.put("diagnostics", diagnosticMedication.getId());
+                jsonArray.put(diagnosticMedication.getId());
+            }
+            jsonObject.put("diagnostics", jsonArray);
+            JSONArray treatmentArray = new JSONArray();
+            for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+                JSONObject treatmentObject = new JSONObject();
+                treatmentObject.put("treatment", diagnosticMedication.getId());
+                treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+                treatmentArray.put(treatmentObject);
+            }
+            jsonObject.put("treatments", treatmentArray);
             jsonObject.put("exploration", exploration);
             jsonObject.put("time", time);
         } catch (JSONException e) {
@@ -381,30 +564,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         if (value) {
             diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(), diagnosticsList);
             medicationDiagnosticListView.setAdapter(diagnosticAdapter);
-            medicationDiagnosticListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DiagnosticMedication diagnosticMedication = medicationList.get(position);
-//                if (mMedicationArrayList.contains(diagnosticMedication))
-//                mMedicationArrayList.add(diagnosticMedication);
-                }
-            });
         } else {
             medicationAdapter = new MedicationAdapter(getApplicationContext(), medicationList);
             medicationDiagnosticListView.setAdapter(medicationAdapter);
-            medicationDiagnosticListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (value) {
-                        DiagnosticMedication diagnosticMedication = diagnosticsList.get(position);
-//                if (mMedicationArrayList.contains(diagnosticMedication))
-//                mMedicationArrayList.add(diagnosticMedication);
-                    } else {
-
-                    }
-
-                }
-            });
         }
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -417,21 +579,21 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Log.i("TAG", charSequence.toString());
                 if (value) {
                     if (!charSequence.toString().isEmpty()) {
-                        searchListForDiagonistics = new ArrayList<>();
+                        searchListForDiagnostics = new ArrayList<>();
                         diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(),
-                                searchListForDiagonistics);
+                                searchListForDiagnostics);
                         medicationDiagnosticListView.setAdapter(diagnosticAdapter);
                         for (DiagnosticMedication diagnosticMedication : diagnosticsList) {
                             if (StringUtils.containsIgnoreCase(diagnosticMedication.getDiagnosticMedication(),
                                     charSequence.toString()) || StringUtils.containsIgnoreCase(String.valueOf(diagnosticMedication.getId()),
                                     charSequence.toString()) ) {
-                                searchListForDiagonistics.add(diagnosticMedication);
+                                searchListForDiagnostics.add(diagnosticMedication);
                                 diagnosticAdapter.notifyDataSetChanged();
 
                             }
                         }
                     } else {
-                        searchListForDiagonistics = new ArrayList<>();
+                        searchListForDiagnostics = new ArrayList<>();
                         diagnosticAdapter = new DiagnosticAdapter(getApplicationContext(),
                                 diagnosticsList);
                         medicationDiagnosticListView.setAdapter(diagnosticAdapter);
@@ -481,6 +643,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+                medicationSpinnerAdapter.notifyDataSetChanged();
+                diagnosticSpinnerAdapter.notifyDataSetChanged();
+                mDiagnosticsSpinner.setSelection(0);
+                mMedicationSpinner.setSelection(0);
             }
         });
         dialog.show();
@@ -652,6 +818,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.check_box);
                viewHolder.idTextView.setTypeface(AppGlobals.typefaceNormal);
                viewHolder.diagnosticListTextView.setTypeface(AppGlobals.typefaceNormal);
+               viewHolder.minus = (ImageButton) convertView.findViewById(R.id.minus);
+               viewHolder.quantity = (TextView) convertView.findViewById(R.id.quantity);
+               viewHolder.add = (ImageButton) convertView.findViewById(R.id.plus);
                convertView.setTag(viewHolder);
                viewHolder.checkBox.setTag(position);
            } else {
@@ -665,6 +834,25 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
            } else {
                viewHolder.checkBox.setChecked(false);
            }
+           viewHolder.quantity.setText(String.valueOf(diagnostic.getQuantity()));
+           viewHolder.add.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   Log.i("TAG", "click");
+                   diagnostic.setQuantity(diagnostic.getQuantity()+1);
+                   notifyDataSetChanged();
+               }
+           });
+           viewHolder.minus.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   if (diagnostic.getQuantity() > 0) {
+                       diagnostic.setQuantity(diagnostic.getQuantity() - 1);
+                       notifyDataSetChanged();
+                   }
+
+               }
+           });
            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                @Override
                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -703,15 +891,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
            TextView idTextView;
            TextView diagnosticListTextView;
            CheckBox checkBox;
+           ImageButton minus;
+           ImageButton add;
+           TextView quantity;
+
        }
    }
 
-   private class DiagonisticSpinnerAdapter extends BaseAdapter {
+   private class DiagnosticSpinnerAdapter extends BaseAdapter {
 
        private ViewHolder viewHolder;
        private ArrayList<DiagnosticMedication> diagnosticMedicationArrayList;
 
-       public DiagonisticSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
+       public DiagnosticSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
            this.diagnosticMedicationArrayList = diagnosticMedicationArrayList;
        }
 
@@ -733,18 +925,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
        @Override
        public View getView(int i, View view, ViewGroup viewGroup) {
            if (view == null) {
-               view = getLayoutInflater().inflate(R.layout.delegate_view, viewGroup, false);
+               view = getLayoutInflater().inflate(R.layout.delegate_view_diagonistics, viewGroup, false);
                viewHolder = new ViewHolder();
                viewHolder.id = (TextView) view.findViewById(R.id.id_text_view);
                viewHolder.textView = (TextView) view.findViewById(R.id.text);
                view.setTag(viewHolder);
            } else {
                viewHolder = (ViewHolder) view.getTag();
-               DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
-               viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
-               viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
            }
-
+           DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
+           viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
+           viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
            return view;
        }
 
@@ -754,4 +945,52 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
        }
    }
+
+    private class MedicationSpinnerAdapter extends BaseAdapter {
+
+        private ViewHolder viewHolder;
+        private ArrayList<DiagnosticMedication> diagnosticMedicationArrayList;
+
+        public MedicationSpinnerAdapter(ArrayList<DiagnosticMedication> diagnosticMedicationArrayList) {
+            this.diagnosticMedicationArrayList = diagnosticMedicationArrayList;
+        }
+
+        @Override
+        public int getCount() {
+            return diagnosticMedicationArrayList.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            if (view == null) {
+                view = getLayoutInflater().inflate(R.layout.delegate_view_medication, viewGroup, false);
+                viewHolder = new ViewHolder();
+                viewHolder.id = (TextView) view.findViewById(R.id.id_text_view);
+                viewHolder.textView = (TextView) view.findViewById(R.id.text);
+                view.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
+            viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
+            viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
+            return view;
+        }
+
+        private class ViewHolder {
+            TextView id;
+            TextView textView;
+
+        }
+    }
 }

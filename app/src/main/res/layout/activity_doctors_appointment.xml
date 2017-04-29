@@ -118,47 +118,35 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <RelativeLayout
-                android:id="@+id/diagnostics_spinner_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight=".6">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="2.5">
+
+            <TextView
+                android:id="@+id/diagnostics_text_view"
+                android:text="Diagnostics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
                 <Spinner
-                    android:id="@+id/diagnostics_TextView"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/diagnostics_spinner"
+                    android:layout_width="250dp"
                     android:layout_height="wrap_content"
                     android:drawablePadding="15dip"
-                    android:text="List of diagnostic for selection"
                     android:drawableRight="@mipmap/dropdown"
-                    android:layout_margin="2dp" />
+                    android:layout_margin="2dp"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
-
-                <View
-                    android:id="@+id/diagnostics_spinner_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_below="@+id/diagnostics_TextView"
-                    android:background="#000" />
-
-                <!--<Button-->
-                    <!--android:id="@+id/minus_button_diagnostics"-->
-                    <!--android:layout_width="15dp"-->
-                    <!--android:layout_height="15dp"-->
-                    <!--android:layout_below="@+id/diagnostics_spinner_view"-->
-                    <!--android:layout_marginTop="7dp"-->
-                    <!--android:background="@mipmap/ic_min" />-->
-
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/diagnostics_button_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:layout_toRightOf="@+id/diagnostics_spinner_layout">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:layout_gravity="center_horizontal">
 
                 <Button
                     android:id="@+id/plus_button_diagnostics"
@@ -178,44 +166,37 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <RelativeLayout
-                android:id="@+id/medication_spinner_layout"
+            <LinearLayout
+                android:id="@+id/main_layout"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight=".72">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="2">
+
+                <TextView
+                    android:id="@+id/treatment_text_view"
+                    android:text="Treatment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <Spinner
-                    android:id="@+id/medication_TextView"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/medication_spinner"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:drawablePadding="8dp"
                     android:text="List of medication for selection"
                     android:drawableRight="@mipmap/dropdown"
-                    android:layout_margin="2dp" />
+                    android:layout_margin="2dp"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_below="@+id/medication_TextView"
-                    android:layout_marginRight="10dp"
-                    android:background="#000" />
-
-                <!--<Button-->
-                    <!--android:id="@+id/minus_button_medication"-->
-                    <!--android:layout_width="15dp"-->
-                    <!--android:layout_height="15dp"-->
-                    <!--android:layout_below="@+id/medication_TextView"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:background="@mipmap/ic_min"/>-->
-
-            </RelativeLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/medication_button_layout"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal">
+                android:layout_weight="1"
+                android:layout_gravity="bottom">
 
                 <TextView
                     android:id="@+id/qty_textview"
@@ -261,13 +242,9 @@
                 <Spinner
                     android:id="@+id/destination_spinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/destination_spinner"
-                    android:background="#000" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -310,7 +287,7 @@
 
 
         <android.support.v7.widget.AppCompatButton
-            android:id="@+id/login_button"
+            android:id="@+id/save_button"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"

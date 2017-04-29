@@ -485,7 +485,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send(getUserReviewData(stars, review));
-        Helpers.showProgressDialog(getActivity(), "Submitting you review...");
+        Helpers.showProgressDialog(getActivity(), "Submitting your review...");
     }
 
 
