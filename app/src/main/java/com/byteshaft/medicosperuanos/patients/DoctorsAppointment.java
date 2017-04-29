@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -320,7 +321,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
 
         try {
-            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + "medicosperuanos.jpg";
+            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
 
             View v1 = getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
@@ -334,9 +335,18 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
+            openScreenshot(imageFile);
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    private void openScreenshot(File imageFile) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.fromFile(imageFile);
+        intent.setDataAndType(uri, "image/*");
+        startActivity(intent);
     }
 
     private void ImageToPdf() {
@@ -390,13 +400,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-        if (!isSetForReturn) {
-            mDateEditText.setText(i2 + "/" + i1 + "/" + i);
-            isSetForReturn = true;
-        } else {
             mReturnDateEditText.setText(i2 + "/" + i1 + "/" + i);
             isSetForReturn = false;
-        }
+
     }
 
     private void getTargets() {
