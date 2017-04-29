@@ -282,9 +282,13 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 }
                 break;
             case R.id.service_spinner:
-                DoctorServicesDialog dialog = new DoctorServicesDialog(CreateAppointmentActivity.this);
-                dialog.setTitle("Select Services");
-                dialog.show();
+                if (arrayList.size() > 0) {
+                    DoctorServicesDialog dialog = new DoctorServicesDialog(CreateAppointmentActivity.this);
+                    dialog.setTitle("Select Services");
+                    dialog.show();
+                } else {
+                    Helpers.showSnackBar(findViewById(android.R.id.content), R.string.no_services_message);
+                }
         }
     }
 
