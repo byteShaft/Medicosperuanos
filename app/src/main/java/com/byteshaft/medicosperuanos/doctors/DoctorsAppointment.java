@@ -70,9 +70,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
-/**
- * Created by husnain on 2/23/17.
- */
 
 public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
         DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
@@ -417,6 +414,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.return_date_edit_text:
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
                 datePickerDialog.show();
                 break;
             case R.id.back_press:
@@ -670,8 +668,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
-        for (String path : imagesArrayList) {
-            data.append(FormData.TYPE_CONTENT_FILE,"photos" , path);
+        if (imagesArrayList != null) {
+            for (String path : imagesArrayList) {
+                data.append(FormData.TYPE_CONTENT_FILE, "photos", path);
+            }
         }
         return data;
 
