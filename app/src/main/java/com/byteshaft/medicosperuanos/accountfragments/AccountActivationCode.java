@@ -190,7 +190,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
                             Log.i("token", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
                             FragmentManager fragmentManager = getFragmentManager();
                             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                            AccountManagerActivity.getInstance().loadFragment(new UserBasicInfoStepOne());
+                            AccountManagerActivity.getInstance().loadFragment(new UserBasicInfoStepOne(true));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
