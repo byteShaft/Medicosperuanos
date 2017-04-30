@@ -111,6 +111,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
     private int locationCounter = 0;
     private static final int LOCATION_PERMISSION = 1;
     private static final int STORAGE_PERMISSION = 2;
+    private boolean fromAccountManager;
 
 
     @Override
@@ -122,6 +123,10 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         } else {
             ((AppCompatActivity) getActivity()).getSupportActionBar()
                     .setTitle(getResources().getString(R.string.sign_up));
+        }
+        Bundle bundle = this.getArguments();
+        if (bundle != null) {
+            fromAccountManager = bundle.getBoolean("boolean", false);
         }
         mProfilePicture = (CircleImageView) mBaseView.findViewById(R.id.user_dp);
         mDocID = (EditText) mBaseView.findViewById(R.id.doctor_id_edit_text);
@@ -248,13 +253,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL, imageUrl);
                     }
                     if (!AppGlobals.isDoctor()) {
-                        if (AccountManagerActivity.getInstance() != null) {
+                        if (fromAccountManager) {
                             AccountManagerActivity.getInstance().loadFragment(new UserBasicInfoStepTwo());
                         } else {
                             MainActivity.getInstance().loadFragment(new UserBasicInfoStepTwo());
                         }
                     } else {
-                        if (AccountManagerActivity.getInstance() != null) {
+                        if (fromAccountManager) {
                             AccountManagerActivity.getInstance().loadFragment(new DoctorsBasicInfo());
                         } else {
                             MainActivity.getInstance().loadFragment(new DoctorsBasicInfo());

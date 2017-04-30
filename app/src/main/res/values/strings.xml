@@ -79,7 +79,7 @@
     <string name="terms_and_conditions_of_the_services">Terms and conditions of the services</string>
     <string name="recover">Recover</string>
     <string name="password_forgot">Forgot Password?</string>
-    <string name="old_password">Old Password</string>
+    <string name="old_password">Password reset key</string>
     <string name="new_password">New Password</string>
     <string name="reset">Reset</string>
     <string name="password">Password</string>
