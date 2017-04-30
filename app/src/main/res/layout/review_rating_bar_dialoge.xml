@@ -13,11 +13,9 @@
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:backgroundTint="@color/normal_rating_bar"
         android:clickable="true"
         android:isIndicator="false"
-        android:numStars="5"
-        android:progressTint="@color/activated_rating_bar" />
+        android:numStars="5" />
 
     <EditText
         android:id="@+id/reviewED"
