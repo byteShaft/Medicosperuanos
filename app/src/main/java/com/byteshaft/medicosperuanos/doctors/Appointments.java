@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -54,6 +55,10 @@ public class Appointments extends Fragment implements
     private ArrayList<Agenda> agendaArrayList;
     private Adapter arrayAdapter;
     private static Appointments sInstance;
+    private Button confirmaedAppointments;
+    private Button pendingAppointments;
+    private Button attendedAppointments;
+    private Button totalAppointments;
 
     public static Appointments getInstance() {
         return sInstance;
@@ -77,6 +82,10 @@ public class Appointments extends Fragment implements
         agendaArrayList = new ArrayList<>();
         Helpers.showProgressDialog(getActivity(), "Please wait...");
         getAgendaList(Helpers.getDate());
+        confirmaedAppointments = (Button) mBaseView.findViewById(R.id.confirmed_appointments);
+        pendingAppointments = (Button) mBaseView.findViewById(R.id.to_be_confirmed_appointments);
+        attendedAppointments = (Button) mBaseView.findViewById(R.id.attended_appointments);
+        totalAppointments = (Button) mBaseView.findViewById(R.id.total_appointments_today);
 
         // assign event handler
         calendarView.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {
@@ -201,6 +210,44 @@ public class Appointments extends Fragment implements
             e.printStackTrace();
         }
         request.send(jsonObject.toString());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDashBoardDetails();
+    }
+
+    private void getDashBoardDetails() {
+        HttpRequest dashBoardRequest = new HttpRequest(getActivity().getApplicationContext());
+        dashBoardRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                try {
+                                    JSONObject dashBoardValues = new JSONObject(request.getResponseText());
+//                                    confirmaedAppointments.setText(String.valueOf(dashBoardValues.getString("")));
+                                    pendingAppointments.setText(String.valueOf(dashBoardValues
+                                            .getInt("appointments_to_be_confirmed")));
+                                    totalAppointments.setText(String.valueOf(String.valueOf(dashBoardValues
+                                            .getInt("appointments_count"))));
+//                                    attendedAppointments.setText(String.valueOf(String.valueOf(String.valueOf(dashBoardValues
+//                                            .getInt("attended")))));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                        }
+                }
+            }
+        });
+        dashBoardRequest.open("GET", String.format("%sdoctor/statistics", AppGlobals.BASE_URL));
+        dashBoardRequest.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        dashBoardRequest.send();
     }
 
     @Override
