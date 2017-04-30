@@ -153,8 +153,7 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
-                    android:layout_marginLeft="25dp"
-                    android:layout_marginTop="5dp"
+                    android:layout_marginTop="35dp"
                     android:background="@mipmap/ic_plus_blue" />
             </RelativeLayout>
         </LinearLayout>
@@ -198,7 +197,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="bottom"
                 android:gravity="bottom"
-                android:layout_marginBottom="5dp"
+                android:layout_marginBottom="10dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -209,7 +208,7 @@
                 <TextView
                     android:id="@+id/qty_text_view"
                     android:layout_width="38dp"
-                    android:layout_height="25dp"
+                    android:layout_height="30dp"
                     android:gravity="center"
                     android:hint="Qty"
                     android:textSize="12sp" />
@@ -226,9 +225,7 @@
                     android:id="@+id/plus_button_medication"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginTop="7dp"
-                    android:layout_toRightOf="@+id/qty_text_view"
+                    android:layout_marginLeft="20dp"
                     android:background="@mipmap/ic_plus_blue" />
             </LinearLayout>
         </LinearLayout>
@@ -275,6 +272,7 @@
                         android:editable="false"
                         android:focusable="false"
                         android:hint="Date of return"
+                        android:layout_marginBottom="-7dp"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
 
