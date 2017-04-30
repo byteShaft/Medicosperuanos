@@ -104,6 +104,11 @@ public class AppGlobals extends Application {
     public static final int CALL_PERMISSION = 4;
 
     public static boolean isDoctorFavourite = false;
+    public static final String INCOME_TODAY = "Income today";
+    public static final String APPOINTMENT_TODAY = "Appointment today";
+    public static final String MESSAGES = "Message";
+    public static final String APPOINTMENT_FOR_CONFIRMATION = "Appointment for confirmation";
+    public static final String APPOINTMENT_CANCELLED = "Appointment Canceled";
 
     @Override
     public void onCreate() {

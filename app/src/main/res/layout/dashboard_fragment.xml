@@ -65,12 +65,12 @@
         android:layout_height="150dp"
         android:layout_below="@+id/board" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/dashboard_list"
+    <ListView
+        android:id="@+id/dashboard_list_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/chart">
 
-    </android.support.v7.widget.RecyclerView>
+    </ListView>
 
 </RelativeLayout>

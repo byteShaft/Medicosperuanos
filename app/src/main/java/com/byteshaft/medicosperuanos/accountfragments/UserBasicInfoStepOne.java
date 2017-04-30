@@ -25,6 +25,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -138,30 +140,49 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         mDateOfBirth.setTypeface(AppGlobals.typefaceNormal);
         mAddress.setTypeface(AppGlobals.typefaceNormal);
 
-        mDocID.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_ID));
-        mFirstName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME));
-        mLastName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
-        mDateOfBirth.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
-        mAddress.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS));
-        String gender = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER);
+        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+            mDocID.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_ID));
+            mFirstName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME));
+            mLastName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
+            mDateOfBirth.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
+            mAddress.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS));
+            mLocationString = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION);
+            String gender = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER);
+            if (gender.contains("M")) {
+                mRadioGroup.check(R.id.radio_button_male);
+                mGenderButtonString = gender;
+            } else {
+                mRadioGroup.check(R.id.radio_button_female);
+                mGenderButtonString = gender;
+            }
 
-        if (gender.contains("M")) {
-            mRadioGroup.check(R.id.radio_button_male);
-            mGenderButtonString = gender;
-        } else {
-            mRadioGroup.check(R.id.radio_button_female);
-            mGenderButtonString = gender;
+            if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
+                String url = String.format("%s" + AppGlobals
+                        .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
+                getBitMap(url, mProfilePicture);
+            }
+            if (AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL) != null) {
+                Bitmap bitmap = BitmapFactory.decodeFile(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
+                mProfilePicture.setImageBitmap(bitmap);
+            }
         }
+        mAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
-            String url = String.format("%s" + AppGlobals
-                    .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
-            getBitMap(url, mProfilePicture);
-        }
-        if (AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL) != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
-            mProfilePicture.setImageBitmap(bitmap);
-        }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mLocationString = null;
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
         mNextButton.setOnClickListener(this);
         mAddressTextView.setOnClickListener(this);
         mDateOfBirth.setOnClickListener(this);
