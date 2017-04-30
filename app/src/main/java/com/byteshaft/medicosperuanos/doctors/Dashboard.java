@@ -184,10 +184,6 @@ public class Dashboard extends Fragment {
             try {
             if (text.equals(AppGlobals.INCOME_TODAY)) {
                 viewHolder.tvAchievementTitle.setText(text);
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewHolder.tvAchievement.getLayoutParams();
-                params.height = 70;
-                params.width = 100;
-                viewHolder.tvAchievement.setLayoutParams(params);
                 viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
                         .getInt("income_amount")));
                 viewHolder.tvAchievement.setBackgroundColor(
