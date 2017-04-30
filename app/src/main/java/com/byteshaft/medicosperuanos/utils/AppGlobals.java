@@ -93,7 +93,6 @@ public class AppGlobals extends Application {
     public static final String REJECTED = "rejected";
     public static final String ATTENDED = "attended";
 
-
     private static final String SERVICE_KEY = "iServiceON";
     public static final String KEY__FCM_TOKEN = "token";
 
