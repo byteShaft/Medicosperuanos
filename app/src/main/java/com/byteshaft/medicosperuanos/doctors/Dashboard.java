@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.data.BarData;
@@ -136,6 +137,19 @@ public class Dashboard extends Fragment {
                 }
             }
         });
+        dashBoardRequest.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+                    Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+                }
+                switch (readyState) {
+                    case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                        Helpers.showSnackBar(getView(), "connection time out");
+                        break;
+                }
+            }
+        });
         dashBoardRequest.open("GET", String.format("%sdoctor/statistics", AppGlobals.BASE_URL));
         dashBoardRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -160,6 +174,8 @@ public class Dashboard extends Fragment {
                 viewHolder.nextButton = (ImageButton) convertView.findViewById(R.id.button_next);
                 viewHolder.tvAchievementTitle = (TextView) convertView.findViewById(R.id.achievement_title);
                 viewHolder.tvAchievement = (TextView) convertView.findViewById(R.id.achievement);
+                viewHolder.tvAchievement.setTypeface(AppGlobals.robotoBoldItalic);
+                viewHolder.tvAchievementTitle.setTypeface(AppGlobals.robotoBoldItalic);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();

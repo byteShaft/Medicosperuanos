@@ -229,13 +229,14 @@ public class Appointments extends Fragment implements
                             case HttpURLConnection.HTTP_OK:
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
-//                                    confirmaedAppointments.setText(String.valueOf(dashBoardValues.getString("")));
+                                    confirmaedAppointments.setText(String.valueOf(dashBoardValues
+                                            .getString("appointments_confirmed")));
                                     pendingAppointments.setText(String.valueOf(dashBoardValues
                                             .getInt("appointments_to_be_confirmed")));
                                     totalAppointments.setText(String.valueOf(String.valueOf(dashBoardValues
                                             .getInt("appointments_count"))));
-//                                    attendedAppointments.setText(String.valueOf(String.valueOf(String.valueOf(dashBoardValues
-//                                            .getInt("attended")))));
+                                    attendedAppointments.setText(String.valueOf(String.valueOf(String.valueOf(dashBoardValues
+                                            .getInt("appointments_attended")))));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

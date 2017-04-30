@@ -19,19 +19,19 @@
             android:id="@+id/image_"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@android:drawable/ic_menu_recent_history" />
+            android:src="@drawable/clock" />
 
         <TextView
             android:id="@+id/achievement_title"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/image_"
-            android:layout_marginBottom="18dp"
+            android:maxWidth="200dp"
+            android:gravity="center_vertical"
             android:layout_marginLeft="4dp"
             android:layout_toEndOf="@+id/image_"
-            android:layout_toLeftOf="@+id/achievement"
             android:layout_toRightOf="@+id/image_"
-            android:layout_toStartOf="@+id/achievement"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
             android:maxLines="1"
             android:text="Today's Income"
             android:textColor="@android:color/black"
