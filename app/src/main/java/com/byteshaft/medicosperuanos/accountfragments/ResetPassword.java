@@ -2,7 +2,9 @@ package com.byteshaft.medicosperuanos.accountfragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
@@ -148,16 +149,31 @@ public class ResetPassword extends Fragment implements View.OnClickListener, Htt
                         break;
                     case HttpURLConnection.HTTP_OK:
                         System.out.println(request.getResponseText() + "working ");
-                        MainActivity.getInstance().loadFragment(new UserBasicInfoStepOne());
+                        loadFragment(new Login());
                         Toast.makeText(getActivity(), "Your password successfully changed", Toast.LENGTH_SHORT).show();
                 }
         }
 
     }
 
+    public void loadFragment(Fragment fragment) {
+        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        tx.replace(R.id.container, fragment);
+        tx.commit();
+    }
+
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
+        if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+            Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        }
+        switch (readyState) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                Helpers.showSnackBar(getView(), "connection time out");
+                break;
+        }
+        Log.i("TAG", "error " + exception.getLocalizedMessage());
 
     }
 }

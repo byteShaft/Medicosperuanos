@@ -2,6 +2,7 @@ package com.byteshaft.medicosperuanos.accountfragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -11,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
@@ -102,10 +102,16 @@ public class ForgotPassword extends Fragment implements View.OnClickListener, Ht
                     case HttpURLConnection.HTTP_OK:
                         System.out.println(request.getResponseText() + "working ");
                         Toast.makeText(getActivity(), "Please check your Email for new password", Toast.LENGTH_LONG).show();
-                        MainActivity.getInstance().loadFragment(new ResetPassword());
+                        loadFragment(new ResetPassword());
                 }
         }
 
+    }
+
+    public void loadFragment(Fragment fragment) {
+        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        tx.replace(R.id.container, fragment);
+        tx.commit();
     }
 
     @Override

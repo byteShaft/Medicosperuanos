@@ -204,6 +204,20 @@ public class Services extends Fragment implements View.OnClickListener {
                 }
             }
         });
+        mRequestServiceList.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+                    Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+                }
+                switch (readyState) {
+                    case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                        Helpers.showSnackBar(getView(), "connection time out");
+                        break;
+                }
+                Helpers.dismissProgressDialog();
+            }
+        });
         mRequestServiceList.open("GET", String.format("%sservices", AppGlobals.BASE_URL));
         mRequestServiceList.send();
         Helpers.showProgressDialog(getActivity(), "Getting services list" + "\n" + "please wait..");

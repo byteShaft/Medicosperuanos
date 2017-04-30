@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -307,7 +308,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_messages) {
             loadFragment(new MainMessages());
         } else if (id == R.id.nav_profile) {
-            loadFragment(new UserBasicInfoStepOne());
+            loadFragment();
         } else if (id == R.id.nav_schedule) {
             loadFragment(new MySchedule());
         } else if (id == R.id.nav_my_services) {
@@ -354,6 +355,26 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void loadFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("boolean", false);
+        UserBasicInfoStepOne userBasicInfoStepOne = new UserBasicInfoStepOne();
+        userBasicInfoStepOne.setArguments(bundle);
+        String backStateName = userBasicInfoStepOne.getClass().getName();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        fragmentTransaction.replace(R.id.container, userBasicInfoStepOne, backStateName);
+        FragmentManager manager = getSupportFragmentManager();
+        Log.i("TAG", backStateName);
+//        if (fragment.isVisible()) {
+        boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
+        if (!fragmentPopped) {
+            fragmentTransaction.addToBackStack(backStateName);
+            fragmentTransaction.commit();
+//            }
+        }
     }
 
     public void loadFragment(Fragment fragment) {
