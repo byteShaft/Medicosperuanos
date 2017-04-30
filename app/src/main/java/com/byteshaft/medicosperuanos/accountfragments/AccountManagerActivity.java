@@ -31,7 +31,7 @@ public class AccountManagerActivity extends AppCompatActivity {
         if (!AppGlobals.isLogin()) {
             loadFragment(new Login());
         } else if (!AppGlobals.isInfoAvailable()) {
-            loadFragment();
+            loadFragment(new UserBasicInfoStepOne(true));
         } else {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
@@ -45,25 +45,6 @@ public class AccountManagerActivity extends AppCompatActivity {
         sInstance = this;
     }
 
-    public void loadFragment() {
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("boolean", true);
-        UserBasicInfoStepOne userBasicInfoStepOne = new UserBasicInfoStepOne();
-        userBasicInfoStepOne.setArguments(bundle);
-        String backStateName = userBasicInfoStepOne.getClass().getName();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-        fragmentTransaction.replace(R.id.container, userBasicInfoStepOne, backStateName);
-        FragmentManager manager = getSupportFragmentManager();
-        Log.i("TAG", backStateName);
-//        if (fragment.isVisible()) {
-        boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
-        if (!fragmentPopped) {
-            fragmentTransaction.addToBackStack(backStateName);
-            fragmentTransaction.commit();
-//            }
-        }
-    }
 
     public void loadFragment(Fragment fragment) {
         String backStateName = fragment.getClass().getName();

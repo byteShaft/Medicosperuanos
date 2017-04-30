@@ -1,6 +1,7 @@
 package com.byteshaft.medicosperuanos.accountfragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -65,9 +66,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.app.Activity.RESULT_OK;
 import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
 
+@SuppressLint("ValidFragment")
 public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.OnDateSetListener,
         View.OnClickListener, RadioGroup.OnCheckedChangeListener, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnFileUploadProgressListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnFileUploadProgressListener {
+
+
+    public UserBasicInfoStepOne(boolean value) {
+        fromAccountManager = value;
+    }
 
     private View mBaseView;
     private static final int REQUEST_CAMERA = 1;

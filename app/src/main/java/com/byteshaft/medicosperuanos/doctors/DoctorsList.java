@@ -98,7 +98,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         doctors = new ArrayList<>();
         sDoctorServices = new HashMap<>();
         locationsArrayList = new ArrayList<>();
-        getDoctorList();
         sInstance = this;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
@@ -251,6 +250,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             }
         });
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDoctorList();
     }
 
     private void getDoctorList() {
