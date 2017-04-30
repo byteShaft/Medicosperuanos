@@ -268,7 +268,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("PATCH", String.format("%sdoctor/schedule/", AppGlobals.BASE_URL));
+        request.open("PUT", String.format("%sdoctor/schedule/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
