@@ -178,24 +178,24 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                 Bitmap bitmap = BitmapFactory.decodeFile(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
                 mProfilePicture.setImageBitmap(bitmap);
             }
+            mAddress.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    mLocationString = null;
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
         }
-        mAddress.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                mLocationString = null;
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         mNextButton.setOnClickListener(this);
         mAddressTextView.setOnClickListener(this);
         mDateOfBirth.setOnClickListener(this);
