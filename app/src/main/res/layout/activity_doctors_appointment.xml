@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -98,6 +99,8 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:counterEnabled="true"
+            app:counterMaxLength="250"
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp">
 
@@ -106,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Exploration.(250 character max)"
-                android:inputType="textPersonName"
+                android:inputType="text"
                 android:lines="3"
                 android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
@@ -281,13 +284,16 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
+            app:counterEnabled="true"
+            app:counterMaxLength="250"
+            app:counterTextAppearance="@anim/enter"
             android:layout_height="wrap_content">
 
             <EditText
                 android:id="@+id/conclusions_edit_text"
                 android:layout_width="match_parent"
+                android:hint="Conclusion"
                 android:layout_height="wrap_content"
-                android:hint="Conclusions(250 character max)"
                 android:inputType="text"
                 android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
