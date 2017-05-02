@@ -234,6 +234,11 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
                                             stateJson.getInt("id"));
 
+                                    JSONObject insuranceObject = jsonObject.getJSONObject("insurance_carrier");
+                                    Log.i("TAG", "insurance " + insuranceObject.toString());
+                                    AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
+                                            insuranceObject.getInt("id"));
+
                                     if (AppGlobals.isDoctor()) {
                                         JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
                                         AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,

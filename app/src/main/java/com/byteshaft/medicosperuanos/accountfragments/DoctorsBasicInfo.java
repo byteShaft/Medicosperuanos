@@ -413,9 +413,13 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                                 AppGlobals.getDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED)) {
                                             specialistPosition = i;
                                         }
+                                        String specialityId = jsonObject.getString(AppGlobals.KEY_KEY_SPECIALITY_ID);
+                                        System.out.println(jsonObject.getInt("id") + "boss pak specialities");
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
+                                        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_KEY_SPECIALITY_ID, specialityId);
                                     }
+
                                     specialitiesAdapter = new SpecialitiesAdapter(getActivity(), specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
                                     mSpecialitySpinner.setSelection(specialistPosition);
