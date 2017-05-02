@@ -70,6 +70,7 @@ public class AppGlobals extends Application {
     public static final String KEY_AFFILIATE_CLINIC = "affiliate_clinic";
     public static final String KEY_CHAT_STATUS = "available_to_chat";
     public static final String KEY_INSURANCE_CARRIER = "insurance_carrier";
+    public static final String KEY_AFFILIATE_CLINIC_ID = "affiliate_clinic";
     public static final String KEY_EMERGENCY_CONTACT = "emergency_contact";
     public static final String KEY_SUBSCRIPTION_TYPE = "subscription_plan";
     public static final String KEY_CONSULTATION_TIME = "consultation_time";
@@ -87,6 +88,10 @@ public class AppGlobals extends Application {
     public static final String KEY_CLINIC_SELECTED = "selected_clinic";
     public static final String KEY_SPECIALIST_SELECTED = "selected_specialist";
     public static final String KEY_INSURANCE_SELECTED = "selected_insurance";
+
+    public static final String KEY_INSURANCE_ID = "id";
+    public static final String KEY_KEY_SPECIALITY_ID = "id";
+    public static final String KEY_KEY_SUBSCRIPTION_TYPE_ID = "id";
 
     public static final String PENDING = "pending";
     public static final String ACCEPTED = "accepted";
@@ -244,6 +249,11 @@ public class AppGlobals extends Application {
     public static String getStringFromSharedPreferences(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getString(key, "");
+    }
+
+    public static int getIntegerFromSharedPreferences(String key) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getInt(key, -1);
     }
 
     public static void firstTimeLaunch(boolean value) {
