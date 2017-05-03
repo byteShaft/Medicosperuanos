@@ -164,6 +164,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mTime.setText(startTime);
         Helpers.getBitMap(drPhoto, mDoctorImage);
         getSchedule(currentDate);
+        Log.i("TAG", "this "  + currentDate);
     }
 
     @Override
@@ -356,6 +357,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             Intent intent = new Intent(this, CreateAppointmentActivity.class);
             intent.putExtra("appointment_id", appointmentDetail.getSlotId());
             intent.putExtra("start_time", appointmentDetail.getStartTime());
+            intent.putExtra("schedule_date", currentDate);
             intent.putExtra("available_to_chat", availableForChat);
             intent.putExtra("name", drName);
             intent.putExtra("user", id);

@@ -257,7 +257,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
                                     } else {
-                                        
+
                                         JSONObject insuranceObject = jsonObject.getJSONObject("insurance_carrier");
                                         Log.i("TAG", "insurance " + insuranceObject.toString());
                                         AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
