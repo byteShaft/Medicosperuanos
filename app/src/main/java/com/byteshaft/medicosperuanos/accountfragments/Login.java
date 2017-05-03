@@ -151,7 +151,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
-                    }
+                        }
 
                         break;
 
@@ -189,8 +189,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
         AppGlobals.alertDialog(getActivity(), getString(R.string.login_faild), getResources().getString(R.string.check_internet));
-
-
 
 
     }
@@ -234,10 +232,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
                                             stateJson.getInt("id"));
 
-                                    JSONObject insuranceObject = jsonObject.getJSONObject("insurance_carrier");
-                                    Log.i("TAG", "insurance " + insuranceObject.toString());
-                                    AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
-                                            insuranceObject.getInt("id"));
 
                                     if (AppGlobals.isDoctor()) {
                                         JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
@@ -262,6 +256,12 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_COLLEGE_ID, collageId);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
+                                    } else {
+                                        
+                                        JSONObject insuranceObject = jsonObject.getJSONObject("insurance_carrier");
+                                        Log.i("TAG", "insurance " + insuranceObject.toString());
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
+                                                insuranceObject.getInt("id"));
                                     }
                                     String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
 
