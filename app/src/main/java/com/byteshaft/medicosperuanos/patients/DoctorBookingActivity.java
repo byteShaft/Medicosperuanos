@@ -78,6 +78,10 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ProgressBar progressBar;
     private String location;
 
+    private String patientNameString;
+    private String patientAgeString;
+    private String circleImageViewString;
+
     public static DoctorBookingActivity getInstance() {
         return sInstance;
     }
@@ -139,6 +143,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mChatButton.setOnClickListener(this);
         mFavButton.setOnClickListener(this);
         Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
+
+
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
         final String startTime = getIntent().getStringExtra("start_time");
@@ -149,6 +155,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
+        System.out.println(id + "ruhab");
         location = getIntent().getStringExtra("location");
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
@@ -312,10 +319,12 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", "abc " + request.getResponseURL());
                 progressBar.setVisibility(View.GONE);
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+
                         timeSlots = new ArrayList<>();
                         timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
                         timeTableGrid.setAdapter(timeTableAdapter);
@@ -336,6 +345,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                             e.printStackTrace();
                         }
                         break;
+                    case HttpURLConnection.HTTP_FORBIDDEN:
+                        System.out.println(request.getResponseText() + "jhoni");
                 }
         }
 
