@@ -249,6 +249,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                     if (mLocationString == null) {
                         LatLng location = getLocationFromAddress(AppGlobals.getContext(), mAddressString);
                         mLocationString = String.format("%s,%s", location.latitude, location.longitude);
+                        System.out.println(mLocationString + "location");
                     }
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, mDocIDString);
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, mFirstNameString);
