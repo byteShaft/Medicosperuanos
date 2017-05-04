@@ -31,6 +31,7 @@ import java.util.HashSet;
 /**
  * Created by a7med on 28/06/2015.
  */
+
 public class CalendarView extends LinearLayout {
     // for logging
     private static final String LOGTAG = "Calendar View";
@@ -116,7 +117,7 @@ public class CalendarView extends LinearLayout {
         btnNext.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentDate.add(Calendar.MONTH, 1);
+                currentDate.add(Calendar.DAY_OF_YEAR, 1);
                 updateCalendar();
             }
         });
@@ -143,7 +144,7 @@ public class CalendarView extends LinearLayout {
                     Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
 
                 } else {
-                    currentDate.add(Calendar.MONTH, -1);
+                    currentDate.add(Calendar.DAY_OF_YEAR, -1);
                     updateCalendar();
                 }
             }
