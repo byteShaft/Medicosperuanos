@@ -262,10 +262,12 @@ public class Appointments extends Fragment implements
                     // close
                     case 0:
                         updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
+                        getDashBoardDetails();
                         return true;
                     // tick
                     case 1:
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
+                        getDashBoardDetails();
                         return true;
                     default:
                         return false;
