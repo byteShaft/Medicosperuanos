@@ -114,6 +114,7 @@
                         android:id="@+id/doc_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="DocID"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -138,6 +139,7 @@
                         android:id="@+id/birth_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="Birth Date"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -163,6 +165,7 @@
                     android:id="@+id/patient_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:editable="false"
                     android:hint="Address"
                     android:textSize="15sp" />
             </android.support.design.widget.TextInputLayout>
@@ -195,6 +198,7 @@
                         android:id="@+id/state_Edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="State"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -209,6 +213,7 @@
                         android:id="@+id/Phone_primary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="@string/phone_1"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -234,6 +239,7 @@
                         android:id="@+id/city_Edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="City"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -249,6 +255,7 @@
                         android:id="@+id/Phone_secondary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:editable="false"
                         android:hint="@string/phone_2"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
@@ -273,6 +280,7 @@
                     android:id="@+id/emergency_contact_"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:editable="false"
                     android:hint="@string/emergency_contact"
                     android:textSize="15sp" />
             </android.support.design.widget.TextInputLayout>
@@ -287,6 +295,7 @@
                     android:id="@+id/insurance_carrier"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:editable="false"
                     android:hint="Insurance Carrier"
                     android:textSize="15sp" />
             </android.support.design.widget.TextInputLayout>
