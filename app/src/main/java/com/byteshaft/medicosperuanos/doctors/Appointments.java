@@ -147,6 +147,10 @@ public class Appointments extends Fragment implements
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Agenda agenda = agendaArrayList.get(i);
+                if (agenda.getAgendaState().equals(AppGlobals.PENDING)) {
+                    Helpers.showSnackBar(getView(), R.string.accept_appointment_first);
+                    return;
+                }
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
                 intent.putExtra("id", agenda.getAgendaId());
                 intent.putExtra("reason", agenda.getReason());

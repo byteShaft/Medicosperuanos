@@ -258,7 +258,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         getDoctorList();
     }
 
-    private void getDoctorList() {
+    public void getDoctorList() {
         Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_doctor_list));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
@@ -355,7 +355,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "response " + request.getResponseText());
+//                        Log.i("TAG", "response " + request.getResponseText());
                         if (request.getResponseText().trim().isEmpty()) {
                             return;
                         }
@@ -374,6 +374,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                 JSONArray doctorList = mainJsonObject.getJSONArray("doctors");
                                 for (int j = 0; j < doctorList.length(); j++) {
                                     JSONObject doctorDetail = doctorList.getJSONObject(j);
+                                    Log.i("TAG", "list " + doctorDetail);
                                     DoctorDetails doctorDetails = new DoctorDetails();
                                     doctorDetails.setDate(date);
                                     JSONObject speciality = doctorDetail.getJSONObject("speciality");

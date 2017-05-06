@@ -358,6 +358,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                         Log.i("TAG", "response " + request.getResponseText());
                         break;
                     case HttpURLConnection.HTTP_CREATED:
+                        Log.i("TAG", "response " + request.getResponseText());
                         Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.appointment_created));
                         new android.os.Handler().postDelayed(new Runnable() {
                             @Override
