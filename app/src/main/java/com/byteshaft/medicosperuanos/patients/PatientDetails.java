@@ -112,17 +112,16 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         insuranceCarrierEditText.setText(insuranceCarrierEditTextString);
         phonePrimary.setText(phonePrimaryString);
         phoneSecondary.setText(phoneSecondaryString);
-
-        docId.setEnabled(false);
-        birthDate.setEnabled(false);
-        patientAddress.setEnabled(false);
-        stateEditText.setEnabled(false);
-        cityEditText.setEnabled(false);
-        phonePrimary.setEnabled(false);
-        phoneSecondary.setEnabled(false);
-        emergencyContact.setEnabled(false);
-        insuranceCarrierEditText.setEnabled(false);
-
+//
+//        docId.setEnabled(false);
+//        birthDate.setEnabled(false);
+//        patientAddress.setEnabled(false);
+//        stateEditText.setEnabled(false);
+//        cityEditText.setEnabled(false);
+//        phonePrimary.setEnabled(false);
+//        phoneSecondary.setEnabled(false);
+//        emergencyContact.setEnabled(false);
+//        insuranceCarrierEditText.setEnabled(false);
 
         patientName.setTypeface(AppGlobals.typefaceNormal);
         patientAge.setTypeface(AppGlobals.typefaceNormal);
