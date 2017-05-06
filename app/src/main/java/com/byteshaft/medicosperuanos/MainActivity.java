@@ -46,6 +46,7 @@ import java.net.HttpURLConnection;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.byteshaft.medicosperuanos.utils.Helpers.calculateAge;
 import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
 
 public class MainActivity extends AppCompatActivity
@@ -64,6 +65,22 @@ public class MainActivity extends AppCompatActivity
     private CircleImageView profilePicture;
     private HttpRequest request;
     private boolean isError;
+
+    String address;
+    int city;
+    String dob;
+    String firstName;
+    String gender;
+    String identityDocument;
+    int insuranceCarrier;
+    String lastName;
+    String location;
+    String phoneNumberPrimary;
+    int state;
+    String consultationTime;
+    int speciality;
+    int subscriptionPlan;
+    String collegeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +138,23 @@ public class MainActivity extends AppCompatActivity
             docEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));
             docSpeciality.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY));
             docExpDate.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE));
+
+            address = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS);
+            city = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_CITY_SELECTED);
+            dob = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH);
+            firstName = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME);
+            gender = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER);
+            identityDocument = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_ID);
+            insuranceCarrier = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_INSURANCE_SELECTED);
+            lastName = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME);
+            location = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION);
+            phoneNumberPrimary = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
+            state = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_STATE_SELECTED);
+            consultationTime = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME);
+            speciality = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SPECIALIST_SELECTED);
+            subscriptionPlan = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_SELECTED);
+            collegeId = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_COLLEGE_ID);
+
             doctorOnlineSwitch.setTypeface(AppGlobals.typefaceNormal);
             if (AppGlobals.isOnline()) {
                 doctorOnlineSwitch.setChecked(true);
@@ -142,7 +176,9 @@ public class MainActivity extends AppCompatActivity
                                 } else {
                                     doctorOnlineSwitch.setText(R.string.offline);
                                 }
-                                changeStatus(b);
+                                    changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                            String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                            consultationTime,  String.valueOf(speciality), String.valueOf(subscriptionPlan), collegeId);
                                 doctorOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -188,6 +224,22 @@ public class MainActivity extends AppCompatActivity
             patientAge.setTypeface(AppGlobals.typefaceNormal);
             patientOnlineSwitch.setTypeface(AppGlobals.typefaceNormal);
 
+            address = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS);
+            city = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_CITY_SELECTED);
+            dob = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH);
+            firstName = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME);
+            gender = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER);
+            identityDocument = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_ID);
+            insuranceCarrier = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_INSURANCE_SELECTED);
+            lastName = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME);
+            location = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION);
+            phoneNumberPrimary = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
+            state = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_STATE_SELECTED);
+            consultationTime = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME);
+            speciality = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SPECIALIST_SELECTED);
+            subscriptionPlan = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_SELECTED);
+            collegeId = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_COLLEGE_ID);
+
             patientOnlineSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -201,7 +253,9 @@ public class MainActivity extends AppCompatActivity
                                 } else {
                                     patientOnlineSwitch.setText(R.string.offline);
                                 }
-                                changeStatus(b);
+                                changeStatus(b,address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                        String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                        consultationTime,  String.valueOf(speciality), String.valueOf(subscriptionPlan), collegeId);
                                 patientOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -243,20 +297,46 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void changeStatus(boolean status) {
+    private void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
+                              String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
+                              String consultation_time, String speciality, String subscription_plan, String collegeId) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("PATCH", String.format("%sprofile", AppGlobals.BASE_URL));
+        request.open("PUT", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send(dataWithChatStatus(status, address, city, dob, first_name, gender, identity_document,
+                insurance_carrier, last_name, location, phone_number_primary, state,
+                consultation_time, speciality, subscription_plan, collegeId));
+    }
+
+    private String dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
+                                   String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
+                                   String consultation_time, String speciality, String subscription_plan, String collegeId) {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put(AppGlobals.KEY_CHAT_STATUS, status);
+            jsonObject.put("available_to_chat", status);
+            jsonObject.put("address", address);
+            jsonObject.put("city", city);
+            jsonObject.put("dob", dob);
+            jsonObject.put("first_name", first_name);
+            jsonObject.put("gender", gender);
+            jsonObject.put("identity_document", identity_document);
+            jsonObject.put("insurance_carrier", insurance_carrier);
+            jsonObject.put("last_name", last_name);
+            jsonObject.put("location", location);
+            jsonObject.put("phone_number_primary", phone_number_primary);
+            jsonObject.put("state", state);
+            jsonObject.put("consultation_time", consultation_time);
+            jsonObject.put("speciality", speciality);
+            jsonObject.put("subscription_plan", subscription_plan);
+            jsonObject.put("college_id", collegeId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        request.send(jsonObject.toString());
+        return jsonObject.toString();
+
     }
 
     @Override
@@ -371,7 +451,6 @@ public class MainActivity extends AppCompatActivity
                         if (!AppGlobals.isDoctor()) {
                             patientOnlineSwitch.setEnabled(true);
                             AppGlobals.saveChatStatus(patientOnlineSwitch.isChecked());
-
                         } else {
                             doctorOnlineSwitch.setEnabled(true);
                             AppGlobals.saveChatStatus(doctorOnlineSwitch.isChecked());
@@ -382,8 +461,11 @@ public class MainActivity extends AppCompatActivity
                             Helpers.alertDialog(this, getResources().getString(R.string.account),
                                     getResources().getString(R.string.account_not_activated),
                                     doctorOnlineSwitch);
-
                         }
+                        break;
+                    case HttpURLConnection.HTTP_BAD_REQUEST:
+                        System.out.println(request.getResponseText());
+                        break;
                 }
         }
     }

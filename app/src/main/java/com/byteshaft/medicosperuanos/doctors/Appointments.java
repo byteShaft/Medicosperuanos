@@ -200,7 +200,7 @@ public class Appointments extends Fragment implements
                 }
             }
         });
-        request.open("PATCH", String.format("%sdoctor/appointments/%d", AppGlobals.BASE_URL, id));
+        request.open("PUT", String.format("%sdoctor/appointments/%d", AppGlobals.BASE_URL, id));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         JSONObject jsonObject = new JSONObject();
@@ -262,10 +262,12 @@ public class Appointments extends Fragment implements
                     // close
                     case 0:
                         updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
+                        getDashBoardDetails();
                         return true;
                     // tick
                     case 1:
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
+                        getDashBoardDetails();
                         return true;
                     default:
                         return false;

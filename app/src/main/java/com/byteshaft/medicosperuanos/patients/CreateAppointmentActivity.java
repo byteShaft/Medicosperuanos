@@ -72,6 +72,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private TextView timeText;
     private boolean isBlocked;
     private String startTime;
+    private String scheduleDate;
     private String phonenumber;
     private String drName;
     private String drSpecialist;
@@ -106,6 +107,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         sInstance = this;
         id = getIntent().getIntExtra("user", -1);
         startTime = getIntent().getStringExtra("start_time");
+        scheduleDate = getIntent().getStringExtra("schedule_date");
         isBlocked = getIntent().getBooleanExtra("block", false);
         drName = getIntent().getStringExtra("name");
 
@@ -124,8 +126,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
-
-        dateText.setText(appointmentDate);
+        System.out.println("date is : " + scheduleDate);
+        dateText.setText(scheduleDate);
         timeText.setText(slotTime);
 
         serviceListSpinner = (TextView) findViewById(R.id.service_spinner);
@@ -164,8 +166,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
             favouriteButton.setBackgroundResource(R.mipmap.ic_empty_heart);
         }
 
-        dateText.setText(Helpers.getDate());
-        timeText.setText(Helpers.getTime());
+        timeText.setText(startTime);
 
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);

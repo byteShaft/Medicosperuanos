@@ -394,8 +394,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 } else {
                                     string.append("Dra.");
                                 }
-                                doctorLocations.setName(string.toString()+" "
-                                        +jsonObject.getString("first_name"));
+                                doctorLocations.setName(string.toString() + " "
+                                        + jsonObject.getString("first_name"));
                                 doctorLocations.setAvailableToChat(jsonObject.getBoolean("available_to_chat"));
                                 locationsArrayList.add(doctorLocations);
                                 JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
@@ -525,6 +525,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                     FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(position);
                     Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
                     intent.putExtra("start_time", doctorDetails.getStartTime());
+                    intent.putExtra("schedule_date", currentDate);
                     intent.putExtra("name", doctorDetails.getDoctorsName());
                     intent.putExtra("specialist", doctorDetails.getSpeciality());
                     intent.putExtra("stars", doctorDetails.getStars());

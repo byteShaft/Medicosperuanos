@@ -180,6 +180,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         InsuranceCarriers insuranceCarriers = new InsuranceCarriers();
                                         insuranceCarriers.setId(jsonObject.getInt("id"));
+                                        System.out.println(jsonObject.getInt("id") + "boss pak");
                                         if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED)
                                                 == jsonObject.getInt("id")) {
                                             insuranceCarrierPosition = i;
@@ -476,7 +477,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         mRequest.setOnErrorListener(this);
         String method = "POST";
         if (AppGlobals.isInfoAvailable()) {
-            method = "PATCH";
+            method = "PUT";
         }
         mRequest.open(method, String.format("%sprofile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
