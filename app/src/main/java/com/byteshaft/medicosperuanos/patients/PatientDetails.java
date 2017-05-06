@@ -53,6 +53,9 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private String insuranceCarrierEditTextString;
     private String emergencyContactString;
 
+    private int id;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +157,13 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_appointment:
-                startActivity(new Intent(getApplicationContext(), DoctorBookingActivity.class));
+                Intent appointmentIntent = new Intent(this, DoctorBookingActivity.class);
+                String id = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID);
+                appointmentIntent.putExtra("user", Integer.valueOf(id));
+                appointmentIntent.putExtra("name",patientNameString );
+                appointmentIntent.putExtra("dob", patientAgeString);
+                appointmentIntent.putExtra("photo", circleImageViewString);
+                startActivity(appointmentIntent);
                 break;
             case R.id.call_button_:
                 if (ContextCompat.checkSelfPermission(this,
