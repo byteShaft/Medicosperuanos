@@ -529,6 +529,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     }
                                 }
                                 break;
+                            case HttpURLConnection.HTTP_NOT_FOUND:
+                                System.out.println("rana" + request.getResponseText());
                         }
                 }
             }
