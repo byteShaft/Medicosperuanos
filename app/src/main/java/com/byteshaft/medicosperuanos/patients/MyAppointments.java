@@ -77,7 +77,6 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private String mUserReview;
     private int doctorsId;
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
