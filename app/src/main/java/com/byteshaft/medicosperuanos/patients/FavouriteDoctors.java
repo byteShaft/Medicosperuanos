@@ -441,14 +441,11 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
                 Date dateOne = null;
                 Date dateTwo = null;
-                Date dateThree = null;
                 Calendar c = Calendar.getInstance();
                 c.add(Calendar.DAY_OF_YEAR, 1);
-                Calendar cal = Calendar.getInstance();
                 try {
                     dateOne = sdf.parse(sdf.format(calendar.getTime()));
                     dateTwo = sdf.parse(sdf.format(c.getTime()));
-                    dateThree = sdf.parse(sdf.format(cal.getTime()));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

@@ -136,10 +136,6 @@ public class CalendarView extends LinearLayout {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Log.i("calendar", "" + sdf.format(calendar.getTime()));
-                Log.i("helpers", "" + Helpers.getDateForHeader());
-                Log.i("TAG", "less then " + String.valueOf(dateOne.compareTo(dateTwo) < 0));
-                Log.i("TAG", "greater then " + String.valueOf(dateOne.compareTo(dateTwo) > 0));
                 if (dateOne.compareTo(dateTwo) < 0) {
                     Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
 
@@ -155,8 +151,6 @@ public class CalendarView extends LinearLayout {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("TAG", "press");
-                Log.i("TAG", "press inside");
                 eventHandler.onDayPress((Date) adapterView.getItemAtPosition(i));
                 Date date = (Date) adapterView.getItemAtPosition(i);
                 DateFormat df = SimpleDateFormat.getDateInstance();
@@ -201,14 +195,15 @@ public class CalendarView extends LinearLayout {
     private class CalendarAdapter extends ArrayAdapter<Date> {
         // days with events
         private HashSet<Date> eventDays;
-
         // for view inflation
         private LayoutInflater inflater;
+        private Date todayDate;
 
         public CalendarAdapter(Context context, ArrayList<Date> days, HashSet<Date> eventDays) {
             super(context, R.layout.control_calendar_day, days);
             this.eventDays = eventDays;
             inflater = LayoutInflater.from(context);
+            todayDate = new Date();
         }
 
         @Override
@@ -219,6 +214,8 @@ public class CalendarView extends LinearLayout {
             int year = date.getYear();
 
             Date today = new Date();
+
+
 
             if (view == null)
                 view = inflater.inflate(R.layout.control_calendar_day, parent, false);
@@ -232,7 +229,9 @@ public class CalendarView extends LinearLayout {
                     }
                 }
             }
-            if (selectedDate != null && selectedDate.getDate() == day) {
+
+            if (selectedDate != null && selectedDate.getDate() == todayDate.getDate()
+                    && day == today.getDay()) {
                 int[] array = getResources().getIntArray(R.array.selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -248,6 +247,14 @@ public class CalendarView extends LinearLayout {
                 final Bitmap letterTile = tileProvider.getLetterTile(String.valueOf(day),
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
+            } else if (selectedDate != null && selectedDate.getDate() == date.getDate() && selectedDate.getDate() != todayDate.getDate()) {
+                int[] array = getResources().getIntArray(R.array.other_date);
+                final Resources resources = AppGlobals.getContext().getResources();
+                final BitmapWithCharacter tileProvider = new BitmapWithCharacter
+                        (resources.obtainTypedArray(R.array.other_date));
+                final Bitmap letterTile = tileProvider.getLetterTile(String.valueOf(day),
+                        String.valueOf(array[0]), 100, 100);
+                ((ImageView) view).setImageBitmap(letterTile);
             } else {
                 int[] array = getResources().getIntArray(R.array.not_selected);
                 final Resources resources = AppGlobals.getContext().getResources();
@@ -257,7 +264,6 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             }
-//            Log.i(TAG, "Called");
 
             return view;
         }
