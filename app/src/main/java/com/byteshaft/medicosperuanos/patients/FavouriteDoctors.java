@@ -525,7 +525,10 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                     FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(position);
                     Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
                     intent.putExtra("start_time", doctorDetails.getStartTime());
-                    intent.putExtra("schedule_date", currentDate);
+                    SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
+                    String date = format1.format(currentDate.getTime());
+                    intent.putExtra("schedule_date", date);
+                    Log.e("Date", String.valueOf(currentDate.getTime()));
                     intent.putExtra("name", doctorDetails.getDoctorsName());
                     intent.putExtra("specialist", doctorDetails.getSpeciality());
                     intent.putExtra("stars", doctorDetails.getStars());
