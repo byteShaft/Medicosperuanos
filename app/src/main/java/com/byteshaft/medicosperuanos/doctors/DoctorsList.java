@@ -397,6 +397,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     doctorDetails.setReviewStars(doctorDetail.getInt("review_stars"));
                                     doctorDetails.setUserId(doctorDetail.getInt("id"));
                                     doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
+                                    Log.i("TAG", "size " + doctors.size());
                                     doctors.add(doctorDetails);
                                     customAdapter.notifyDataSetChanged();
                                     JSONArray services = doctorDetail.getJSONArray("services");
