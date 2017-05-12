@@ -44,6 +44,7 @@ import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
@@ -645,61 +646,61 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     }
 
 
-    private String getAttentionsData(String conclusion, String date, String dateOfReturn,
-                                     String destination, String exploration, String time) throws JSONException {
+    private FormData getAttentionsData(String conclusion, String date, String dateOfReturn,
+                                       String destination, String exploration, String time) throws JSONException {
 
-//        FormData data = new FormData();
-//        data.append(FormData.TYPE_CONTENT_TEXT, "conclusion", conclusion);
-//        data.append(FormData.TYPE_CONTENT_TEXT, "date", date);
-//        data.append(FormData.TYPE_CONTENT_TEXT, "date_of_return", dateOfReturn);
-//        data.append(FormData.TYPE_CONTENT_TEXT, "destination", destination);
-//        JSONArray jsonArray = new JSONArray();
-//        for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
-//            jsonArray.put(diagnosticMedication.getId());
-//        }
-//        data.append(FormData.TYPE_CONTENT_TEXT, "diagnostics", jsonArray.toString());
-//        JSONArray treatmentArray = new JSONArray();
-//        for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
-//            JSONObject treatmentObject = new JSONObject();
-//            treatmentObject.put("treatment", diagnosticMedication.getId());
-//            treatmentObject.put("quantity", diagnosticMedication.getQuantity());
-//            treatmentArray.put(treatmentObject);
-//        }
-//        data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
-//        data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
-//        data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
-//        for (String path : imagesArrayList) {
-//            data.append(FormData.TYPE_CONTENT_FILE,"photos" , path);
-//        }
-//        return data;
+        FormData data = new FormData();
+        data.append(FormData.TYPE_CONTENT_TEXT, "conclusion", conclusion);
+        data.append(FormData.TYPE_CONTENT_TEXT, "date", date);
+        data.append(FormData.TYPE_CONTENT_TEXT, "date_of_return", dateOfReturn);
+        data.append(FormData.TYPE_CONTENT_TEXT, "destination", destination);
+        JSONArray jsonArray = new JSONArray();
+        for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
+            jsonArray.put(diagnosticMedication.getId());
+        }
+        data.append(FormData.TYPE_CONTENT_TEXT, "diagnostics", jsonArray.toString());
+        JSONArray treatmentArray = new JSONArray();
+        for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+            JSONObject treatmentObject = new JSONObject();
+            treatmentObject.put("treatment", diagnosticMedication.getId());
+            treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+            treatmentArray.put(treatmentObject);
+        }
+        data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
+        data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
+        data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
+        for (String path : imagesArrayList) {
+            data.append(FormData.TYPE_CONTENT_FILE, "photos", path);
+        }
+        return data;
 
         /// previous
-
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("conclusion", conclusion);
-            jsonObject.put("date", date);
-            jsonObject.put("date_of_return", dateOfReturn);
-            jsonObject.put("destination", destination);
-            JSONArray jsonArray = new JSONArray();
-            for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
-                jsonArray.put(diagnosticMedication.getId());
-            }
-            jsonObject.put("diagnostics", jsonArray);
-            JSONArray treatmentArray = new JSONArray();
-            for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
-                JSONObject treatmentObject = new JSONObject();
-                treatmentObject.put("treatment", diagnosticMedication.getId());
-                treatmentObject.put("quantity", diagnosticMedication.getQuantity());
-                treatmentArray.put(treatmentObject);
-            }
-            jsonObject.put("treatments", treatmentArray);
-            jsonObject.put("exploration", exploration);
-            jsonObject.put("time", time);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject.toString();
+//
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("conclusion", conclusion);
+//            jsonObject.put("date", date);
+//            jsonObject.put("date_of_return", dateOfReturn);
+//            jsonObject.put("destination", destination);
+//            JSONArray jsonArray = new JSONArray();
+//            for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
+//                jsonArray.put(diagnosticMedication.getId());
+//            }
+//            jsonObject.put("diagnostics", jsonArray);
+//            JSONArray treatmentArray = new JSONArray();
+//            for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+//                JSONObject treatmentObject = new JSONObject();
+//                treatmentObject.put("treatment", diagnosticMedication.getId());
+//                treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+//                treatmentArray.put(treatmentObject);
+//            }
+//            jsonObject.put("treatments", treatmentArray);
+//            jsonObject.put("exploration", exploration);
+//            jsonObject.put("time", time);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        return jsonObject.toString();
 
     }
 

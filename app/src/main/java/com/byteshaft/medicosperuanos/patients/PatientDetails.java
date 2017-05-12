@@ -53,8 +53,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private String insuranceCarrierEditTextString;
     private String emergencyContactString;
 
-    private int id;
-
+    private int patientId;
 
 
     @Override
@@ -84,6 +83,8 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         appointmentButton = (Button) findViewById(R.id.button_appointment);
 
         patientNameString = getIntent().getStringExtra("name");
+        patientId = getIntent().getIntExtra("patient_id", 0);
+
         docIdString = getIntent().getStringExtra("identity_document");
         patientAddressString = getIntent().getStringExtra("address");
         circleImageViewString = getIntent().getStringExtra("photo");
@@ -99,7 +100,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
 
         patientName.setText(patientNameString);
         String years = Helpers.calculateAge(patientAgeString);
-        patientAge.setText(years +" " + "years");
+        patientAge.setText(years + " " + "years");
         Helpers.getBitMap(circleImageViewString, circleImageView);
 
         emergencyContact.setText(emergencyContactString);
@@ -112,6 +113,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         insuranceCarrierEditText.setText(insuranceCarrierEditTextString);
         phonePrimary.setText(phonePrimaryString);
         phoneSecondary.setText(phoneSecondaryString);
+
 //
 //        docId.setEnabled(false);
 //        birthDate.setEnabled(false);
@@ -160,9 +162,10 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 Intent appointmentIntent = new Intent(this, DoctorBookingActivity.class);
                 String id = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID);
                 appointmentIntent.putExtra("user", Integer.valueOf(id));
-                appointmentIntent.putExtra("name",patientNameString );
+                appointmentIntent.putExtra("name", patientNameString);
                 appointmentIntent.putExtra("dob", patientAgeString);
                 appointmentIntent.putExtra("photo", circleImageViewString);
+                appointmentIntent.putExtra("patientID", patientId);
                 startActivity(appointmentIntent);
                 break;
             case R.id.call_button_:

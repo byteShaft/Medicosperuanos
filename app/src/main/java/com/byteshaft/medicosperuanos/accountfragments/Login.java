@@ -189,8 +189,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
         AppGlobals.alertDialog(getActivity(), getString(R.string.login_faild), getResources().getString(R.string.check_internet));
-
-
     }
 
     private void gettingUserData() {

@@ -58,6 +58,7 @@ public class Services extends Fragment implements View.OnClickListener {
     private ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList;
     private ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> searchList;
     private int currentAdapterPosition;
+    private JSONObject jsonObject;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -120,7 +121,7 @@ public class Services extends Fragment implements View.OnClickListener {
                             servicesArrayList) {
                         if (StringUtils.containsIgnoreCase(services.getServiceName(),
                                 s.toString()) || StringUtils.containsIgnoreCase(String.valueOf(
-                                        services.getServiceId()),
+                                services.getServiceId()),
                                 s.toString())) {
                             searchList.add(services);
                             serviceAdapter.notifyDataSetChanged();
@@ -256,7 +257,19 @@ public class Services extends Fragment implements View.OnClickListener {
         request.send(jsonObject.toString());
     }
 
-    private void removeService(int id, final int itemPosition) {
+    private void removeService(final int itemPosition) {
+        final com.byteshaft.medicosperuanos.gettersetter.Services services = servicesArrayList.get(itemPosition);
+        jsonObject = new JSONObject();
+        try {
+            jsonObject.put("is_active", false);
+            jsonObject.put("doctor", services.getDoctorId());
+            jsonObject.put("description", services.getDescription());
+            jsonObject.put("price", services.getPrice());
+            jsonObject.put("service", services.getId());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         HttpRequest request = new HttpRequest(getActivity());
         Helpers.showProgressDialog(getActivity(), "Removing Service...");
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
@@ -266,21 +279,20 @@ public class Services extends Fragment implements View.OnClickListener {
                     case HttpRequest.STATE_DONE:
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
-                            case HttpURLConnection.HTTP_NO_CONTENT:
-                                com.byteshaft.medicosperuanos.gettersetter.Services services = servicesArrayList.get(itemPosition);
+                            case HttpURLConnection.HTTP_OK:
                                 services.setStatus(false);
-                                services.setPrice("");
-                                services.setServiceId(-1);
                                 serviceAdapter.notifyDataSetChanged();
+                                Log.e("Response", request.getResponseText());
                                 Helpers.showSnackBar(getView(), "Service removed");
                         }
                 }
             }
         });
-        request.open("DELETE", String.format("%sdoctor/services/%d", AppGlobals.BASE_URL, id));
+        request.open("PUT", String.format("%sdoctor/services/%d", AppGlobals.BASE_URL, services.getServiceId()));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        request.send();
+        Log.e("Cha, jitthy jao cha !", jsonObject.toString());
+        request.send(jsonObject.toString());
     }
 
     private void getDoctorServices() {
@@ -300,6 +312,11 @@ public class Services extends Fragment implements View.OnClickListener {
                                     JSONArray jsonArray = object.getJSONArray("results");
                                     for (int i = 0; i < jsonArray.length(); i++) {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                        int doctorId = jsonObject.getInt("doctor");
+                                        int serviceIdMain = jsonObject.getInt("id");
+                                        boolean serviceState = jsonObject.getBoolean("is_active");
+
+
                                         JSONObject serviceObject = jsonObject.getJSONObject("service");
                                         int serviceId = serviceObject.getInt("id");
                                         for (com.byteshaft.medicosperuanos.gettersetter.Services service :
@@ -308,10 +325,15 @@ public class Services extends Fragment implements View.OnClickListener {
                                                 service.setServiceId(jsonObject.getInt("id"));
                                                 service.setDescription(jsonObject.getString("description"));
                                                 service.setPrice(jsonObject.getString("price"));
-                                                service.setStatus(true);
+
+                                                service.setDoctorId(doctorId);
+                                                service.setServiceIdMain(serviceIdMain);
+//                                                service.setServiceState(serviceState);
+                                                service.setStatus(serviceState);
                                                 serviceAdapter.notifyDataSetChanged();
                                             }
                                         }
+
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -348,7 +370,7 @@ public class Services extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
-    private void confirmationDialog(final int serviceId, final int itemPosition) {
+    private void confirmationDialog(final int itemPosition) {
         new AlertDialog.Builder(getActivity())
                 .setCancelable(false)
                 .setTitle("Delete Service")
@@ -356,7 +378,7 @@ public class Services extends Fragment implements View.OnClickListener {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        removeService(serviceId, itemPosition);
+                        removeService(itemPosition);
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
@@ -421,7 +443,7 @@ public class Services extends Fragment implements View.OnClickListener {
             viewHolder.removeService.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    confirmationDialog(services.getServiceId(), position);
+                    confirmationDialog(position);
                 }
             });
             viewHolder.addService.setOnClickListener(new View.OnClickListener() {
@@ -434,12 +456,14 @@ public class Services extends Fragment implements View.OnClickListener {
             viewHolder.serviceName.setText(services.getServiceName());
             AppGlobals.buttonEffect(viewHolder.removeService);
             viewHolder.servicePrice.setText(services.getPrice());
+            Log.i("TAG", "state " + services.getStatus());
             if (services.getStatus()) {
                 viewHolder.servicePrice.setVisibility(View.VISIBLE);
                 viewHolder.serviceCheckBox.setVisibility(View.VISIBLE);
                 viewHolder.removeService.setVisibility(View.VISIBLE);
                 viewHolder.addService.setVisibility(View.GONE);
             } else {
+                viewHolder.servicePrice.setVisibility(View.GONE);
                 viewHolder.serviceCheckBox.setVisibility(View.GONE);
                 viewHolder.removeService.setVisibility(View.INVISIBLE);
                 viewHolder.addService.setVisibility(View.VISIBLE);

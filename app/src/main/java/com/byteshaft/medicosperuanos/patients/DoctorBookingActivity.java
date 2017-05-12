@@ -48,7 +48,8 @@ import java.util.HashSet;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class DoctorBookingActivity extends AppCompatActivity implements View.OnClickListener,
-        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener, AdapterView.OnItemClickListener {
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener,
+        AdapterView.OnItemClickListener {
 
     private TextView mDoctorName;
     private TextView mDoctorSpeciality;
@@ -171,7 +172,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mTime.setText(startTime);
         Helpers.getBitMap(drPhoto, mDoctorImage);
         getSchedule(currentDate);
-        Log.i("TAG", "this "  + currentDate);
+        Log.i("TAG", "this " + currentDate);
     }
 
     @Override
