@@ -75,7 +75,8 @@ public class SignUp extends Fragment implements View.OnClickListener,
             case android.R.id.home:
 
                 return true;
-            default:return false;
+            default:
+                return false;
         }
     }
 
@@ -94,7 +95,6 @@ public class SignUp extends Fragment implements View.OnClickListener,
                 AccountManagerActivity.getInstance().loadFragment(new Login());
                 break;
         }
-
     }
 
     @Override
@@ -207,5 +207,4 @@ public class SignUp extends Fragment implements View.OnClickListener,
         return jsonObject.toString();
 
     }
-
 }

@@ -42,13 +42,28 @@ public class Services implements Serializable {
         this.description = description;
     }
 
-    public boolean isStatus() {
-        return status;
-    }
-
     private int serviceId;
     private String price;
     private String description;
+
+    private int doctorId;
+    private  int serviceIdMain;
+
+    public int getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(int doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public int getServiceIdMain() {
+        return serviceIdMain;
+    }
+
+    public void setServiceIdMain(int serviceIdMain) {
+        this.serviceIdMain = serviceIdMain;
+    }
 
     public boolean getStatus() {
         return status;
