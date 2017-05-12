@@ -118,6 +118,7 @@ public class CalendarView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 currentDate.add(Calendar.DAY_OF_YEAR, 1);
+                selectedDate = currentDate.getTime();
                 updateCalendar();
             }
         });
@@ -136,15 +137,12 @@ public class CalendarView extends LinearLayout {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Log.i("calendar", "" + sdf.format(calendar.getTime()));
-                Log.i("helpers", "" + Helpers.getDateForHeader());
-                Log.i("TAG", "less then " + String.valueOf(dateOne.compareTo(dateTwo) < 0));
-                Log.i("TAG", "greater then " + String.valueOf(dateOne.compareTo(dateTwo) > 0));
                 if (dateOne.compareTo(dateTwo) < 0) {
                     Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
 
                 } else {
                     currentDate.add(Calendar.DAY_OF_YEAR, -1);
+                    selectedDate = currentDate.getTime();
                     updateCalendar();
                 }
             }
@@ -155,13 +153,11 @@ public class CalendarView extends LinearLayout {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("TAG", "press");
-                Log.i("TAG", "press inside");
                 eventHandler.onDayPress((Date) adapterView.getItemAtPosition(i));
                 Date date = (Date) adapterView.getItemAtPosition(i);
                 DateFormat df = SimpleDateFormat.getDateInstance();
                 String resultDate = df.format(date);
-
+                currentDate.setTime(date);
                 txtDate.setText(resultDate);
                 selectedDate = (Date) adapterView.getItemAtPosition(i);
                 calendarAdapter.notifyDataSetChanged();
@@ -201,14 +197,15 @@ public class CalendarView extends LinearLayout {
     private class CalendarAdapter extends ArrayAdapter<Date> {
         // days with events
         private HashSet<Date> eventDays;
-
         // for view inflation
         private LayoutInflater inflater;
+        private Date todayDate;
 
         public CalendarAdapter(Context context, ArrayList<Date> days, HashSet<Date> eventDays) {
             super(context, R.layout.control_calendar_day, days);
             this.eventDays = eventDays;
             inflater = LayoutInflater.from(context);
+            todayDate = new Date();
         }
 
         @Override
@@ -232,7 +229,16 @@ public class CalendarView extends LinearLayout {
                     }
                 }
             }
-            if (selectedDate != null && selectedDate.getDate() == day) {
+            if (selectedDate != null ) {
+                Log.i("TAG", "booleans " + String.valueOf(selectedDate != null) +
+                        String.valueOf(selectedDate.getDate() == todayDate.getDate()) +
+                        String.valueOf(todayDate.getDate() == today.getDay()));
+            }
+            if (selectedDate != null && selectedDate.getDate() == todayDate.getDate()) {
+                selectedDate = null;
+            }
+            if (selectedDate != null && selectedDate.getDate() == todayDate.getDate()) {
+                Log.i("TAG", "one");
                 int[] array = getResources().getIntArray(R.array.selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -241,6 +247,7 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             } else if (day == today.getDate() && selectedDate == null && month == today.getMonth()) {
+                Log.i("TAG", "two");
                 int[] array = getResources().getIntArray(R.array.selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -248,7 +255,17 @@ public class CalendarView extends LinearLayout {
                 final Bitmap letterTile = tileProvider.getLetterTile(String.valueOf(day),
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
+            } else if (selectedDate != null && selectedDate.getDate() == date.getDate() && selectedDate.getDate() != todayDate.getDate()) {
+                Log.i("TAG", "three");
+                int[] array = getResources().getIntArray(R.array.other_date);
+                final Resources resources = AppGlobals.getContext().getResources();
+                final BitmapWithCharacter tileProvider = new BitmapWithCharacter
+                        (resources.obtainTypedArray(R.array.other_date));
+                final Bitmap letterTile = tileProvider.getLetterTile(String.valueOf(day),
+                        String.valueOf(array[0]), 100, 100);
+                ((ImageView) view).setImageBitmap(letterTile);
             } else {
+                Log.i("TAG", "else");
                 int[] array = getResources().getIntArray(R.array.not_selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -257,7 +274,6 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             }
-//            Log.i(TAG, "Called");
 
             return view;
         }

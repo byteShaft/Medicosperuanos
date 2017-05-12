@@ -146,6 +146,10 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                 seekBar.setProgress(20);
                 startDate.setText(Helpers.getDate());
                 endDate.setText(Helpers.getDate());
+                if (!isFavList) {
+                    dismiss();
+                    DoctorsList.getInstance().getDoctorList();
+                }
                 break;
             case R.id.button_apply_filters:
                 String sDate = startDate.getText().toString();
@@ -160,7 +164,6 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                             mSpecialities.getSpecialitiesId());
                     dismiss();
                 } else {
-                    System.out.println("Ok kr k form fav list");
                     FavouriteDoctors.getsInstance().getFavDoctorList(sDate,
                             eDate,
                             seekBar.getProgress(),

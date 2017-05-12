@@ -291,7 +291,7 @@ public class Helpers {
 
     public static String getDateForComparison() {
         Calendar c = Calendar.getInstance();
-        c.add(Calendar.MONTH, 1);
+        c.add(Calendar.DAY_OF_YEAR, 1);
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
         return df.format(c.getTime());
     }

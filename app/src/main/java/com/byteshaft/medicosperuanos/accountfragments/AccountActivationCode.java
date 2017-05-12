@@ -69,7 +69,6 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-
                 return true;
             default:return false;
         }
@@ -244,7 +243,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
 
             }
         });
-        request.open("POST", String.format("%suser/request-activation-key", AppGlobals.BASE_URL));
+        request.open("POST", String.format("%srequest-activation-key", AppGlobals.BASE_URL));
         request.send(getresendVerificationData(email));
     }
 
