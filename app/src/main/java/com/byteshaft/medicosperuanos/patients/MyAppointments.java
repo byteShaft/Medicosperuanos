@@ -220,14 +220,8 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
 
             }
         });
-
-        return mBaseView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         getPatientAppointments();
+        return mBaseView;
     }
 
     @Override
@@ -367,9 +361,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
             }
             stringBuilder.append(patientAppointment.getDrFirstName());
             stringBuilder.append(" ");
-            stringBuilder.append(patientAppointment.getDrLastName());
             viewHolder.doctorName.setText(stringBuilder.toString() + " " + patientAppointment.getDrSpeciality());
-
             TextPaint paint = viewHolder.doctorName.getPaint();
             Rect rect = new Rect();
             String text = String.valueOf(viewHolder.doctorName.getText());
@@ -384,10 +376,8 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                 } else {
                     specialist = patientAppointment.getDrSpeciality();
                 }
-                viewHolder.doctorName.setText(patientAppointment.getDrFirstName() + " - " + specialist);
-
+                viewHolder.doctorName.setText(stringBuilder.toString()+ " - " + specialist);
             }
-
             viewHolder.serviceDescription.setText(patientAppointment.getServiceName());
             Log.i("TAG", patientAppointment.getState());
             switch (patientAppointment.getState()) {
