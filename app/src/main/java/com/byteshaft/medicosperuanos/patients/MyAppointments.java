@@ -488,7 +488,6 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
         Helpers.showProgressDialog(getActivity(), "Submitting your review...");
     }
 
-
     private String getUserReviewData(float stars, String review) {
         JSONObject jsonObject = new JSONObject();
         try {
