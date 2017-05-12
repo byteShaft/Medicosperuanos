@@ -728,7 +728,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         dialog.getWindow().setLayout(width, height);
         dialog.setCancelable(true);
         EditText searchEditText = (EditText) dialog.findViewById(R.id.search_edit_text);
-        TextView okTextView = (TextView) dialog.findViewById(R.id.ok_textV_view);
+        Button okTextView = (Button) dialog.findViewById(R.id.ok_textV_view);
         medicationDiagnosticListView = (ListView) dialog.
                 findViewById(R.id.medication_diagnostic_search_list_view);
         if (value) {
