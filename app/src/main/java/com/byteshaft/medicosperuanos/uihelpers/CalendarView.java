@@ -117,8 +117,10 @@ public class CalendarView extends LinearLayout {
         btnNext.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 currentDate.add(Calendar.DAY_OF_YEAR, 1);
                 selectedDate = currentDate.getTime();
+                eventHandler.onDayPress(selectedDate);
                 updateCalendar();
             }
         });
@@ -143,6 +145,7 @@ public class CalendarView extends LinearLayout {
                 } else {
                     currentDate.add(Calendar.DAY_OF_YEAR, -1);
                     selectedDate = currentDate.getTime();
+                    eventHandler.onDayPress(selectedDate);
                     updateCalendar();
                 }
             }
