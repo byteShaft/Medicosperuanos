@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -229,16 +228,10 @@ public class CalendarView extends LinearLayout {
                     }
                 }
             }
-            if (selectedDate != null ) {
-                Log.i("TAG", "booleans " + String.valueOf(selectedDate != null) +
-                        String.valueOf(selectedDate.getDate() == todayDate.getDate()) +
-                        String.valueOf(todayDate.getDate() == today.getDay()));
-            }
             if (selectedDate != null && selectedDate.getDate() == todayDate.getDate()) {
                 selectedDate = null;
             }
             if (selectedDate != null && selectedDate.getDate() == todayDate.getDate()) {
-                Log.i("TAG", "one");
                 int[] array = getResources().getIntArray(R.array.selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -247,7 +240,6 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             } else if (day == today.getDate() && selectedDate == null && month == today.getMonth()) {
-                Log.i("TAG", "two");
                 int[] array = getResources().getIntArray(R.array.selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -256,7 +248,6 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             } else if (selectedDate != null && selectedDate.getDate() == date.getDate() && selectedDate.getDate() != todayDate.getDate()) {
-                Log.i("TAG", "three");
                 int[] array = getResources().getIntArray(R.array.other_date);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
@@ -265,7 +256,6 @@ public class CalendarView extends LinearLayout {
                         String.valueOf(array[0]), 100, 100);
                 ((ImageView) view).setImageBitmap(letterTile);
             } else {
-                Log.i("TAG", "else");
                 int[] array = getResources().getIntArray(R.array.not_selected);
                 final Resources resources = AppGlobals.getContext().getResources();
                 final BitmapWithCharacter tileProvider = new BitmapWithCharacter
