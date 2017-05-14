@@ -211,6 +211,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
 
     private void getSchedule(String targetDate) {
         progressBar.setVisibility(View.VISIBLE);
+        timeTableGrid.setVisibility(View.GONE);
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -347,7 +348,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         }
                         break;
                     case HttpURLConnection.HTTP_FORBIDDEN:
-                        System.out.println(request.getResponseText() + "jhoni");
                 }
         }
 
