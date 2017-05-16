@@ -147,7 +147,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private String photo4 = "";
     private ArrayList<Integer> providedServicesIds;
 
-    public static ArrayList<String> photosArrayList;
+    public static HashMap<String, String> photosArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,7 +177,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
         imagesArray = new ArrayList<>();
-        photosArrayList = new ArrayList<>();
+        photosArrayList = new HashMap<>();
 
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
@@ -548,16 +548,16 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         photo3 = jsonObject.getString("photo3");
                                         photo4 = jsonObject.getString("photo4");
                                         if (photo1 != null) {
-                                            photosArrayList.add(photo1.replace("http://localhost", AppGlobals.SERVER_IP));
+                                            photosArrayList.put("photo1", photo1.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo2 != null) {
-                                            photosArrayList.add(photo2.replace("http://localhost", AppGlobals.SERVER_IP));
+                                            photosArrayList.put("photo2", photo2.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo3 != null) {
-                                            photosArrayList.add(photo3.replace("http://localhost", AppGlobals.SERVER_IP));
+                                            photosArrayList.put("photo3", photo3.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo4 != null) {
-                                            photosArrayList.add(photo4.replace("http://localhost", AppGlobals.SERVER_IP));
+                                            photosArrayList.put("photo4", photo4.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
