@@ -548,16 +548,16 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         photo3 = jsonObject.getString("photo3");
                                         photo4 = jsonObject.getString("photo4");
                                         if (photo1 != null) {
-                                            photosArrayList.add(photo1);
+                                            photosArrayList.add(photo1.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo2 != null) {
-                                            photosArrayList.add(photo2);
+                                            photosArrayList.add(photo2.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo3 != null) {
-                                            photosArrayList.add(photo3);
+                                            photosArrayList.add(photo3.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo4 != null) {
-                                            photosArrayList.add(photo4);
+                                            photosArrayList.add(photo4.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
