@@ -201,6 +201,7 @@ public class MyPatients extends Fragment {
                 intent.putExtra("phone_secondary", myPatients.getPatientPhoneNumberSecondary());
                 intent.putExtra("photo", myPatients.getPatientImage());
                 intent.putExtra("name", myPatients.getPatientsName());
+                intent.putExtra("patient_id", myPatients.getPatientId());
                 intent.putExtra("emergency_contact", myPatients.getPatientEmergencyContact());
                 intent.putExtra("insurance_carrier", myPatients.getPatientInsuranceCarrier());
                 startActivity(intent);

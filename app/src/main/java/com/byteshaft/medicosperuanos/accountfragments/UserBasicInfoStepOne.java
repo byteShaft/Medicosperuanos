@@ -82,7 +82,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
     }
 
     private View mBaseView;
-    private static final int REQUEST_CAMERA = 1;
+    private static final int REQUEST_CAMERA = 3;
     private static final int SELECT_FILE = 2;
     private File destination;
     private Uri selectedImageUri;

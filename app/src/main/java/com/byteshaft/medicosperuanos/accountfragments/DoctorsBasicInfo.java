@@ -486,7 +486,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                             case HttpRequest.STATE_DONE:
                                 switch (request.getStatus()) {
                                     case HttpURLConnection.HTTP_OK:
-                                        System.out.println(request.getResponseText());
                                         try {
                                             JSONObject object = new JSONObject(request.getResponseText());
                                             JSONArray jsonArray = object.getJSONArray("results");
@@ -528,7 +527,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                System.out.println(request.getResponseText());
                                 try {
                                     JSONObject object = new JSONObject(request.getResponseText());
                                     JSONArray jsonArray = object.getJSONArray("results");
