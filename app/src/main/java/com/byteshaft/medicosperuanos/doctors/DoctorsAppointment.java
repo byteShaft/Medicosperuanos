@@ -73,7 +73,8 @@ import java.util.HashMap;
 
 public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
         DatePickerDialog.OnDateSetListener, HttpRequest.OnReadyStateChangeListener,
-        HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener, HttpRequest.OnFileUploadProgressListener {
+        HttpRequest.OnErrorListener, AdapterView.OnItemSelectedListener,
+        HttpRequest.OnFileUploadProgressListener, CompoundButton.OnCheckedChangeListener {
 
     private Spinner mDiagnosticsSpinner;
     private Spinner mMedicationSpinner;
@@ -144,6 +145,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private String photo2 = "";
     private String photo3 = "";
     private String photo4 = "";
+    private ArrayList<Integer> providedServicesIds;
 
     public static ArrayList<String> photosArrayList;
 
@@ -166,6 +168,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         position = getIntent().getIntExtra("position", -1);
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
+        providedServicesIds = new ArrayList<>();
         diagnosticsList = new ArrayList<>();
         medicationList = new ArrayList<>();
         targetsArrayList = new ArrayList<>();
@@ -196,6 +199,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         quantityTextView = (TextView) findViewById(R.id.qty_text_view);
         saveButton = (AppCompatButton) findViewById(R.id.save_button);
         saveButton.setOnClickListener(this);
+        providedServicesIds.add(arrayList.get(0).getId());
         showCheckbox(arrayList);
 
         mDateEditText.setTypeface(AppGlobals.typefaceNormal);
@@ -267,7 +271,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
             }
         });
-
     }
 
     private void showCheckbox(ArrayList<Services> arrayList) {
@@ -276,14 +279,33 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             CheckBox checkBox = new CheckBox(this);
             checkBox.setText(services.getServiceName());
             checkBox.setTextSize(16);
+            checkBox.setTag(services.getId());
             checkBox.setTypeface(AppGlobals.typefaceNormal);
             checkBox.setId(services.getId());
             if (counter == 0) {
                 checkBox.setChecked(true);
             }
+            checkBox.setOnCheckedChangeListener(this);
             checkBoxLayout.addView(checkBox);
             counter++;
         }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        if (b) {
+            Log.i("TAG", "checkbox id " + compoundButton.getId());
+                providedServicesIds.add(compoundButton.getId());
+        } else {
+            if (providedServicesIds.contains(compoundButton.getId())) {
+                Log.i("TAG", "checkbox id " + compoundButton.getId());
+                int index = providedServicesIds.indexOf(compoundButton.getId());
+                providedServicesIds.remove(index);
+            }
+
+        }
+
+
     }
 
 
@@ -475,6 +497,27 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         JSONObject destinationObject = jsonObject.getJSONObject("destination");
                                         selectedTargetId = destinationObject.getInt("id");
                                         JSONArray jsonArray = jsonObject.getJSONArray("diagnostics");
+                                        JSONArray providedServicesArray = jsonObject.getJSONArray("services_provided");
+                                        for (int i = 0; i < providedServicesArray.length(); i++) {
+                                            JSONObject serviceObject = providedServicesArray.getJSONObject(i);
+                                            if (!providedServicesIds.contains(serviceObject.getInt("id"))) {
+                                                providedServicesIds.add(serviceObject.getInt("id"));
+                                            }
+                                            Log.i("TAG", "service id " + serviceObject.getInt("id"));
+                                        }
+                                        int count = checkBoxLayout.getChildCount();
+                                        View view;
+                                        for(int i=0; i<count; i++) {
+                                            view = ((LinearLayout ) checkBoxLayout).getChildAt(i);
+                                            if (view instanceof CheckBox)
+                                            if (providedServicesIds.contains(view.getId())) {
+                                                CheckBox checkbox = (CheckBox) view;
+                                                checkbox.setChecked(true);
+                                            }
+
+                                            //do something with your child element
+                                        }
+
                                         for (int i = 0; i < jsonArray.length(); i++) {
                                             JSONObject diagnosticObject = jsonArray.getJSONObject(i);
                                             DiagnosticMedication diagnosticMedication =
@@ -612,8 +655,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     e.printStackTrace();
                                 }
                                 break;
-
-
                         }
                 }
             }
@@ -656,8 +697,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", request.getResponseURL());
                         Log.i("TAG", request.getResponseText());
+                        finish();
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
                         Log.i("TAG", request.getResponseText());
@@ -693,30 +734,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         }
         Log.i("TAG", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
-
-//        for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
-//            JSONObject treatmentObject = new JSONObject();
-//            Log.i("TAG", "treatments " + diagnosticMedication.getId());
-//            treatmentObject.put("treatment", diagnosticMedication.getId());
-//            treatmentObject.put("quantity", diagnosticMedication.getQuantity());
-//            treatmentArray.put(treatmentObject);
-//        }
-
-//        data.append(FormData.TYPE_CONTENT_JSON, "services_provided", treatmentArray.toString());
-
-
+        Log.i("TAG","services id " +  providedServicesIds.toString());
+        data.append(FormData.TYPE_CONTENT_JSON, "services_provided", providedServicesIds.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
         if (method.equals("PUT")) {
 
-        }
-        int imagesCounter = 1;
-        for (String path : imagesArrayList) {
-            data.append(FormData.TYPE_CONTENT_FILE, "photo" + imagesCounter, path);
+        } else {
+            int imagesCounter = 1;
+            if (imagesArrayList != null) {
+                for (String path : imagesArrayList) {
+                    data.append(FormData.TYPE_CONTENT_FILE, "photo" + imagesCounter, path);
+                }
+            }
         }
         return data;
     }
-
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
