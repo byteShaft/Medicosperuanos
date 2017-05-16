@@ -14,24 +14,39 @@ import android.widget.ImageView;
 import com.byteshaft.medicosperuanos.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
 
 public class SelectedImages extends AppCompatActivity {
 
     private GridView androidGridView;
-    private ArrayList<String> photosList;
+    private HashMap<String, String> photosList;
     private ImagesAdapter adapter;
+    private ArrayList<String> arrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_images);
-        androidGridView = (GridView) findViewById(R.id.selected_images);
+        arrayList = new ArrayList<>();
         photosList = DoctorsAppointment.photosArrayList;
+        printMap(photosList);
+        androidGridView = (GridView) findViewById(R.id.selected_images);
         Log.i("TAG", "photos" + photosList);
-        adapter = new ImagesAdapter(photosList);
+        adapter = new ImagesAdapter(arrayList);
         androidGridView.setAdapter(adapter);
+    }
+
+    public void printMap(Map mp) {
+        Iterator it = mp.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            System.out.println(pair.getKey() + " = " + pair.getValue());
+            arrayList.add(String.valueOf(pair.getKey()));
+        }
     }
 
 
@@ -57,7 +72,19 @@ public class SelectedImages extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             // set here
-            getBitMap(imagesList.get(position), viewHolder.imageView);
+            viewHolder.removeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: 16/05/2017 remove img 
+                }
+            });
+            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: 16/05/2017 show image in full screen
+                }
+            });
+            getBitMap(photosList.get(imagesList.get(position)), viewHolder.imageView);
             return convertView;
         }
 
