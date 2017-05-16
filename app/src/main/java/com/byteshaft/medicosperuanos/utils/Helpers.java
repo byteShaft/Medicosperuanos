@@ -191,6 +191,18 @@ public class Helpers {
         sImageLoader.displayImage(url, circleImageView, options, animateFirstListener);
     }
 
+    public static void getBitMap(String url, ImageView imageView) {
+        ImageLoadingListener animateFirstListener;
+        DisplayImageOptions options;
+        options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.mipmap.image_placeholder)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
+                .cacheInMemory(true)
+                .cacheOnDisc(true).considerExifParams(true).build();
+        animateFirstListener = new AnimateFirstDisplayListener();
+        sImageLoader.displayImage(url, imageView, options, animateFirstListener);
+    }
+
     private static class AnimateFirstDisplayListener extends
             SimpleImageLoadingListener {
 
