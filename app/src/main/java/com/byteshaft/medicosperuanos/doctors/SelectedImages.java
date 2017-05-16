@@ -55,7 +55,7 @@ public class SelectedImages extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             // set here
-                getBitMap(imagesList.get(position), viewHolder.imageView);
+            getBitMap(imagesList.get(position), viewHolder.imageView);
             return convertView;
         }
 
