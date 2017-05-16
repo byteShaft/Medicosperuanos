@@ -139,6 +139,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private int updateId = -1;
     private ArrayList<Services> arrayList;
     private ArrayList<String> imagesArrayList;
+    private static String method = "POST";
+    private String photo1 = "";
+    private String photo2 = "";
+    private String photo3 = "";
+    private String photo4 = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -528,6 +533,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
+                                    method = "PUT";
+                                    saveButton.setText("Update");
                                 }
                                 break;
                             case HttpURLConnection.HTTP_NOT_FOUND:
@@ -599,11 +606,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.setOnFileUploadProgressListener(this);
-        request.open("POST", String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
+        request.open(method, String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         try {
-            Log.i("TAG", "Data" + getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
             request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -620,8 +626,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
         Log.i("TAG", String.valueOf(progress));
-
-
     }
 
     @Override
@@ -648,7 +652,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private FormData getAttentionsData(String conclusion, String date, String dateOfReturn,
                                        String destination, String exploration, String time) throws JSONException {
-
         FormData data = new FormData();
         data.append(FormData.TYPE_CONTENT_TEXT, "conclusion", conclusion);
         data.append(FormData.TYPE_CONTENT_TEXT, "date", date);
@@ -658,50 +661,27 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
             jsonArray.put(diagnosticMedication.getId());
         }
-        data.append(FormData.TYPE_CONTENT_TEXT, "diagnostics", jsonArray.toString());
+        data.append(FormData.TYPE_CONTENT_JSON, "diagnostics", jsonArray.toString());
         JSONArray treatmentArray = new JSONArray();
         for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
             JSONObject treatmentObject = new JSONObject();
+            Log.i("TAG", "treatments " + diagnosticMedication.getId());
             treatmentObject.put("treatment", diagnosticMedication.getId());
             treatmentObject.put("quantity", diagnosticMedication.getQuantity());
             treatmentArray.put(treatmentObject);
         }
-        data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
+        Log.i("TAG", treatmentArray.toString());
+        data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
+        if (method.equals("PUT")) {
+
+        }
+        int imagesCounter = 1;
         for (String path : imagesArrayList) {
-            data.append(FormData.TYPE_CONTENT_FILE, "photos", path);
+            data.append(FormData.TYPE_CONTENT_FILE,"photo" + imagesCounter , path);
         }
         return data;
-
-        /// previous
-//
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("conclusion", conclusion);
-//            jsonObject.put("date", date);
-//            jsonObject.put("date_of_return", dateOfReturn);
-//            jsonObject.put("destination", destination);
-//            JSONArray jsonArray = new JSONArray();
-//            for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
-//                jsonArray.put(diagnosticMedication.getId());
-//            }
-//            jsonObject.put("diagnostics", jsonArray);
-//            JSONArray treatmentArray = new JSONArray();
-//            for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
-//                JSONObject treatmentObject = new JSONObject();
-//                treatmentObject.put("treatment", diagnosticMedication.getId());
-//                treatmentObject.put("quantity", diagnosticMedication.getQuantity());
-//                treatmentArray.put(treatmentObject);
-//            }
-//            jsonObject.put("treatments", treatmentArray);
-//            jsonObject.put("exploration", exploration);
-//            jsonObject.put("time", time);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return jsonObject.toString();
-
     }
 
 
