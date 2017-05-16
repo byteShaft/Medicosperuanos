@@ -10,11 +10,9 @@
         android:id="@+id/selected_images"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:columnWidth="100dp"
-        android:gravity="center"
-        android:minHeight="90dp"
-        android:numColumns="auto_fit"
-        android:stretchMode="columnWidth" />
+        android:layout_margin="10dp"
+        android:horizontalSpacing="10dp"
+        android:numColumns="2"
+        android:verticalSpacing="10dp" />
 
 </LinearLayout>

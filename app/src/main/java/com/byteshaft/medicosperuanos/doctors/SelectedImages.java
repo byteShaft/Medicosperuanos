@@ -43,7 +43,7 @@ public class SelectedImages extends AppCompatActivity {
     public void printMap(Map mp) {
         Iterator it = mp.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry pair = (Map.Entry)it.next();
+            Map.Entry pair = (Map.Entry) it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
             arrayList.add(String.valueOf(pair.getKey()));
         }
@@ -55,7 +55,7 @@ public class SelectedImages extends AppCompatActivity {
         private ViewHolder viewHolder;
         private ArrayList<String> imagesList;
 
-        private ImagesAdapter(ArrayList<String>  imagesList) {
+        private ImagesAdapter(ArrayList<String> imagesList) {
             this.imagesList = imagesList;
         }
 
@@ -75,7 +75,13 @@ public class SelectedImages extends AppCompatActivity {
             viewHolder.removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    // TODO: 16/05/2017 remove img 
+                }
+            });
+            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: 16/05/2017 show image in full screen
                 }
             });
             getBitMap(photosList.get(imagesList.get(position)), viewHolder.imageView);
