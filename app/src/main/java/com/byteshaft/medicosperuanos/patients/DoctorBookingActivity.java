@@ -156,7 +156,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
-        System.out.println(id + "ruhab");
         location = getIntent().getStringExtra("location");
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
