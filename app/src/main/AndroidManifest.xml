@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -21,12 +21,12 @@
     <application
         android:name=".utils.AppGlobals"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="true">
+        android:theme="@style/AppTheme">
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -40,33 +40,23 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
-            android:launchMode="singleInstance">
-
-        </activity>
-
-        <activity
-            android:name=".patients.DoctorsLocator" >
-            </activity>
-        <activity
-            android:name=".patients.DoctorsRoute" >
-
-        </activity>
-
+            android:launchMode="singleInstance"></activity>
+        <activity android:name=".patients.DoctorsLocator"></activity>
+        <activity android:name=".patients.DoctorsRoute"></activity>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize" >
-        </activity>
-
-        <activity android:name=".introscreen.IntroScreen"
+            android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".introscreen.IntroScreen"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
@@ -84,7 +74,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".doctors.DoctorsAppointment"
-            android:windowSoftInputMode="adjustResize|stateHidden"/>
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".patients.PatientsRecentHistory"
             android:windowSoftInputMode="adjustResize" />
@@ -100,7 +90,6 @@
         <activity
             android:name=".messages.ConversationActivity"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"
             android:theme="@style/MultipleImageSelectTheme">
@@ -110,6 +99,8 @@
         </activity>
 
         <uses-library android:name="com.google.android.maps" />
+
+        <activity android:name=".doctors.SelectedImages"></activity>
     </application>
 
 </manifest>

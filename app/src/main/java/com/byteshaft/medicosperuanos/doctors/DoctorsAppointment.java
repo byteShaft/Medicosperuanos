@@ -306,7 +306,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.share:
+            case R.id.view_images:
+                startActivity(new Intent(this, SelectedImages.class));
+                break;
+            case R.id.take_screenshot:
                 takeScreenshot();
                 break;
             case R.id.attach_icon:
