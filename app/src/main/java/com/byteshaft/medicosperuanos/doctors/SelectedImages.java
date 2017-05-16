@@ -3,6 +3,7 @@ package com.byteshaft.medicosperuanos.doctors;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -28,6 +29,7 @@ public class SelectedImages extends AppCompatActivity {
         setContentView(R.layout.activity_selected_images);
         androidGridView = (GridView) findViewById(R.id.selected_images);
         photosList = DoctorsAppointment.photosArrayList;
+        Log.i("TAG", "photos" + photosList);
         adapter = new ImagesAdapter(photosList);
         androidGridView.setAdapter(adapter);
     }
