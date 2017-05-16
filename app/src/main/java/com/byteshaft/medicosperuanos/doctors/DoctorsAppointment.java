@@ -626,8 +626,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
         Log.i("TAG", String.valueOf(progress));
-
-
     }
 
     @Override
@@ -654,7 +652,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private FormData getAttentionsData(String conclusion, String date, String dateOfReturn,
                                        String destination, String exploration, String time) throws JSONException {
-
         FormData data = new FormData();
         data.append(FormData.TYPE_CONTENT_TEXT, "conclusion", conclusion);
         data.append(FormData.TYPE_CONTENT_TEXT, "date", date);
