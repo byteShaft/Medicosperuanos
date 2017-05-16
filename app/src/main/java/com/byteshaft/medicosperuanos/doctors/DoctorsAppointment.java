@@ -147,6 +147,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private String photo4 = "";
     private ArrayList<Integer> providedServicesIds;
 
+    public static ArrayList<String> photosArrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -175,6 +177,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
         imagesArray = new ArrayList<>();
+        photosArrayList = new ArrayList<>();
 
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
@@ -544,6 +547,18 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         photo2 = jsonObject.getString("photo2");
                                         photo3 = jsonObject.getString("photo3");
                                         photo4 = jsonObject.getString("photo4");
+                                        if (photo1 != null) {
+                                            photosArrayList.add(photo1);
+                                        }
+                                        if (photo2 != null) {
+                                            photosArrayList.add(photo2);
+                                        }
+                                        if (photo3 != null) {
+                                            photosArrayList.add(photo3);
+                                        }
+                                        if (photo4 != null) {
+                                            photosArrayList.add(photo4);
+                                        }
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
                                         mReturnDateEditText.setText(dateOfReturn);
