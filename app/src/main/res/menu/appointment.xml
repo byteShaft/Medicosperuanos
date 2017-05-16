@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/share"
+        android:id="@+id/view_images"
+        android:title="Images" />
+
+    <item
+        android:id="@+id/take_screenshot"
         android:title="Screen Capture" />
 
     <item
         android:id="@+id/attach_icon"
-        android:title="attach"
         android:icon="@mipmap/attatched"
+        android:title="attach"
         app:showAsAction="always" />
 </menu>
