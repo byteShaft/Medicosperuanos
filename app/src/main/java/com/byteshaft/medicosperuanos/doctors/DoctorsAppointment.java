@@ -497,6 +497,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         String exploration = jsonObject.getString("exploration");
                                         String dateOfReturn = jsonObject.getString("date_of_return");
                                         String conclusion = jsonObject.getString("conclusion");
+                                        photo1 = jsonObject.getString("photo1");
+                                        photo2 = jsonObject.getString("photo2");
+                                        photo3 = jsonObject.getString("photo3");
+                                        photo4 = jsonObject.getString("photo4");
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
                                         mReturnDateEditText.setText(dateOfReturn);
@@ -652,7 +656,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     }
 
-
     private FormData getAttentionsData(String conclusion, String date, String dateOfReturn,
                                        String destination, String exploration, String time) throws JSONException {
         FormData data = new FormData();
@@ -675,6 +678,18 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         }
         Log.i("TAG", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
+
+//        for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
+//            JSONObject treatmentObject = new JSONObject();
+//            Log.i("TAG", "treatments " + diagnosticMedication.getId());
+//            treatmentObject.put("treatment", diagnosticMedication.getId());
+//            treatmentObject.put("quantity", diagnosticMedication.getQuantity());
+//            treatmentArray.put(treatmentObject);
+//        }
+
+//        data.append(FormData.TYPE_CONTENT_JSON, "services_provided", treatmentArray.toString());
+
+
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
         if (method.equals("PUT")) {
