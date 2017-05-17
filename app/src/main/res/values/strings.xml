@@ -145,5 +145,6 @@
     <string name="schedule_is_not_set_by_any_of_your_favorite_doctors">Schedule is not set by any of your favorite doctors</string>
     <string name="select_service">Select Required Service</string>
     <string name="accept_appointment_first">You must accept this appointment first…</string>
+    <string name="network_unreachable">Network is unreachable</string>
 </resources>
 

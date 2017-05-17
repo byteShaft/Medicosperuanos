@@ -695,7 +695,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.setOnFileUploadProgressListener(this);
-        request.open(method, String.format("%sdoctor/appointments/%s/attention ", AppGlobals.BASE_URL, appointmentId));
+        request.open(method, String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         try {
@@ -704,20 +704,31 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(getResources().getString(R.string.updating_attention));
-        alertDialogBuilder.setCancelable(false);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.progress_alert_dialog, null);
-        alertDialogBuilder.setView(dialogView);
-        donutProgress = (DonutProgress) dialogView.findViewById(R.id.upload_progress);
-        alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
+        if (imagesArrayList != null && imagesArrayList.size() < 1) {
+            alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle(getResources().getString(R.string.updating_attention));
+            alertDialogBuilder.setCancelable(false);
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.progress_alert_dialog, null);
+            alertDialogBuilder.setView(dialogView);
+            donutProgress = (DonutProgress) dialogView.findViewById(R.id.upload_progress);
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
     }
 
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        switch (readyState) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                Helpers.showSnackBar(findViewById(android.R.id.content), "connection time out");
+                break;
+            case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                Helpers.showSnackBar(findViewById(android.R.id.content),
+                        getResources().getString(R.string.network_unreachable));
+                break;
+        }
 
     }
 
@@ -746,6 +757,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", request.getResponseURL());
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         alertDialog.dismiss();
