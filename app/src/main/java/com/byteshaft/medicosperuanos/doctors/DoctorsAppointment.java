@@ -156,6 +156,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private AlertDialog alertDialog;
     private AlertDialog.Builder alertDialogBuilder;
     private ProgressBar progressBar;
+    private ArrayList<String> uploadedImages;
 
     public static HashMap<String, String> photosHashMap;
 
@@ -721,6 +722,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private void sendAttentionData(int appointmentId, String conclusion, String date, String dateOfReturn,
                                    String destination, String exploration, String time) {
+        uploadedImages = new ArrayList<>();
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -728,13 +730,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.open(method, String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        try {
-//            getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time);
-            request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (imagesArrayList != null && imagesArrayList.size() < 1) {
+        if (imagesArrayList != null) {
+            Log.i("TAG", "progress");
             alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle(getResources().getString(R.string.updating_attention));
             alertDialogBuilder.setCancelable(false);
@@ -744,6 +741,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             donutProgress = (DonutProgress) dialogView.findViewById(R.id.upload_progress);
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
+        }
+        try {
+            request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -765,21 +767,28 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
-        if ((int) progress == 100) {
-            if (alertDialog != null) {
-                donutProgress.setProgress(100);
-                alertDialog.dismiss();
-            }
-            alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
-            alertDialogBuilder.setCancelable(false);
-            LayoutInflater inflater = getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.finishingup_dialog, null);
-            alertDialogBuilder.setView(dialogView);
-            progressBar = (ProgressBar) dialogView.findViewById(R.id.progress_bar);
-            alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+        Log.i("TAG", "progress " + progress);
+        Log.i("TAG", "dialog "+ String.valueOf(alertDialog == null));
+        Log.i("TAG", "dialog "+ String.valueOf(donutProgress == null));
+        if (alertDialog != null) {
+            donutProgress.setProgress(100);
         }
+            if (!uploadedImages.contains(file.getAbsolutePath())) {
+                uploadedImages.add(file.getAbsolutePath());
+            }
+             if (uploadedImages.size() == imagesArrayList.size()) {
+                 Log.i("TAG", "HIDE ");
+                 alertDialog.dismiss();
+                 alertDialogBuilder = new AlertDialog.Builder(this);
+                 alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
+                 alertDialogBuilder.setCancelable(false);
+                 LayoutInflater inflater = getLayoutInflater();
+                 View dialogView = inflater.inflate(R.layout.finishingup_dialog, null);
+                 alertDialogBuilder.setView(dialogView);
+                 progressBar = (ProgressBar) dialogView.findViewById(R.id.progress_bar);
+                 alertDialog = alertDialogBuilder.create();
+                 alertDialog.show();
+             }
 
     }
 
@@ -792,6 +801,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     case HttpURLConnection.HTTP_OK:
                         alertDialog.dismiss();
                         Log.i("TAG", request.getResponseText());
+                        Appointments.getInstance().updateAppointmentStatus(AppGlobals.ATTENDED, id, position);
                         finish();
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
@@ -830,6 +840,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
         if (method.equals("PUT")) {
+            Log.i("TAG", "total counter " + totalImagesCounter);
             if (totalImagesCounter == 0) {
                 int imagesCounter = 1;
                 if (imagesArrayList != null) {
