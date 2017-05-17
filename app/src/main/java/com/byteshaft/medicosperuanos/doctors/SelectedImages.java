@@ -1,5 +1,6 @@
 package com.byteshaft.medicosperuanos.doctors;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -67,6 +68,14 @@ public class SelectedImages extends AppCompatActivity {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             // set here
+            viewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getApplicationContext(), FullscreenImageView.class);
+                    intent.putExtra("url", imagesList.get(position));
+                    startActivity(intent);
+                }
+            });
             viewHolder.removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
