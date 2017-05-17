@@ -157,6 +157,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private AlertDialog.Builder alertDialogBuilder;
     private ProgressBar progressBar;
     private ArrayList<String> uploadedImages;
+    private TextView files;
 
     public static HashMap<String, String> photosHashMap;
 
@@ -709,6 +710,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             View dialogView = inflater.inflate(R.layout.progress_alert_dialog, null);
             alertDialogBuilder.setView(dialogView);
             donutProgress = (DonutProgress) dialogView.findViewById(R.id.upload_progress);
+            files = (TextView) dialogView.findViewById(R.id.file);
+            files.setText("0/" + imagesArrayList.size());
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
@@ -741,13 +744,15 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         Log.i("TAG", "dialog "+ String.valueOf(alertDialog == null));
         Log.i("TAG", "dialog "+ String.valueOf(donutProgress == null));
         if (alertDialog != null) {
-            donutProgress.setProgress(100);
+            donutProgress.setProgress((int) progress);
         }
             if (!uploadedImages.contains(file.getAbsolutePath())) {
                 uploadedImages.add(file.getAbsolutePath());
+                donutProgress.setProgress(donutProgress.getProgress());
+                files.setText(uploadedImages.size()+"/" + imagesArrayList.size());
             }
-             if (uploadedImages.size() == imagesArrayList.size()) {
-                 Log.i("TAG", "HIDE ");
+             if (uploadedImages.size() == imagesArrayList.size() && progress == 100) {
+                 donutProgress.setProgress(100);
                  alertDialog.dismiss();
                  alertDialogBuilder = new AlertDialog.Builder(this);
                  alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
