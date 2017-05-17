@@ -112,6 +112,7 @@
     <string name="time_slot_booked">Time Slot already Booked</string>
     <string name="sample_message">Sample Message</string>
     <string name="updating">Setting up profile</string>
+    <string name="updating_attention">Updating Attention</string>
     <string name="finishing_up">Finishing up</string>
     <string name="appointments">Appointments</string>
     <string name="my_patient_details">My Patient Details</string>

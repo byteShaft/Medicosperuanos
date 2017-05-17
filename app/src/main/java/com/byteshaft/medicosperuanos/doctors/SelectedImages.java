@@ -3,7 +3,6 @@ package com.byteshaft.medicosperuanos.doctors;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -14,7 +13,6 @@ import android.widget.ImageView;
 import com.byteshaft.medicosperuanos.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,7 +21,6 @@ import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
 public class SelectedImages extends AppCompatActivity {
 
     private GridView androidGridView;
-    private HashMap<String, String> photosList;
     private ImagesAdapter adapter;
     private ArrayList<String> arrayList;
 
@@ -32,10 +29,8 @@ public class SelectedImages extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selected_images);
         arrayList = new ArrayList<>();
-        photosList = DoctorsAppointment.photosArrayList;
-        printMap(photosList);
+        printMap(DoctorsAppointment.photosHashMap);
         androidGridView = (GridView) findViewById(R.id.selected_images);
-        Log.i("TAG", "photos" + photosList);
         adapter = new ImagesAdapter(arrayList);
         androidGridView.setAdapter(adapter);
     }
@@ -61,7 +56,7 @@ public class SelectedImages extends AppCompatActivity {
 
         @NonNull
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = getLayoutInflater().inflate(R.layout.delegate_images, parent, false);
                 viewHolder = new ViewHolder();
@@ -75,10 +70,14 @@ public class SelectedImages extends AppCompatActivity {
             viewHolder.removeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    if (DoctorsAppointment.photosHashMap.containsKey(imagesList.get(position))) {
+                        DoctorsAppointment.photosHashMap.remove(imagesList.get(position));
+                        DoctorsAppointment.removedImages.add(imagesList.get(position));
+                        notifyDataSetChanged();
+                    }
                 }
             });
-            getBitMap(photosList.get(imagesList.get(position)), viewHolder.imageView);
+            getBitMap(DoctorsAppointment.photosHashMap.get(imagesList.get(position)), viewHolder.imageView);
             return convertView;
         }
 

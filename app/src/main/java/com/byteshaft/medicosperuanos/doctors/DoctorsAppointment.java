@@ -18,6 +18,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -48,6 +50,7 @@ import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 import com.darsh.multipleimageselect.activities.AlbumSelectActivity;
 import com.darsh.multipleimageselect.helpers.Constants;
+import com.github.lzyzsd.circleprogress.DonutProgress;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -146,8 +149,15 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private String photo3 = "";
     private String photo4 = "";
     private ArrayList<Integer> providedServicesIds;
+    private int totalImagesCounter = 0;
+    public static ArrayList<String> removedImages;
+    private MenuItem showImages;
+    private DonutProgress donutProgress;
+    private AlertDialog alertDialog;
+    private AlertDialog.Builder alertDialogBuilder;
+    private ProgressBar progressBar;
 
-    public static HashMap<String, String> photosArrayList;
+    public static HashMap<String, String> photosHashMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +179,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         providedServicesIds = new ArrayList<>();
+        removedImages = new ArrayList<>();
         diagnosticsList = new ArrayList<>();
         medicationList = new ArrayList<>();
         targetsArrayList = new ArrayList<>();
@@ -177,7 +188,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
         imagesArray = new ArrayList<>();
-        photosArrayList = new HashMap<>();
+        photosHashMap = new HashMap<>();
 
         mPatientsName = (TextView) view.findViewById(R.id.action_bar_title);
         mPatientsAge = (TextView) view.findViewById(R.id.action_bar_age);
@@ -294,11 +305,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         if (b) {
-            Log.i("TAG", "checkbox id " + compoundButton.getId());
                 providedServicesIds.add(compoundButton.getId());
         } else {
             if (providedServicesIds.contains(compoundButton.getId())) {
-                Log.i("TAG", "checkbox id " + compoundButton.getId());
                 int index = providedServicesIds.indexOf(compoundButton.getId());
                 providedServicesIds.remove(index);
             }
@@ -325,6 +334,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.appointment, menu);
+        if (menu != null) {
+            showImages = menu.findItem(R.id.view_images);
+            showImages.setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -339,7 +352,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.attach_icon:
                 Intent intent = new Intent(this, AlbumSelectActivity.class);
-                intent.putExtra(Constants.INTENT_EXTRA_LIMIT, 4);
+                int limit = 4;
+                if (method.equals("PUT")) {
+                    limit = 4 - DoctorsAppointment.photosHashMap.size();
+                }
+                intent.putExtra(Constants.INTENT_EXTRA_LIMIT, limit);
                 startActivityForResult(intent, Constants.REQUEST_CODE);
 //                ImageToPdf();
 //                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
@@ -361,7 +378,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             ArrayList<com.darsh.multipleimageselect.models.Image> images =
                     data.getParcelableArrayListExtra(Constants.INTENT_EXTRA_IMAGES);
             for (com.darsh.multipleimageselect.models.Image image : images) {
-                Log.i("TAG", image.path);
                 imagesArrayList.add(image.path);
             }
 
@@ -486,10 +502,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
-                        Log.e("GET", request.getResponseURL());
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                Log.e("GET", request.getResponseText());
                                 if (!request.getResponseText().trim().isEmpty()) {
                                     try {
                                         JSONObject jsonObject = new JSONObject(request.getResponseText());
@@ -503,7 +517,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             if (!providedServicesIds.contains(serviceObject.getInt("id"))) {
                                                 providedServicesIds.add(serviceObject.getInt("id"));
                                             }
-                                            Log.i("TAG", "service id " + serviceObject.getInt("id"));
                                         }
                                         int count = checkBoxLayout.getChildCount();
                                         View view;
@@ -543,21 +556,39 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         String exploration = jsonObject.getString("exploration");
                                         String dateOfReturn = jsonObject.getString("date_of_return");
                                         String conclusion = jsonObject.getString("conclusion");
-                                        photo1 = jsonObject.getString("photo1");
-                                        photo2 = jsonObject.getString("photo2");
-                                        photo3 = jsonObject.getString("photo3");
-                                        photo4 = jsonObject.getString("photo4");
-                                        if (photo1 != null) {
-                                            photosArrayList.put("photo1", photo1.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        if (!jsonObject.isNull("photo1")) {
+                                            photo1 = jsonObject.getString("photo1");
                                         }
-                                        if (photo2 != null) {
-                                            photosArrayList.put("photo2", photo2.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        if (!jsonObject.isNull("photo2")) {
+                                            photo2 = jsonObject.getString("photo2");
                                         }
-                                        if (photo3 != null) {
-                                            photosArrayList.put("photo3", photo3.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        if (!jsonObject.isNull("photo2")) {
+                                            photo3 = jsonObject.getString("photo3");
                                         }
-                                        if (photo4 != null) {
-                                            photosArrayList.put("photo4", photo4.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        if (!jsonObject.isNull("photo4")) {
+                                            photo4 = jsonObject.getString("photo4");
+                                        }
+                                        if (photo1 != null && !photo1.trim().isEmpty()) {
+                                            totalImagesCounter = totalImagesCounter+1;
+                                            photosHashMap.put("photo1", photo1.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        }
+                                        if (photo2 != null &&  !photo2.trim().isEmpty())  {
+                                            totalImagesCounter = totalImagesCounter+1;
+                                            photosHashMap.put("photo2", photo2.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        }
+                                        if (photo3 != null && !photo3.trim().isEmpty()) {
+                                            totalImagesCounter = totalImagesCounter+1;
+                                            photosHashMap.put("photo3", photo3.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        }
+                                        if (photo4 != null && !photo4.trim().isEmpty()) {
+                                            totalImagesCounter = totalImagesCounter+1;
+                                            photosHashMap.put("photo4", photo4.replace("http://localhost", AppGlobals.SERVER_IP));
+                                        }
+                                        Log.i("TAG", "photos " + photosHashMap);
+                                        if (totalImagesCounter > 0) {
+                                            showImages.setVisible(true);
+                                        } else {
+                                            showImages.setVisible(false);
                                         }
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
@@ -585,16 +616,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         for (int o = 0; o < medicationList.size(); o++) {
                                             DiagnosticMedication diagnosticMedication =
                                                     medicationList.get(o);
-                                            Log.i("TAG", " innner loop  " + diagnosticMedication.getId());
                                             for (DiagnosticMedication diagnosticMedication1 : selectedMedicationList) {
-                                                Log.i("TAG", " inner loop condition  " + diagnosticMedication.getId());
                                                 if (diagnosticMedication.getId() == diagnosticMedication1.getId()) {
-                                                    Log.i("TAG", " size " + diagnosticMedication.getId());
                                                     selectedMedication.put(o, diagnosticMedication.getId());
                                                 }
                                             }
                                         }
-                                        Log.i("TAG", "selected medication " + selectedMedication);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -612,7 +639,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
                 exception.printStackTrace();
-                Log.e("TAG", exception.getLocalizedMessage());
             }
         });
         String url = String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, id);
@@ -673,10 +699,20 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         try {
+//            getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time);
             request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(getResources().getString(R.string.updating_attention));
+        alertDialogBuilder.setCancelable(false);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.progress_alert_dialog, null);
+        alertDialogBuilder.setView(dialogView);
+        donutProgress = (DonutProgress) dialogView.findViewById(R.id.upload_progress);
+        alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
 
@@ -688,7 +724,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
-        Log.i("TAG", String.valueOf(progress));
+        if ((int) progress == 100) {
+            if (alertDialog != null) {
+                donutProgress.setProgress(100);
+                alertDialog.dismiss();
+            }
+            alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
+            alertDialogBuilder.setCancelable(false);
+            LayoutInflater inflater = getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.finishingup_dialog, null);
+            alertDialogBuilder.setView(dialogView);
+            progressBar = (ProgressBar) dialogView.findViewById(R.id.progress_bar);
+            alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
     }
 
     @Override
@@ -697,6 +748,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        alertDialog.dismiss();
                         Log.i("TAG", request.getResponseText());
                         finish();
                         break;
@@ -727,18 +779,53 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         JSONArray treatmentArray = new JSONArray();
         for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
             JSONObject treatmentObject = new JSONObject();
-            Log.i("TAG", "treatments " + diagnosticMedication.getId());
             treatmentObject.put("treatment", diagnosticMedication.getId());
             treatmentObject.put("quantity", diagnosticMedication.getQuantity());
             treatmentArray.put(treatmentObject);
         }
-        Log.i("TAG", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
-        Log.i("TAG","services id " +  providedServicesIds.toString());
         data.append(FormData.TYPE_CONTENT_JSON, "services_provided", providedServicesIds.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
         if (method.equals("PUT")) {
+            if (totalImagesCounter == 0) {
+                int imagesCounter = 1;
+                if (imagesArrayList != null) {
+                    for (String path : imagesArrayList) {
+                        data.append(FormData.TYPE_CONTENT_FILE, "photo" + imagesCounter, path);
+                        imagesCounter++;
+                    }
+                }
+
+            } else if (totalImagesCounter == 4) {
+                if (imagesArrayList != null) {
+                    for (int i = 1; i < imagesArrayList.size(); i++) {
+                        String name = "photo" + removedImages.get(i);
+                        data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
+                    }
+                }
+            } else if (totalImagesCounter < 4) {
+                if (imagesArrayList != null) {
+                    Log.i("NAME", "images Array size" + imagesArrayList.size());
+                    Log.i("NAME", "Photo Array size" + photosHashMap.size());
+                    int counter = photosHashMap.size();
+                    for (int i = 0; i < (imagesArrayList.size()); i++) {
+                        String name;
+                        if (i < removedImages.size() && removedImages.size() > 0) {
+                            name = "photo" + removedImages.get(i) + 1;
+                            Log.i("IF", "name" + name);
+                        } else {
+                            counter = counter+1;
+                            name = "photo" + (counter);
+                            Log.i("else", "name" + name);
+                        }
+                        Log.i("NAME", "name" + name);
+                        Log.i("NAME", "file" + imagesArrayList.get(i));
+                        data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
+                    }
+                }
+
+            }
 
         } else {
             int imagesCounter = 1;
