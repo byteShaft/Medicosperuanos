@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -472,10 +473,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 onBackPressed();
                 break;
             case R.id.plus_button_diagnostics:
-                medicationDiagnosticsDialog(true);
+                medicationDiagnosticsDialog(true, getString(R.string.diagnostics));
                 break;
             case R.id.plus_button_medication:
-                medicationDiagnosticsDialog(false);
+                medicationDiagnosticsDialog(false, getString(R.string.medications));
                 break;
             case R.id.medication_spinner:
                 break;
@@ -911,14 +912,16 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     }
 
-    public void medicationDiagnosticsDialog(final boolean value) {
+    public void medicationDiagnosticsDialog(final boolean value, String dialogTitle) {
         final Dialog dialog = new Dialog(DoctorsAppointment.this);
         dialog.setContentView(R.layout.medication_diagnostics_search_list);
         int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.95);
         int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.70);
         dialog.getWindow().setLayout(width, height);
         dialog.setCancelable(true);
+        dialog.setTitle(dialogTitle);
         EditText searchEditText = (EditText) dialog.findViewById(R.id.search_edit_text);
+        searchEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         Button okTextView = (Button) dialog.findViewById(R.id.ok_textV_view);
         medicationDiagnosticListView = (ListView) dialog.
                 findViewById(R.id.medication_diagnostic_search_list_view);

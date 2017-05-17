@@ -149,5 +149,7 @@
     <string name="already_taken">Cannot delete booked slot</string>
     <string name="slot_deleted">slot deleted</string>
     <string name="cannot_reject_attended_appointment">cannot reject attended appointment</string>
+    <string name="diagnostics">Select Diagnostics</string>
+    <string name="medications">Select Medications</string>
 </resources>
 
