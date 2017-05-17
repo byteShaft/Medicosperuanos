@@ -69,6 +69,7 @@
         android:id="@+id/dashboard_list_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="4dp"
         android:layout_below="@+id/chart">
 
     </ListView>
