@@ -64,9 +64,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
         mEmailString = mEmail.getText().toString();
         mPasswordString = mPassword.getText().toString();
 
-        System.out.println(mEmailString);
-        System.out.println(mPasswordString);
-
         if (mEmailString.trim().isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(mEmailString).matches()) {
             mEmail.setError("please provide a valid email");
             valid = false;

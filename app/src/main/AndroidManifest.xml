@@ -47,14 +47,14 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
-            android:launchMode="singleInstance"></activity>
-        <activity android:name=".patients.DoctorsLocator"></activity>
-        <activity android:name=".patients.DoctorsRoute"></activity>
+            android:launchMode="singleInstance" />
+        <activity android:name=".patients.DoctorsLocator" />
+        <activity android:name=".patients.DoctorsRoute" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".introscreen.IntroScreen"
             android:screenOrientation="portrait"
@@ -100,7 +100,8 @@
 
         <uses-library android:name="com.google.android.maps" />
 
-        <activity android:name=".doctors.SelectedImages"></activity>
+        <activity android:name=".doctors.SelectedImages" />
+        <activity android:name=".doctors.FullscreenImageView"></activity>
     </application>
 
 </manifest>
