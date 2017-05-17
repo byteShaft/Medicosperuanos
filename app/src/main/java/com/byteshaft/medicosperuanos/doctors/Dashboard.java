@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
@@ -43,12 +42,15 @@ public class Dashboard extends Fragment {
     private ListView list;
     private ArrayList<String> dashBoardItems = new ArrayList<>();
     private JSONObject dashBoardValues;
+    private boolean foreground = false;
+    private DashboardAdapter dashboardAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.dashboard_fragment, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.dashboard));
+        foreground = true;
         dashBoardItems.add(AppGlobals.INCOME_TODAY);
         dashBoardItems.add(AppGlobals.APPOINTMENT_TODAY);
         dashBoardItems.add(AppGlobals.MESSAGES);
@@ -114,6 +116,13 @@ public class Dashboard extends Fragment {
     public void onResume() {
         super.onResume();
         getDashBoardDetails();
+        foreground = true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        foreground = false;
     }
 
     private void getDashBoardDetails() {
@@ -130,9 +139,11 @@ public class Dashboard extends Fragment {
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                DashboardAdapter dashboardAdapter = new DashboardAdapter(getActivity()
-                                        .getApplicationContext(), dashBoardItems);
-                                list.setAdapter(dashboardAdapter);
+                                if (foreground) {
+                                    dashboardAdapter = new DashboardAdapter(AppGlobals.getContext(),
+                                            dashBoardItems);
+                                    list.setAdapter(dashboardAdapter);
+                                }
                         }
                 }
             }

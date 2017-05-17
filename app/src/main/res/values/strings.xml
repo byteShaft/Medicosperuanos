@@ -146,5 +146,8 @@
     <string name="select_service">Select Required Service</string>
     <string name="accept_appointment_first">You must accept this appointment first…</string>
     <string name="network_unreachable">Network is unreachable</string>
+    <string name="already_taken">Cannot delete booked slot</string>
+    <string name="slot_deleted">slot deleted</string>
+    <string name="cannot_reject_attended_appointment">cannot reject attended appointment</string>
 </resources>
 

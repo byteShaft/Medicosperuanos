@@ -169,7 +169,6 @@ public class MyPatients extends Fragment {
         LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
-        toolbar.addView(searchContainer);
         myPatientsList = new ArrayList<>();
         customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
                 R.layout.doctors_search_delagete, myPatientsList);
@@ -208,6 +207,12 @@ public class MyPatients extends Fragment {
             }
         });
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        toolbar.addView(searchContainer);
     }
 
     @Override
