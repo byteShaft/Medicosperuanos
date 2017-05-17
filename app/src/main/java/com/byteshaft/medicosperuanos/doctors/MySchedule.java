@@ -52,6 +52,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     private HashMap<String, Integer> idForDate;
     private HashMap<Integer, ArrayList<Integer>> toBeDelete;
     private ArrayList<Integer> toBeDeleteselectedIds;
+    private HashMap<String, Integer[]> map;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -227,6 +228,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             data.add(position, jsonObject);
                         } else {
                             try {
+                                if (jsonObject.getInt("taken") == 1) {
+                                    Helpers.showSnackBar(MySchedule.this.getView(),
+                                            getResources().getString(R.string.already_taken));
+                                    notifyDataSetChanged();
+                                    return;
+                                }
                                 jsonObject.put("taken", 0);
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -238,10 +245,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
                                     Integer[] idsArray = (Integer[]) jsonObject.get("ids");
                                     Log.i("TAG", "slotId" + idsArray[0] + "object id" + idsArray[1]);
-                                    if (jsonObject.getInt("taken") == 1) {
-                                        Helpers.showSnackBar(MySchedule.this.getView(),
-                                                getResources().getString(R.string.already_taken));
-                                    }
                                     toBeDeleteselectedIds.add(idsArray[0]);
                                     toBeDelete.put(idsArray[1], toBeDeleteselectedIds);
 //                                    selectedIds.add()
@@ -260,7 +263,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             try {
                 viewHolder.startTime.setText(jsonObject.getString("start_time"));
                 viewHolder.endTime.setText(jsonObject.getString("end_time"));
-                if (jsonObject.getInt("taken") == 0) {
+                if (map != null && !map.containsKey(jsonObject.getString("start_time"))) {
                     viewHolder.state.setChecked(false);
                 } else {
                     viewHolder.state.setChecked(true);
@@ -372,7 +375,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
 //                        Log.i("TAG", "response  " + request.getResponseText());
-                        HashMap<String, Integer[]> map = new HashMap<>();
+                        map = new HashMap<>();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             jsonArray = jsonObject.getJSONArray("results");
@@ -389,22 +392,22 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                                 }
                             }
                             Log.i("Map", map.toString());
-                            ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
-                            if (jsonObjects.size() > 0) {
-                                for (int j = 0; j < jsonObjects.size(); j++) {
-                                    if (map.containsKey(jsonObjects.get(j).getString("start_time").trim())) {
-                                        JSONObject slot = jsonObjects.get(j);
-                                        slot.put("taken", 1);
-                                        slot.put("ids", map.get(jsonObjects.get(j)
-                                                .getString("start_time").trim()));
-                                        jsonObjects.remove(j);
-                                        jsonObjects.add(j, slot);
-                                    }
-                                }
-                                scheduleList.put(currentDate, jsonObjects);
-                                scheduleAdapter.notifyDataSetChanged();
-                                Log.i("Server", scheduleList.toString());
-                            }
+                            scheduleAdapter.notifyDataSetChanged();
+//                            ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
+//                            if (jsonObjects.size() > 0) {
+//                                for (int j = 0; j < jsonObjects.size(); j++) {
+//                                    if (map.containsKey(jsonObjects.get(j).getString("start_time").trim())) {
+//                                        JSONObject slot = jsonObjects.get(j);
+//                                        slot.put("taken", 0);
+//                                        slot.put("ids", map.get(jsonObjects.get(j)
+//                                                .getString("start_time").trim()));
+//                                        jsonObjects.remove(j);
+//                                        jsonObjects.add(j, slot);
+//                                    }
+//                                }
+//                                scheduleList.put(currentDate, jsonObjects);
+//                                scheduleAdapter.notifyDataSetChanged();
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
