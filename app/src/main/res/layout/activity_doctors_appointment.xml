@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="fill_parent">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -73,13 +73,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/request_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="Requested services"
-            android:textSize="15sp" />
+            <TextView
+                android:id="@+id/request_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="Requested services"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -99,10 +99,10 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:counterEnabled="true"
-            app:counterMaxLength="250"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="250">
 
             <EditText
                 android:id="@+id/explanation_edit_text"
@@ -124,23 +124,23 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="2.5">
+                android:layout_weight="2.5"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/diagnostics_text_view"
-                android:text="Diagnostics"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/diagnostics_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Diagnostics" />
 
                 <Spinner
                     android:id="@+id/diagnostics_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="250dp"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="15dip"
-                    android:drawableRight="@mipmap/dropdown"
                     android:layout_margin="2dp"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
+                    android:drawablePadding="15dip"
+                    android:drawableRight="@mipmap/dropdown" />
 
             </LinearLayout>
 
@@ -148,8 +148,8 @@
                 android:id="@+id/diagnostics_button_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:layout_gravity="center_horizontal">
+                android:layout_gravity="center_horizontal"
+                android:layout_weight=".5">
 
                 <Button
                     android:id="@+id/plus_button_diagnostics"
@@ -172,24 +172,24 @@
                 android:id="@+id/main_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_weight="2">
+                android:layout_weight="2"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/treatment_text_view"
-                    android:text="Treatment"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="Treatment" />
 
                 <Spinner
                     android:id="@+id/medication_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:text="List of medication for selection"
-                    android:drawableRight="@mipmap/dropdown"
                     android:layout_margin="2dp"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
+                    android:drawablePadding="8dp"
+                    android:drawableRight="@mipmap/dropdown"
+                    android:text="List of medication for selection" />
 
             </LinearLayout>
 
@@ -197,10 +197,10 @@
                 android:id="@+id/medication_button_layout"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_gravity="bottom"
-                android:gravity="bottom"
                 android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:gravity="bottom"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -208,19 +208,19 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/qty_text_view"
-                    android:layout_width="38dp"
-                    android:layout_height="30dp"
-                    android:gravity="center"
-                    android:hint="Qty"
-                    android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/qty_text_view"
+                        android:layout_width="38dp"
+                        android:layout_height="30dp"
+                        android:gravity="center"
+                        android:hint="Qty"
+                        android:textSize="12sp" />
 
-                <View
-                    android:layout_width="35dp"
-                    android:layout_height="1dp"
-                    android:layout_below="@+id/qty_text_view"
-                    android:background="#000" />
+                    <View
+                        android:layout_width="35dp"
+                        android:layout_height="1dp"
+                        android:layout_below="@+id/qty_text_view"
+                        android:background="#000" />
                 </LinearLayout>
 
 
@@ -250,9 +250,9 @@
 
                 <Spinner
                     android:id="@+id/destination_spinner"
+                    style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
+                    android:layout_height="wrap_content" />
 
             </RelativeLayout>
 
@@ -272,10 +272,10 @@
                         android:id="@+id/return_date_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="-7dp"
                         android:editable="false"
                         android:focusable="false"
                         android:hint="Date of return"
-                        android:layout_marginBottom="-7dp"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -284,30 +284,29 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             app:counterEnabled="true"
             app:counterMaxLength="250"
-            app:counterTextAppearance="@anim/enter"
-            android:layout_height="wrap_content">
+            app:counterTextAppearance="@anim/enter">
 
             <EditText
                 android:id="@+id/conclusions_edit_text"
                 android:layout_width="match_parent"
-                android:hint="Conclusion"
                 android:layout_height="wrap_content"
+                android:hint="Conclusion"
                 android:inputType="text"
                 android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
 
 
-        <android.support.v7.widget.AppCompatButton
+        <Button
             android:id="@+id/save_button"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginTop="15dp"
-            android:background="#FF5252"
             android:text="Save"
-            android:textColor="#ffffff" />
+            android:theme="@style/MyButton" />
 
         <TextView
             android:id="@+id/sign_up_text_view"

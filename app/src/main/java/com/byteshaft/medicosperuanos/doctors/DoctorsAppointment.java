@@ -91,6 +91,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private Button mPlusButtonDiagnostics;
     private Button mPlusButtonMedication;
+    private Button saveButton;
 
     private DatePickerDialog datePickerDialog;
     private TimePickerDialog mTimePickerDialog;
@@ -132,7 +133,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private MedicationSpinnerAdapter medicationSpinnerAdapter;
 
     private TextView quantityTextView;
-    private TextView saveButton;
     private int selectedTargetId = -1;
 
     private static final int REQUEST_CODE = 123;
@@ -306,7 +306,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         if (b) {
-                providedServicesIds.add(compoundButton.getId());
+            providedServicesIds.add(compoundButton.getId());
         } else {
             if (providedServicesIds.contains(compoundButton.getId())) {
                 int index = providedServicesIds.indexOf(compoundButton.getId());
@@ -481,12 +481,42 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             case R.id.diagnostics_spinner:
                 break;
             case R.id.save_button:
-                sendAttentionData(id, mConclusionsEditText.getText().toString(), mDateEditText.getText().toString(),
-                        mReturnDateEditText.getText().toString(),
-                        String.valueOf(selectedTargetId), mExplanationEditText.getText().toString(),
-                        mTimeEditText.getText().toString());
+                if (validate()) {
+                    sendAttentionData(id, mConclusionsEditText.getText().toString(), mDateEditText.getText().toString(),
+                            mReturnDateEditText.getText().toString(),
+                            String.valueOf(selectedTargetId), mExplanationEditText.getText().toString(),
+                            mTimeEditText.getText().toString());
+                }
                 break;
         }
+    }
+
+    private boolean validate() {
+        boolean valid = true;
+
+        if (mConclusionsEditText.getText().toString().isEmpty()) {
+            mConclusionsEditText.setError("can not be empty");
+            valid = false;
+        } else {
+            mConclusionsEditText.setError(null);
+        }
+
+        if (mExplanationEditText.getText().toString().isEmpty()) {
+            mExplanationEditText.setError("can not be empty");
+            valid = false;
+        } else {
+            mExplanationEditText.setError(null);
+        }
+        
+//        if (diagnosticsList.size() < 1) {
+//            Helpers.showSnackBar(findViewById(android.R.id.content), "Select diagnostic");
+//        }
+//
+//        if (medicationList.size() < 1) {
+//            Helpers.showSnackBar(findViewById(android.R.id.content), "Select medication");
+//        }
+
+        return valid;
     }
 
     @Override
@@ -521,13 +551,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         }
                                         int count = checkBoxLayout.getChildCount();
                                         View view;
-                                        for(int i=0; i<count; i++) {
-                                            view = ((LinearLayout ) checkBoxLayout).getChildAt(i);
+                                        for (int i = 0; i < count; i++) {
+                                            view = ((LinearLayout) checkBoxLayout).getChildAt(i);
                                             if (view instanceof CheckBox)
-                                            if (providedServicesIds.contains(view.getId())) {
-                                                CheckBox checkbox = (CheckBox) view;
-                                                checkbox.setChecked(true);
-                                            }
+                                                if (providedServicesIds.contains(view.getId())) {
+                                                    CheckBox checkbox = (CheckBox) view;
+                                                    checkbox.setChecked(true);
+                                                }
 
                                             //do something with your child element
                                         }
@@ -570,19 +600,19 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             photo4 = jsonObject.getString("photo4");
                                         }
                                         if (photo1 != null && !photo1.trim().isEmpty()) {
-                                            totalImagesCounter = totalImagesCounter+1;
+                                            totalImagesCounter = totalImagesCounter + 1;
                                             photosHashMap.put("photo1", photo1.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
-                                        if (photo2 != null &&  !photo2.trim().isEmpty())  {
-                                            totalImagesCounter = totalImagesCounter+1;
+                                        if (photo2 != null && !photo2.trim().isEmpty()) {
+                                            totalImagesCounter = totalImagesCounter + 1;
                                             photosHashMap.put("photo2", photo2.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo3 != null && !photo3.trim().isEmpty()) {
-                                            totalImagesCounter = totalImagesCounter+1;
+                                            totalImagesCounter = totalImagesCounter + 1;
                                             photosHashMap.put("photo3", photo3.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         if (photo4 != null && !photo4.trim().isEmpty()) {
-                                            totalImagesCounter = totalImagesCounter+1;
+                                            totalImagesCounter = totalImagesCounter + 1;
                                             photosHashMap.put("photo4", photo4.replace("http://localhost", AppGlobals.SERVER_IP));
                                         }
                                         Log.i("TAG", "photos " + photosHashMap);
@@ -838,7 +868,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                             name = "photo" + removedImages.get(i) + 1;
                             Log.i("IF", "name" + name);
                         } else {
-                            counter = counter+1;
+                            counter = counter + 1;
                             name = "photo" + (counter);
                             Log.i("else", "name" + name);
                         }
