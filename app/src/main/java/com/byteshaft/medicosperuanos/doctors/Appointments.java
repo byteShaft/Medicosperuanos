@@ -265,6 +265,10 @@ public class Appointments extends Fragment implements
                 switch (index) {
                     // close
                     case 0:
+                        if(agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
+                            Helpers.showSnackBar(getView(), getResources().getString(R.string.cannot_reject_attended_appointment));
+                            return false;
+                        }
                         updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
                         getDashBoardDetails();
                         return true;

@@ -51,7 +51,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     private int currentScheduleId;
     private HashMap<String, Integer> idForDate;
     private HashMap<Integer, ArrayList<Integer>> toBeDelete;
-    private ArrayList<Integer> toBeDeleteselectedIds ;
+    private ArrayList<Integer> toBeDeleteselectedIds;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -238,6 +238,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
                                     Integer[] idsArray = (Integer[]) jsonObject.get("ids");
                                     Log.i("TAG", "slotId" + idsArray[0] + "object id" + idsArray[1]);
+                                    if (jsonObject.getInt("taken") == 1) {
+                                        Helpers.showSnackBar(MySchedule.this.getView(),
+                                                getResources().getString(R.string.already_taken));
+                                    }
                                     toBeDeleteselectedIds.add(idsArray[0]);
                                     toBeDelete.put(idsArray[1], toBeDeleteselectedIds);
 //                                    selectedIds.add()
@@ -291,7 +295,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request.send();
     }
 
-    private void deleteSchedule(int idOfSchedule, ArrayList<Integer>  ids) {
+    private void deleteSchedule(int idOfSchedule, ArrayList<Integer> ids) {
         Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.setting_up_schedule));
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
@@ -302,8 +306,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         Helpers.dismissProgressDialog();
                         Log.i("TAG", "status" + request.getStatus());
                         switch (request.getStatus()) {
-                            case HttpURLConnection.HTTP_BAD_REQUEST:
-                                Log.i("TAG", "status" + request.getResponseText());
+                            case HttpURLConnection.HTTP_NO_CONTENT:
+                                Helpers.showSnackBar(getView(), getResources().getString(R.string.slot_deleted));
+                                sendSchedule();
                                 break;
                         }
                 }
@@ -314,14 +319,18 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         request.open("POST", String.format("%sdoctor/schedule/%s/delete-slots", AppGlobals.BASE_URL, idOfSchedule));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        JSONArray jsonArray = new JSONArray();
+        for (Integer id : ids) {
+            jsonArray.put(id);
+        }
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("slots", ids);
-            Log.i("TAG", jsonObject.toString());
-            request.send(jsonObject.toString());
+            jsonObject.put("slots", jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.i("TAG", jsonObject.toString());
+        request.send(jsonObject.toString());
     }
 
     private void sendSchedule() {
