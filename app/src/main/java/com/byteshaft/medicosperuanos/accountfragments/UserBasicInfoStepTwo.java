@@ -645,25 +645,26 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
+        Log.i("TAG", file.getAbsolutePath());
         double progress = (loaded / (double) total) * 100;
         Log.i("current progress", "" + (int) progress);
-        donutProgress.setProgress((int) progress);
-        if ((int) progress == 100) {
-            Log.i("PROGRESS", "condition matched");
-            if (alertDialog != null) {
-                donutProgress.setProgress(100);
-                alertDialog.dismiss();
-            }
-            alertDialogBuilder = new AlertDialog.Builder(getActivity());
-            alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
-            alertDialogBuilder.setCancelable(false);
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.finishingup_dialog, null);
-            alertDialogBuilder.setView(dialogView);
-            progressBar = (ProgressBar) dialogView.findViewById(R.id.progress_bar);
-            alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
-        }
+//        donutProgress.setProgress((int) progress);
+//        if ((int) progress == 100) {
+//            Log.i("PROGRESS", "condition matched");
+//            if (alertDialog != null) {
+//                donutProgress.setProgress(100);
+//                alertDialog.dismiss();
+//            }
+//            alertDialogBuilder = new AlertDialog.Builder(getActivity());
+//            alertDialogBuilder.setTitle(getResources().getString(R.string.finishing_up));
+//            alertDialogBuilder.setCancelable(false);
+//            LayoutInflater inflater = getActivity().getLayoutInflater();
+//            View dialogView = inflater.inflate(R.layout.finishingup_dialog, null);
+//            alertDialogBuilder.setView(dialogView);
+//            progressBar = (ProgressBar) dialogView.findViewById(R.id.progress_bar);
+//            alertDialog = alertDialogBuilder.create();
+//            alertDialog.show();
+//        }
     }
 
     @Override

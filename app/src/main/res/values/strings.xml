@@ -112,6 +112,7 @@
     <string name="time_slot_booked">Time Slot already Booked</string>
     <string name="sample_message">Sample Message</string>
     <string name="updating">Setting up profile</string>
+    <string name="updating_attention">Updating Attention</string>
     <string name="finishing_up">Finishing up</string>
     <string name="appointments">Appointments</string>
     <string name="my_patient_details">My Patient Details</string>
@@ -144,5 +145,6 @@
     <string name="schedule_is_not_set_by_any_of_your_favorite_doctors">Schedule is not set by any of your favorite doctors</string>
     <string name="select_service">Select Required Service</string>
     <string name="accept_appointment_first">You must accept this appointment first…</string>
+    <string name="network_unreachable">Network is unreachable</string>
 </resources>
 
