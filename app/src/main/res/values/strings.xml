@@ -137,6 +137,7 @@
     <string name="getting_doctor_list">fetching doctors list…</string>
     <string name="getting_schedule">fetching schedule…</string>
     <string name="setting_up_schedule">setting up schedule…</string>
+    <string name="updating_schedule">updating schedule…</string>
     <string name="getting_patients">fetching patients…</string>
     <string name="getting_favourite_doctors">fetching favourite doctor</string>
     <string name="fetching_my_appointments">fetching…</string>
@@ -151,5 +152,7 @@
     <string name="cannot_reject_attended_appointment">cannot reject attended appointment</string>
     <string name="diagnostics">Select Diagnostics</string>
     <string name="medications">Select Medications</string>
+    <string name="schedule_updated">Schedule Successfully updated</string>
+
 </resources>
 
