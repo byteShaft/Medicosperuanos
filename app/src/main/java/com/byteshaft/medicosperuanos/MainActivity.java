@@ -46,7 +46,6 @@ import java.net.HttpURLConnection;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.byteshaft.medicosperuanos.utils.Helpers.calculateAge;
 import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
 
 public class MainActivity extends AppCompatActivity
@@ -96,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.i("TAG", "token  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.i("TAG", "id  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
