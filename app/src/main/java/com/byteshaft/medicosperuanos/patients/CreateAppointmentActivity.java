@@ -49,7 +49,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CreateAppointmentActivity extends AppCompatActivity implements View.OnClickListener,
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
-
     private Button mSaveButton;
     private TextView serviceListSpinner;
     private ImageButton callButton;
