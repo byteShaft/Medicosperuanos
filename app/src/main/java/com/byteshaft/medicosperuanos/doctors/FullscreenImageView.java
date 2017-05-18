@@ -3,19 +3,15 @@ package com.byteshaft.medicosperuanos.doctors;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageView;
+import android.webkit.WebView;
 
 import com.byteshaft.medicosperuanos.R;
 
-import uk.co.senab.photoview.PhotoViewAttacher;
-
 public class FullscreenImageView extends Activity {
 
-    private ImageView imageView;
-    private PhotoViewAttacher photoViewAttacher;
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +21,13 @@ public class FullscreenImageView extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_fullscreen_image_view);
-        imageView = (ImageView) findViewById(R.id.image_view);
-        photoViewAttacher = new PhotoViewAttacher(imageView);
-        photoViewAttacher.update();
+        webView = (WebView) findViewById(R.id.image_view);
+
         Intent intent = getIntent();
-        String imagePosition = intent.getStringExtra("url");
-        Log.i("URL ", imagePosition);
+        String url = intent.getStringExtra("url");
+        webView.getSettings().setLoadWithOverviewMode(true);
+        webView.getSettings().setUseWideViewPort(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.loadUrl(url);
     }
 }

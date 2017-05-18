@@ -72,7 +72,7 @@ public class SelectedImages extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getApplicationContext(), FullscreenImageView.class);
-                    intent.putExtra("url", imagesList.get(position));
+                    intent.putExtra("url", DoctorsAppointment.photosHashMap.get(imagesList.get(position)));
                     startActivity(intent);
                 }
             });
