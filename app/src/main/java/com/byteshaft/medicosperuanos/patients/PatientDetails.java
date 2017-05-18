@@ -159,13 +159,15 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_appointment:
-                Intent appointmentIntent = new Intent(this, DoctorBookingActivity.class);
+                Intent appointmentIntent = new Intent(getApplicationContext(),
+                        DoctorBookingActivity.class);
                 String id = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID);
                 appointmentIntent.putExtra("user", Integer.valueOf(id));
                 appointmentIntent.putExtra("name", patientNameString);
                 appointmentIntent.putExtra("dob", patientAgeString);
                 appointmentIntent.putExtra("photo", circleImageViewString);
                 appointmentIntent.putExtra("patientID", patientId);
+                appointmentIntent.putExtra("from_doctor", true);
                 startActivity(appointmentIntent);
                 break;
             case R.id.call_button_:

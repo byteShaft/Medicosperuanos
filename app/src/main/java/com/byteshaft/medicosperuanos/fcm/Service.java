@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
@@ -22,6 +23,7 @@ public class Service extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        Log.i("TAG", "message");
         sendNotification();
     }
 
@@ -35,6 +37,7 @@ public class Service extends FirebaseMessagingService {
         Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setLargeIcon(bm)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker("text")
                 .setContentTitle("text")
                 .setContentText("text")
@@ -47,30 +50,4 @@ public class Service extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
-//
-//    public void sendSMS(String phoneNo, String msg) {
-//        try {
-//            SmsManager smsManager = SmsManager.getDefault();
-//            Log.i("TAG", "sending sms to " + msg + " Number " + phoneNo);
-//            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//    }
-
-//    private void sendKey(String token, String name) {
-//        HttpRequest request = new HttpRequest(this);
-//        request.setOnReadyStateChangeListener(this);
-//        request.setOnErrorListener(this);
-//        request.open("POST", String.format("%skey", AppGlobals.BASE_URL));
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put(AppGlobals.KEY, token);
-//            jsonObject.put("full_name", name);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        request.send(jsonObject.toString());
-//        AppGlobals.showProgressDialog(MainActivity.this, "Please wait...");
-//    }
 }
