@@ -1,5 +1,6 @@
 package com.byteshaft.medicosperuanos.fcm;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -9,6 +10,8 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.RemoteInput;
+import android.support.v4.content.ContextCompat;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
@@ -19,10 +22,58 @@ import com.google.firebase.messaging.RemoteMessage;
 public class Service extends FirebaseMessagingService {
 //    private String message;
 
+    private static int notificationId = 101;
+    private static String KEY_TEXT_REPLY = "key_text_reply";
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         sendNotification();
+    }
+
+
+    public void replyNotification() {
+
+        String replyLabel = "Enter your reply here";
+        RemoteInput remoteInput =
+                new RemoteInput.Builder(KEY_TEXT_REPLY)
+                        .setLabel(replyLabel)
+                        .build();
+
+        Intent resultIntent =
+                new Intent(this, MainActivity.class);
+
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        NotificationCompat.Action replyAction =
+                new NotificationCompat.Action.Builder(
+                        android.R.drawable.ic_dialog_info,
+                        "Reply", resultPendingIntent)
+                        .addRemoteInput(remoteInput)
+                        .build();
+
+        Notification newMessageNotification =
+                new NotificationCompat.Builder(this)
+                        .setColor(ContextCompat.getColor(this,
+                                R.color.colorPrimary))
+                        .setSmallIcon(
+                                android.R.drawable.ic_dialog_info)
+                        .setContentTitle("My Notification")
+                        .setContentText("This is a test message")
+                        .addAction(replyAction).build();
+
+        NotificationManager notificationManager =
+                (NotificationManager)
+                        getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(notificationId,
+                newMessageNotification);
     }
 
     private void sendNotification() {
