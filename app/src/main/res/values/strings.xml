@@ -153,6 +153,7 @@
     <string name="diagnostics">Select Diagnostics</string>
     <string name="medications">Select Medications</string>
     <string name="schedule_updated">Schedule Successfully updated</string>
+    <string name="connection_time_out">Connection timeout</string>
 
 </resources>
 

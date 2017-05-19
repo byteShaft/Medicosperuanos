@@ -43,6 +43,8 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.2.1'
     compile 'com.github.darsh2:MultipleImageSelect:v0.0.4'
     compile 'com.commit451:PhotoView:1.2.4'
+    compile 'hani.momanii.supernova_emoji_library:supernova-emoji-library:0.0.2'
+    compile 'me.himanshusoni.chatmessageview:chat-message-view:1.0.3'
 }
 
 

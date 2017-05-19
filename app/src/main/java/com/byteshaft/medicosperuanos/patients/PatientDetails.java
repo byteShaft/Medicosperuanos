@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -17,9 +18,19 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -54,6 +65,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private String emergencyContactString;
 
     private int patientId;
+    public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
 
 
     @Override
@@ -62,7 +74,8 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_patient_details);
-
+        sDoctorServices = new HashMap<>();
+        getDoctorServices();
         patientName = (TextView) findViewById(R.id.patient_name_);
         patientAge = (TextView) findViewById(R.id.patient_age_);
         docId = (EditText) findViewById(R.id.doc_id);
@@ -114,17 +127,6 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         phonePrimary.setText(phonePrimaryString);
         phoneSecondary.setText(phoneSecondaryString);
 
-//
-//        docId.setEnabled(false);
-//        birthDate.setEnabled(false);
-//        patientAddress.setEnabled(false);
-//        stateEditText.setEnabled(false);
-//        cityEditText.setEnabled(false);
-//        phonePrimary.setEnabled(false);
-//        phoneSecondary.setEnabled(false);
-//        emergencyContact.setEnabled(false);
-//        insuranceCarrierEditText.setEnabled(false);
-
         patientName.setTypeface(AppGlobals.typefaceNormal);
         patientAge.setTypeface(AppGlobals.typefaceNormal);
         appointmentButton.setTypeface(AppGlobals.typefaceNormal);
@@ -137,7 +139,6 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         patientAddress.setTypeface(AppGlobals.typefaceNormal);
         birthDate.setTypeface(AppGlobals.typefaceNormal);
         docId.setTypeface(AppGlobals.typefaceNormal);
-
 
         appointmentButton.setOnClickListener(this);
         callButton.setOnClickListener(this);
@@ -153,6 +154,52 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
             default:
                 return false;
         }
+    }
+
+    private void getDoctorServices() {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest request, int readyState) {
+                switch (readyState) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (request.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                request.getResponseText();
+                                try {
+                                    JSONObject jsonObject1 = new JSONObject(request.getResponseText());
+                                    JSONArray services = jsonObject1.getJSONArray("results");
+                                    Log.i("TAG", services.toString());
+                                    if (services.length() > 0) {
+                                        ArrayList<Services> servicesArrayList = new ArrayList<>();
+                                        for (int s = 0; s < services.length(); s++) {
+                                            JSONObject singleService = services.getJSONObject(s);
+                                            com.byteshaft.medicosperuanos.gettersetter.Services service
+                                                    = new com.byteshaft.medicosperuanos.gettersetter.Services();
+                                            service.setServiceId(singleService.getInt("id"));
+                                            JSONObject internalObject = singleService.getJSONObject("service");
+                                            service.setServiceName(internalObject.getString("name"));
+                                            service.setServicePrice(singleService.getString("price"));
+                                            if (singleService.getBoolean("is_active")) {
+                                                servicesArrayList.add(service);
+                                            }
+                                        }sDoctorServices.put(Integer.valueOf(AppGlobals
+                                                .getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))
+                                                , servicesArrayList);
+
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                        }
+                }
+            }
+        });
+        request.open("GET", String.format("%sdoctor/services/", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 
     @Override

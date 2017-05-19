@@ -383,7 +383,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("number", phoneNumber);
             intent.putExtra("stars", drStars);
             intent.putExtra("specialist", drSpecialist);
-            intent.putExtra("services_array", DoctorsList.sDoctorServices);
+            if (AppGlobals.isDoctor()) {
+                intent.putExtra("services_array", PatientDetails.sDoctorServices);
+            } else {
+                intent.putExtra("services_array", DoctorsList.sDoctorServices);
+            }
             startActivity(intent);
         } else {
             Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);

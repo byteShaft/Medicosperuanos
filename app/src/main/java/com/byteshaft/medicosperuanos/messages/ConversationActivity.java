@@ -17,31 +17,52 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.medicosperuanos.utils.RotateUtil;
+import com.byteshaft.requests.FormData;
+import com.byteshaft.requests.HttpRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 /**
  * Created by s9iper1 on 3/23/17.
  */
 
-public class ConversationActivity extends AppCompatActivity implements View.OnClickListener {
+public class ConversationActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View view;
     private ImageButton deleteButton;
@@ -56,6 +77,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private static final int REQUEST_CAMERA = 1;
     private static final int SELECT_FILE = 2;
     private static final int STORAGE_PERMISSION = 2;
+    private String nextUrl;
+    private String previousUrl;
+    private ChatAdapter chatAdapter;
+    private ArrayList<ChatModel> messages;
+    private RecyclerView conversation;
+    private int id = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +92,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_for_messages);
         setContentView(R.layout.activity_conversation);
+        messages = new ArrayList<>();
+        conversation = (RecyclerView) findViewById(R.id.conversation);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        conversation.setLayoutManager(linearLayoutManager);
+        conversation.canScrollVertically(1);
+        conversation.setHasFixedSize(true);
+        getMyMessages(id);
         view = (View) findViewById(R.id.include);
         deleteButton = (ImageButton) findViewById(R.id.dustbin_messages);
         sendButton = (ImageView) view.findViewById(R.id.send_button);
@@ -74,11 +108,175 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         deleteButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         cameraButton.setOnClickListener(this);
-
         if (imageUrl.trim().isEmpty() && imageUrl != null) {
             profilePic = Helpers.getBitMapOfProfilePic(imageUrl);
             cameraButton.setImageResource(0);
             cameraButton.setImageBitmap(profilePic);
+        }
+        chatAdapter = new ChatAdapter(messages);
+        conversation.setAdapter(chatAdapter);
+    }
+
+    private void sendMessage(int id, String message, final String attachment) {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest httpRequest, int i) {
+                switch (i) {
+                    case HttpRequest.STATE_DONE:
+                        switch (httpRequest.getStatus()) {
+                            case HttpURLConnection.HTTP_CREATED:
+                                JSONObject singleMessage;
+                                if (attachment != null && !attachment.trim().isEmpty())
+                                try {
+                                    singleMessage = new JSONObject(httpRequest.getResponseText());
+                                    ChatModel chatModel = new ChatModel();
+                                    if (AppGlobals.isDoctor()) {
+                                        chatModel.setId(singleMessage.getInt("patient"));
+                                    } else {
+                                        chatModel.setId(singleMessage.getInt("doctor"));
+                                    }
+                                    chatModel.setMessage(singleMessage.getString("text"));
+                                    if (!singleMessage.isNull("attachment")) {
+                                        chatModel.setImageUrl(singleMessage.getString("attachment"));
+                                    }
+                                    chatModel.setTimeStamp(singleMessage.getString("created_at"));
+                                    messages.add(chatModel);
+                                    chatAdapter.notifyDataSetChanged();
+                                    conversation.scrollToPosition(messages.size() - 1);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case HttpURLConnection.HTTP_BAD_REQUEST:
+                                Log.i("TAG", httpRequest.getResponseText());
+                                break;
+
+                        }
+                }
+
+            }
+        });
+        request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+                switch (i) {
+                    case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_time_out));
+                        break;
+                    case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), e.getLocalizedMessage());
+                        break;
+                }
+            }
+        });
+        request.open("POST", String.format("%smessages/", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+
+        FormData formData = new FormData();
+        String msg;
+        if (message.trim().isEmpty()) {
+            msg = "attachment";
+        } else msg = message;
+        formData.append(FormData.TYPE_CONTENT_TEXT, "patient", String.valueOf(id));
+        formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
+        Log.i("TAG", attachment);
+        if (attachment != null && !attachment.trim().isEmpty()) {
+            formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
+            request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
+                @Override
+                public void onFileUploadProgress(HttpRequest httpRequest, File file, long l, long l1) {
+                    Log.i("TAG", String.valueOf(l));
+
+                }
+            });
+        }
+        request.send(formData);
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            ChatModel chatModel = new ChatModel();
+            if (AppGlobals.isDoctor()) {
+                chatModel.setId(4);
+            } else {
+                chatModel.setId(Integer.parseInt(AppGlobals.
+                        getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
+            }
+            chatModel.setMessage(message);
+            chatModel.setImageUrl(imageUrl);
+            SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
+            Date date = new Date();
+            chatModel.setTimeStamp(formatter.format(date));
+            messages.add(chatModel);
+            chatAdapter.notifyDataSetChanged();
+            conversation.scrollToPosition(messages.size() - 1);
+        }
+    }
+
+
+    private void getMyMessages(int secondPersonId) {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%smessages/%s", AppGlobals.BASE_URL, secondPersonId));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest httpRequest, int i) {
+        switch (i) {
+            case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
+                switch (httpRequest.getStatus()) {
+                    case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", httpRequest.getResponseText());
+                        try {
+                            JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
+                            if (!jsonObject.isNull("next")) {
+                                nextUrl = jsonObject.getString("");
+                            }
+                            if (!jsonObject.isNull("previous")) {
+                                previousUrl = jsonObject.getString("previous");
+                            }
+                            JSONArray jsonArray = jsonObject.getJSONArray("results");
+                            for (int j = 0; j < jsonArray.length();j++) {
+                                JSONObject singleMessage = jsonArray.getJSONObject(j);
+                                ChatModel chatModel = new ChatModel();
+                                if (AppGlobals.isDoctor()) {
+                                    chatModel.setId(singleMessage.getInt("patient"));
+                                } else {
+                                    chatModel.setId(singleMessage.getInt("doctor"));
+                                }
+                                chatModel.setMessage(singleMessage.getString("text"));
+                                if (!singleMessage.isNull("attachment")) {
+                                    chatModel.setImageUrl(singleMessage.getString("attachment")
+                                            .replace("http://localhost", AppGlobals.SERVER_IP));
+                                }
+                                chatModel.setTimeStamp(singleMessage.getString("created_at"));
+                                messages.add(chatModel);
+                                chatAdapter.notifyDataSetChanged();
+                                conversation.scrollToPosition(messages.size() - 1);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                }
+        }
+
+    }
+
+    @Override
+    public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+        switch (i) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_time_out));
+                break;
+            case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                Helpers.showSnackBar(findViewById(android.R.id.content), e.getLocalizedMessage());
+                break;
+
         }
 
     }
@@ -92,6 +290,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.block_unblock:
                 if (isBlock) {
                     item.setTitle("Block");
@@ -128,19 +329,19 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 alertDialog.show();
                 break;
             case R.id.camera_button:
-                System.out.println("camera button");
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.CAMERA},
                             STORAGE_PERMISSION);
                 } else {
                     selectImage();
                 }
                 break;
             case R.id.send_button:
+                sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
                 writeMessageEditText.getText().clear();
-                Toast.makeText(this, "Soon chat will work", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -232,5 +433,133 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             }
         });
         builder.show();
+    }
+
+    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder>{
+
+
+        private static final int RIGHT_MSG = 0;
+        private static final int LEFT_MSG = 1;
+        private static final int RIGHT_MSG_IMG = 2;
+        private static final int LEFT_MSG_IMG = 3;
+        private ArrayList<ChatModel> modelArrayList;
+
+
+
+        public ChatAdapter(ArrayList<ChatModel> modelArrayList) {
+            super();
+            this.modelArrayList = modelArrayList;
+        }
+
+        @Override
+        public int getItemCount() {
+            return modelArrayList.size();
+        }
+
+        @Override
+        public MyChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view;
+            if (viewType == RIGHT_MSG){
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right,parent,false);
+                return new MyChatViewHolder(view);
+            }else if (viewType == LEFT_MSG){
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left,parent,false);
+                return new MyChatViewHolder(view);
+            }else if (viewType == RIGHT_MSG_IMG){
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img,parent,false);
+                return new MyChatViewHolder(view);
+            }else{
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img,parent,false);
+                return new MyChatViewHolder(view);
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(MyChatViewHolder holder, int position) {
+            ChatModel chatModel = modelArrayList.get(position);
+            holder.setProfilePhoto(chatModel.getSenderProfilePic());
+            holder.setTxtMessage(chatModel.getMessage());
+            holder.setTvTimestamp(chatModel.getTimeStamp());
+            if (chatModel.getImageUrl() != null) {
+                holder.setPicInChat(chatModel.getImageUrl());
+            }
+        }
+
+
+        @Override
+        public int getItemViewType(int position) {
+            ChatModel model = modelArrayList.get(position);
+             if (model.getImageUrl() != null){
+                if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
+                    return RIGHT_MSG_IMG;
+                }else {
+                    return LEFT_MSG_IMG;
+                }
+            } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
+                return RIGHT_MSG;
+            }else{
+                return LEFT_MSG;
+            }
+        }
+
+        public class MyChatViewHolder extends RecyclerView.ViewHolder {
+
+            TextView tvTimestamp;
+            EmojiconTextView txtMessage;
+            ImageView profilePhoto;
+            ImageView picInChat;
+
+            public MyChatViewHolder(View itemView) {
+                super(itemView);
+                tvTimestamp = (TextView) itemView.findViewById(R.id.timestamp);
+                txtMessage = (EmojiconTextView) itemView.findViewById(R.id.txtMessage);
+                picInChat = (ImageView) itemView.findViewById(R.id.img_chat);
+                profilePhoto = (ImageView) itemView.findViewById(R.id.ivUserChat);
+            }
+
+
+            public void setTxtMessage(String message) {
+                if (txtMessage == null) return;
+                txtMessage.setText(message);
+            }
+
+            public void setProfilePhoto(String urlPhotoUser) {
+                if (profilePhoto == null) return;
+                Glide.with(profilePhoto.getContext()).load(urlPhotoUser).centerCrop().transform(new CircleTransform(profilePhoto.getContext())).override(40, 40).into(profilePhoto);
+            }
+
+            public  String getDate(String createdAt) {
+                // Create a DateFormatter object for displaying date in specified format.
+                SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
+                formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));
+                Date date = null;
+                try {
+                    date = formatter.parse(createdAt);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                return String.valueOf(date.getTime());
+            }
+
+            public void setTvTimestamp(String timestamp) {
+                if (tvTimestamp == null) return;
+                Log.i("TAG", getDate(timestamp));
+                tvTimestamp.setText(converteTimestamp(getDate(timestamp)));
+            }
+
+            public void setPicInChat(String url) {
+                if (picInChat == null) return;
+                Glide.with(picInChat.getContext()).load(url)
+                        .override(100, 100)
+                        .fitCenter()
+                        .into(picInChat);
+            }
+
+        }
+
+        private CharSequence converteTimestamp(String mileSegundos) {
+            return DateUtils.getRelativeTimeSpanString(Long.parseLong(mileSegundos), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+        }
     }
 }
