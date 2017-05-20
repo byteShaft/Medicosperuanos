@@ -25,7 +25,8 @@ import java.util.Objects;
 public class Service extends FirebaseMessagingService {
 //    private String message;
 
-    private static int notificationId = 101;
+    private static int APPOINTMENT_NOTIFICATION_ID = 101;
+    private static int REPLY_NOTIFICATION_ID = 202;
     private static String KEY_TEXT_REPLY = "key_text_reply";
 
     private String doctorName;
@@ -49,7 +50,6 @@ public class Service extends FirebaseMessagingService {
 
 
     public void replyNotification() {
-
         String replyLabel = "Enter your reply here";
         RemoteInput remoteInput =
                 new RemoteInput.Builder(KEY_TEXT_REPLY)
@@ -88,14 +88,14 @@ public class Service extends FirebaseMessagingService {
                 (NotificationManager)
                         getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(notificationId,
+        notificationManager.notify(REPLY_NOTIFICATION_ID,
                 newMessageNotification);
     }
 
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -113,6 +113,6 @@ public class Service extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(APPOINTMENT_NOTIFICATION_ID, notificationBuilder.build());
     }
 }
