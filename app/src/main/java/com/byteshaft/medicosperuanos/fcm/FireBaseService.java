@@ -12,7 +12,7 @@ public class FireBaseService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         super.onTokenRefresh();
         String token = FirebaseInstanceId.getInstance().getToken();
-        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY__FCM_TOKEN, token);
         Log.e("TAG", "Token " + token);
+        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FCM_TOKEN, token);
     }
 }

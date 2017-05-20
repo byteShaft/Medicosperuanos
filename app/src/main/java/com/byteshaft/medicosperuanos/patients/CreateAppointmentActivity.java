@@ -49,7 +49,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CreateAppointmentActivity extends AppCompatActivity implements View.OnClickListener,
         HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
-
     private Button mSaveButton;
     private TextView serviceListSpinner;
     private ImageButton callButton;
@@ -62,9 +61,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private TextView mDoctorStartTime;
     private RatingBar mDoctorRating;
     private ImageView status;
-
     private int id;
-
     private HttpRequest request;
     private boolean blocked;
     private ImageButton favouriteButton;
@@ -106,6 +103,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         setContentView(R.layout.activity_create_appoint);
         sInstance = this;
         id = getIntent().getIntExtra("user", -1);
+        if (AppGlobals.isDoctor()) {
+            id = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+        }
         startTime = getIntent().getStringExtra("start_time");
         scheduleDate = getIntent().getStringExtra("schedule_date");
         isBlocked = getIntent().getBooleanExtra("block", false);
@@ -320,7 +320,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     }
 
     private void patientsAppointment(String appointmentReason) {
-        Helpers.showProgressDialog(this, "Getting appointment");
+        Helpers.showProgressDialog(this, "Creating Appointment");
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -372,6 +372,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                 }
                             }
                         }, 500);
+                        break;
+                    case HttpURLConnection.HTTP_FORBIDDEN:
+                        Log.i("TAG", "response " + request.getResponseText());
                         break;
                 }
         }

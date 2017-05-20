@@ -348,7 +348,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 
 
     private void updateSchedule(int id) {
-
         HttpRequest request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override

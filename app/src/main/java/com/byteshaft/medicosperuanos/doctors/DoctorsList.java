@@ -455,8 +455,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         }
         switch (readyState) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
-                Helpers.showSnackBar(getView(), "connection time out");
+                Helpers.showSnackBar(getView(), getResources().getString(R.string.connection_time_out));
                 break;
+            case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+                break;
+
         }
         Helpers.dismissProgressDialog();
     }

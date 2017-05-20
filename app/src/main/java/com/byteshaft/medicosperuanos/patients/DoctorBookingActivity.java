@@ -78,6 +78,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private static DoctorBookingActivity sInstance;
     private ProgressBar progressBar;
     private String location;
+    private boolean fromDoctor = false;
 
     private String patientNameString;
     private String patientAgeString;
@@ -145,7 +146,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mFavButton.setOnClickListener(this);
         Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
 
-
         startTime = getIntent().getStringExtra("start_time");
         isBlocked = getIntent().getBooleanExtra("block", false);
         final String startTime = getIntent().getStringExtra("start_time");
@@ -157,6 +157,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
         location = getIntent().getStringExtra("location");
+        fromDoctor = getIntent().getBooleanExtra("from_doctor", false);
         if (!availableForChat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
@@ -214,6 +215,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
+        if (fromDoctor) {
+            id = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+        }
         String url = String.format("%sdoctors/%s/schedule?date=%s",
                 AppGlobals.BASE_URL, id, targetDate);
         Log.i("TAG", "url" + url);
@@ -325,7 +329,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
-
                         timeSlots = new ArrayList<>();
                         timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
                         timeTableGrid.setAdapter(timeTableAdapter);
@@ -347,6 +350,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         }
                         break;
                     case HttpURLConnection.HTTP_FORBIDDEN:
+                        Log.i("TAG", request.getResponseText());
                 }
         }
 
@@ -379,7 +383,11 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("number", phoneNumber);
             intent.putExtra("stars", drStars);
             intent.putExtra("specialist", drSpecialist);
-            intent.putExtra("services_array", DoctorsList.sDoctorServices);
+            if (AppGlobals.isDoctor()) {
+                intent.putExtra("services_array", PatientDetails.sDoctorServices);
+            } else {
+                intent.putExtra("services_array", DoctorsList.sDoctorServices);
+            }
             startActivity(intent);
         } else {
             Helpers.showSnackBar(findViewById(android.R.id.content), R.string.time_slot_booked);

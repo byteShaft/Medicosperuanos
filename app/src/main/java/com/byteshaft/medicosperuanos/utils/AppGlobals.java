@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.google.firebase.FirebaseApp;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -99,7 +100,7 @@ public class AppGlobals extends Application {
     public static final String ATTENDED = "attended";
 
     private static final String SERVICE_KEY = "iServiceON";
-    public static final String KEY__FCM_TOKEN = "token";
+    public static final String KEY_FCM_TOKEN = "fcm_token";
 
     public static final String KEY_TOKEN = "token";
     public static final String USER_ACTIVATION_KEY = "activation_key";
@@ -119,6 +120,7 @@ public class AppGlobals extends Application {
         super.onCreate();
 //        disableSSLCertificateChecking();
         sImageLoader = ImageLoader.getInstance();
+        FirebaseApp.initializeApp(getApplicationContext());
         sImageLoader.init(ImageLoaderConfiguration.createDefault(getApplicationContext()));
         sContext = getApplicationContext();
         typefaceBold = Typeface.createFromAsset(getApplicationContext().getAssets(), "fonts/bold.ttf");
