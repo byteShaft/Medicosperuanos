@@ -63,10 +63,8 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private String cityEditTextString;
     private String insuranceCarrierEditTextString;
     private String emergencyContactString;
-
     private int patientId;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

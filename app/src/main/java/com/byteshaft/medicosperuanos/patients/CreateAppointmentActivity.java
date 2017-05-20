@@ -107,7 +107,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         scheduleDate = getIntent().getStringExtra("schedule_date");
         isBlocked = getIntent().getBooleanExtra("block", false);
         drName = getIntent().getStringExtra("name");
-
         drSpecialist = getIntent().getStringExtra("specialist");
         drStars = getIntent().getFloatExtra("stars", 0);
         appointmentId = getIntent().getIntExtra("appointment_id", -1);
@@ -119,7 +118,12 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         slotTime = getIntent().getStringExtra("time_slot");
         appointmentDate = getIntent().getStringExtra("appointment_date");
         HashMap<Integer, ArrayList<Services>> hashMap = (HashMap<Integer, ArrayList<Services>>) getIntent().getSerializableExtra("services_array");
-        arrayList = hashMap.get(id);
+        if (AppGlobals.isDoctor()) {
+            arrayList = hashMap.get(Integer.valueOf(AppGlobals
+                    .getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
+        } else {
+            arrayList = hashMap.get(id);
+        }
 
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
@@ -363,6 +367,11 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "response " + request.getResponseText());
+                        if (AppGlobals.isDoctor()) {
+                            if (DoctorBookingActivity.getInstance() != null) {
+                                DoctorBookingActivity.getInstance().finish();
+                            }
+                        }
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Log.i("TAG", "response " + request.getResponseText());
@@ -372,7 +381,9 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                             public void run() {
                                 if (DoctorBookingActivity.getInstance() != null) {
                                     DoctorBookingActivity.getInstance().finish();
-                                    DoctorDetailsActivity.getInstance().finish();
+                                    if (DoctorDetailsActivity.getInstance() != null) {
+                                        DoctorDetailsActivity.getInstance().finish();
+                                    }
                                     finish();
                                 } else {
                                     finish();

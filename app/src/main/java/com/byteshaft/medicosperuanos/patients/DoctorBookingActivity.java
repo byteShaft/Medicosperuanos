@@ -156,6 +156,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         drPhoto = getIntent().getStringExtra("photo");
         availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
+        Log.i("TAG", "ID" + id);
         location = getIntent().getStringExtra("location");
         fromDoctor = getIntent().getBooleanExtra("from_doctor", false);
         if (!availableForChat) {
@@ -210,16 +211,17 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     }
 
     private void getSchedule(String targetDate) {
+        int userId = id;
         progressBar.setVisibility(View.VISIBLE);
         timeTableGrid.setVisibility(View.GONE);
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         if (fromDoctor) {
-            id = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+            userId = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
         }
         String url = String.format("%sdoctors/%s/schedule?date=%s",
-                AppGlobals.BASE_URL, id, targetDate);
+                AppGlobals.BASE_URL, userId, targetDate);
         Log.i("TAG", "url" + url);
         request.open("GET", url);
         request.setRequestHeader("Authorization", "Token " +
@@ -369,7 +371,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         AppointmentDetail appointmentDetail = timeSlots.get(i);
         TextView textView = (TextView) view;
-        Log.i("TAG", timeSlots.get(i).getStartTime());
+        Log.i("TAG", String.valueOf(id));
         if (!appointmentDetail.getState()) {
             Intent intent = new Intent(this, CreateAppointmentActivity.class);
             intent.putExtra("appointment_id", appointmentDetail.getSlotId());
