@@ -324,6 +324,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             }
         });
         request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+
             @Override
             public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
                 Helpers.dismissProgressDialog();

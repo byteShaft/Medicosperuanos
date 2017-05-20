@@ -411,7 +411,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private void imageToPdf() {
         Document document = new Document();
-        String path = android.os.Environment.getExternalStorageDirectory().toString();
+        String path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
             PdfWriter.getInstance(document, new FileOutputStream(path + "/medicosperuanos.pdf"));
         } catch (DocumentException | FileNotFoundException e) {

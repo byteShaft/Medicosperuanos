@@ -560,8 +560,10 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             viewHolder.chat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(getActivity().getApplicationContext(),
-                            ConversationActivity.class));
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            ConversationActivity.class);
+                    intent.putExtra("id", singleDoctor.getId());
+                    startActivity(intent);
                 }
             });
             if (singleDoctor.isBlocked()) {

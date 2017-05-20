@@ -92,6 +92,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.action_bar_for_messages);
         setContentView(R.layout.activity_conversation);
+        id = getIntent().getIntExtra("id", 4);
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());

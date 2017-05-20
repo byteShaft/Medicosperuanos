@@ -54,7 +54,10 @@ public class MainMessages extends Fragment {
         mMessagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                startActivity(new Intent(getActivity().getApplicationContext(), ConversationActivity.class));
+                Intent intent = new Intent(getActivity().getApplicationContext(),
+                        ConversationActivity.class);
+//                intent.putExtra("id", myPatients.getPatientId());
+                startActivity(intent);
             }
         });
         mMessagesList.setAdapter(new Adapter(getActivity().getApplicationContext(), mainMessages));

@@ -291,8 +291,10 @@ public class MyPatients extends Fragment {
             viewHolder.chat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(getActivity().getApplicationContext(),
-                            ConversationActivity.class));
+                    Intent intent = new Intent(getActivity().getApplicationContext(),
+                            ConversationActivity.class);
+                    intent.putExtra("id", myPatients.getPatientId());
+                    startActivity(intent);
                 }
             });
             viewHolder.call.setOnClickListener(new View.OnClickListener() {
@@ -338,7 +340,6 @@ public class MyPatients extends Fragment {
                                         JSONObject jsonObject = jsonArray.getJSONObject(i);
                                         com.byteshaft.medicosperuanos.gettersetter.MyPatients myPatients =
                                                 new com.byteshaft.medicosperuanos.gettersetter.MyPatients();
-
                                         JSONObject insuranceCarrier = jsonObject.getJSONObject("insurance_carrier");
                                         myPatients.setPatientInsuranceCarrier((insuranceCarrier.getString("name")));
 

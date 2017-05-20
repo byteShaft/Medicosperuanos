@@ -103,9 +103,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         setContentView(R.layout.activity_create_appoint);
         sInstance = this;
         id = getIntent().getIntExtra("user", -1);
-        if (AppGlobals.isDoctor()) {
-            id = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
-        }
         startTime = getIntent().getStringExtra("start_time");
         scheduleDate = getIntent().getStringExtra("schedule_date");
         isBlocked = getIntent().getBooleanExtra("block", false);
@@ -217,8 +214,10 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 }
                 break;
             case R.id.btn_chat:
-                startActivity(new Intent(getApplicationContext(),
-                        ConversationActivity.class));
+                Intent intent = new Intent(getApplicationContext(),
+                        ConversationActivity.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
                 break;
             case R.id.btn_fav:
                 favouriteButton.setEnabled(false);
@@ -321,11 +320,18 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
     private void patientsAppointment(String appointmentReason) {
         Helpers.showProgressDialog(this, "Creating Appointment");
-        request = new HttpRequest(this);
+        HttpRequest request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("POST", String.format("%sdoctors/%s/schedule/%s/get-appointment",
-                AppGlobals.BASE_URL, id, appointmentId));
+        String url;
+        if (AppGlobals.isDoctor()) {
+            url = String.format("%sdoctor/patients/%s/appointments/%s",
+                    AppGlobals.BASE_URL, id, appointmentId);
+        } else {
+            url = String.format("%sdoctors/%s/schedule/%s/get-appointment",
+                    AppGlobals.BASE_URL, id, appointmentId);
+        }
+        request.open("POST", url);
         Log.i("TAG", "id " + appointmentId);
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -352,6 +358,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", "response " + request.getResponseURL());
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
