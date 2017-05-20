@@ -216,8 +216,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 }
                 break;
             case R.id.message_button:
-                startActivity(new Intent(getApplicationContext(),
-                        ConversationActivity.class));
+                Intent intent = new Intent(getApplicationContext(),
+                        ConversationActivity.class);
+                intent.putExtra("id", id);
+                startActivity(intent);
                 break;
             case R.id.heart_button:
                 heartButton.setEnabled(false);
