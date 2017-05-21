@@ -563,6 +563,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                     Intent intent = new Intent(getActivity().getApplicationContext(),
                             ConversationActivity.class);
                     intent.putExtra("id", singleDoctor.getId());
+                    intent.putExtra("name", singleDoctor.getFirstName() + " " + singleDoctor.getLastName());
+                    intent.putExtra("status", singleDoctor.isAvailableToChat());
                     startActivity(intent);
                 }
             });

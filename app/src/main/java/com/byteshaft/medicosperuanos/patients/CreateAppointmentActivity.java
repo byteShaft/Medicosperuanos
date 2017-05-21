@@ -221,6 +221,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", id);
+                intent.putExtra("name", drName);
+                intent.putExtra("status", availableForChat);
                 startActivity(intent);
                 break;
             case R.id.btn_fav:

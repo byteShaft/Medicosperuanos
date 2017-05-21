@@ -6,18 +6,27 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -26,43 +35,94 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by s9iper1 on 3/21/17.
  */
 
-public class MainMessages extends Fragment {
+public class MainMessages extends Fragment implements HttpRequest.OnReadyStateChangeListener,
+        HttpRequest.OnErrorListener {
 
     private View mBaseView;
-    private ListView mMessagesList;
-    private ArrayList<String[]> mainMessages;
+    private ListView mMessagesListView;
+    private String nextUrl;
+    private String previousUrl;
+    private ArrayList<ChatModel> chatWithList;
+    private Adapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.activity_main_messages, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.messages));
-        mMessagesList = (ListView) mBaseView.findViewById(R.id.main_messages);
-        mainMessages = new ArrayList<>();
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-        "Dr Bilal", "Dermatologist", "2-3-2017", "12:00"});
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-                "Dr shahid", "ENT", "3-3-2017", "14:00"});
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-                "Dr Omer", "Chest Specilist", "4-3-2017", "16:00"});
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-                "Dr Imran", "ENT", "5-3-2017", "09:00"});
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-                "Dr Zeshan", "Cest Specilist", "4-3-2017", "15:00"});
-        mainMessages.add(new String[]{AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL),
-                "Dr Arham", "Dermatologist", "7-3-2017", "16:00"});
-        mMessagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        getMessages();
+        mMessagesListView = (ListView) mBaseView.findViewById(R.id.main_messages);
+        chatWithList = new ArrayList<>();
+        mMessagesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getActivity().getApplicationContext(),
                         ConversationActivity.class);
-//                intent.putExtra("id", myPatients.getPatientId());
+                ChatModel chatModel = chatWithList.get(i);
+                intent.putExtra("id", chatModel.getId());
+                intent.putExtra("name", chatModel.getFullName());
+                intent.putExtra("status", chatModel.isAvailable_to_chat());
                 startActivity(intent);
             }
         });
-        mMessagesList.setAdapter(new Adapter(getActivity().getApplicationContext(), mainMessages));
+        adapter = new Adapter(getActivity().getApplicationContext(), chatWithList);
+        mMessagesListView.setAdapter(adapter);
         return mBaseView;
     }
+
+    private void getMessages() {
+        HttpRequest request = new HttpRequest(getActivity().getApplicationContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%smessages_metadata", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
+    @Override
+    public void onReadyStateChange(HttpRequest httpRequest, int i) {
+        switch (i) {
+            case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
+                switch (httpRequest.getStatus()) {
+                    case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", httpRequest.getResponseText());
+                        try {
+                            JSONArray jsonArray = new JSONArray(httpRequest.getResponseText());
+                            for (int j = 0; j < jsonArray.length();j++) {
+                                JSONObject singleMessage = jsonArray.getJSONObject(j);
+                                ChatModel chatModel = new ChatModel();
+                                chatModel.setFullName(singleMessage.getString("full_name"));
+                                chatModel.setId(singleMessage.getInt("user_id"));
+                                chatModel.setMessage(singleMessage.getString("latest_text"));
+                                chatModel.setImageUrl(AppGlobals.SERVER_IP+singleMessage.getString("photo_url"));
+                                chatWithList.add(chatModel);
+                                adapter.notifyDataSetChanged();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                }
+                break;
+        }
+
+    }
+
+    @Override
+    public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+        switch (i) {
+            case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                Helpers.showSnackBar(getView(), getResources().getString(R.string.connection_time_out));
+                break;
+            case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                Helpers.showSnackBar(getView(), e.getLocalizedMessage());
+                break;
+
+        }
+
+    }
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -71,10 +131,10 @@ public class MainMessages extends Fragment {
 
     private class Adapter extends ArrayAdapter<String> {
 
-        private ArrayList<String[]> messagesList;
+        private ArrayList<ChatModel> messagesList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context,  ArrayList<String[]> messagesList) {
+        public Adapter(Context context,  ArrayList<ChatModel> messagesList) {
             super(context, R.layout.delegate_main_messages);
             this.messagesList = messagesList;
         }
@@ -90,8 +150,8 @@ public class MainMessages extends Fragment {
                 viewHolder.specialist = (TextView) convertView.findViewById(R.id.specialist);
                 viewHolder.date = (TextView) convertView.findViewById(R.id.date);
                 viewHolder.time = (TextView) convertView.findViewById(R.id.time);
+                viewHolder.status = (ImageView) convertView.findViewById(R.id.status);
                 viewHolder.navigateButton = (ImageButton) convertView.findViewById(R.id.navigate_button);
-
                 viewHolder.drName.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.date.setTypeface(AppGlobals.typefaceNormal);
                 viewHolder.time.setTypeface(AppGlobals.typefaceNormal);
@@ -100,13 +160,17 @@ public class MainMessages extends Fragment {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            ChatModel chatModel = messagesList.get(position);
 //            String url = String.format("%s"+messagesList.get(position)[0], AppGlobals.SERVER_IP);
 //            Helpers.getBitMap(url, viewHolder.profilePicture);
-            viewHolder.profilePicture.setImageResource(R.mipmap.image_placeholder);
-            viewHolder.drName.setText(messagesList.get(position)[1]);
-            viewHolder.specialist.setText(messagesList.get(position)[2]);
-            viewHolder.date.setText(messagesList.get(position)[3]);
-            viewHolder.time.setText(messagesList.get(position)[4]);
+            Helpers.getBitMap(chatModel.getImageUrl(), viewHolder.profilePicture);
+            viewHolder.drName.setText(chatModel.getFullName());
+            viewHolder.specialist.setText(chatModel.getMessage());
+            if (!chatModel.isAvailable_to_chat()) {
+                viewHolder.status.setImageResource(R.mipmap.ic_offline_indicator);
+            } else {
+                viewHolder.status.setImageResource(R.mipmap.ic_online_indicator);
+            }
             return convertView;
         }
 
@@ -122,6 +186,7 @@ public class MainMessages extends Fragment {
         TextView specialist;
         TextView date;
         TextView time;
+        ImageView status;
         ImageButton navigateButton;
     }
 }

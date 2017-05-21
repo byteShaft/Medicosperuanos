@@ -203,6 +203,7 @@ public class MyPatients extends Fragment {
                 intent.putExtra("patient_id", myPatients.getPatientId());
                 intent.putExtra("emergency_contact", myPatients.getPatientEmergencyContact());
                 intent.putExtra("insurance_carrier", myPatients.getPatientInsuranceCarrier());
+                intent.putExtra("status", myPatients.isChatStatus());
                 startActivity(intent);
             }
         });
@@ -294,6 +295,9 @@ public class MyPatients extends Fragment {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
                             ConversationActivity.class);
                     intent.putExtra("id", myPatients.getPatientId());
+                    intent.putExtra("name", myPatients.getPatientFirstName() + " " +
+                            myPatients.getPatientLastName());
+                    intent.putExtra("status", myPatients.isChatStatus());
                     startActivity(intent);
                 }
             });

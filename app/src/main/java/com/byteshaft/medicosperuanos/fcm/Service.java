@@ -16,10 +16,11 @@ import android.util.Log;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.messages.ChatModel;
+import com.byteshaft.medicosperuanos.messages.ConversationActivity;
+import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import java.util.Objects;
 
 
 public class Service extends FirebaseMessagingService {
@@ -32,6 +33,12 @@ public class Service extends FirebaseMessagingService {
     private String doctorName;
     private String appointmentReason;
     private String appointmentState;
+    private String senderName;
+    private String messageBody;
+    private int senderId;
+    private String senderImageUrl;
+    private String attachment;
+    private String createdAt;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -40,14 +47,37 @@ public class Service extends FirebaseMessagingService {
         doctorName = remoteMessage.getData().get("doctor_name");
         appointmentReason = remoteMessage.getData().get("appointment_reason");
         appointmentState = remoteMessage.getData().get("reason");
-        if (Objects.equals(remoteMessage.getData().get("type"), "appointment")) {
-            sendNotification();
-        } else {
-            replyNotification();
+        senderName = remoteMessage.getData().get("sender_name");
+        messageBody = remoteMessage.getData().get("text");
+        senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
+        senderImageUrl = remoteMessage.getData().get("sender_image_url");
+        if (remoteMessage.getData().containsKey("attachment")) {
+            attachment = remoteMessage.getData().get("attachment");
         }
 
+        if (remoteMessage.getData().get("type").equals("appointment")) {
+            sendNotification();
+        } else {
+            if (!ConversationActivity.foreground) {
+                replyNotification();
+            } else {
+                createdAt = remoteMessage.getData().get("created_at");
+//                {sender_image_url=/media/1494489383303.jpg, text=pppp, type=message, sender_id=2, sender_name=Bilal Shahid}
+                ChatModel chatModel = new ChatModel();
+                chatModel.setFullName(senderName);
+                chatModel.setTimeStamp(createdAt);
+                chatModel.setId(senderId);
+                chatModel.setMessage(messageBody);
+                if (attachment != null && !attachment.trim().isEmpty()) {
+                    chatModel.setImageUrl(attachment
+                            .replace("http://localhost", AppGlobals.SERVER_IP));
+                }
+                chatModel.setSenderProfilePic(senderImageUrl);
+                ConversationActivity.messages.add(chatModel);
+                ConversationActivity.getInstance().notifyData();
+            }
+        }
     }
-
 
     public void replyNotification() {
         String replyLabel = "Enter your reply here";
@@ -57,7 +87,9 @@ public class Service extends FirebaseMessagingService {
                         .build();
 
         Intent resultIntent =
-                new Intent(this, MainActivity.class);
+                new Intent(this, ConversationActivity.class);
+        resultIntent.putExtra("notification", true);
+        resultIntent.putExtra("sender_id", senderId);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -69,7 +101,7 @@ public class Service extends FirebaseMessagingService {
 
         NotificationCompat.Action replyAction =
                 new NotificationCompat.Action.Builder(
-                        android.R.drawable.ic_dialog_info,
+                        R.drawable.msg,
                         "Reply", resultPendingIntent)
                         .addRemoteInput(remoteInput)
                         .build();
@@ -79,9 +111,9 @@ public class Service extends FirebaseMessagingService {
                         .setColor(ContextCompat.getColor(this,
                                 R.color.colorPrimary))
                         .setSmallIcon(
-                                android.R.drawable.ic_dialog_info)
-                        .setContentTitle("My Notification")
-                        .setContentText("This is a test message")
+                                R.drawable.msg)
+                        .setContentTitle(senderName)
+                        .setContentText(messageBody)
                         .addAction(replyAction).build();
 
         NotificationManager notificationManager =

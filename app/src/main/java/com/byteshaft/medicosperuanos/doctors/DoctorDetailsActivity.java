@@ -74,6 +74,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private static DoctorDetailsActivity sInstance;
     private ProgressBar progressBar;
     private String location;
+    private String name;
+    private boolean isAvailable_to_chat;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -88,14 +90,14 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         sInstance = this;
         reviewList = (ListView) findViewById(R.id.review_list);
         startTime = getIntent().getStringExtra("start_time");
-        final String name = getIntent().getStringExtra("name");
+        name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
         number = getIntent().getStringExtra("number");
         location = getIntent().getStringExtra("location");
         isBlocked = getIntent().getBooleanExtra("block", false);
         final String photo = getIntent().getStringExtra("photo");
-        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        isAvailable_to_chat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
@@ -140,7 +142,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 intent.putExtra("specialist", specialist);
                 intent.putExtra("stars", stars);
                 intent.putExtra("number", number);
-                intent.putExtra("available_to_chat", availableForChat);
+                intent.putExtra("available_to_chat", isAvailable_to_chat);
                 intent.putExtra("user", id);
                 intent.putExtra("photo", photo);
                 intent.putExtra("block", isBlocked);
@@ -149,7 +151,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 startActivity(intent);
             }
         });
-        if (!availableForChat) {
+        if (!isAvailable_to_chat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
@@ -219,6 +221,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", id);
+                intent.putExtra("name", name);
+                intent.putExtra("status", isAvailable_to_chat);
                 startActivity(intent);
                 break;
             case R.id.heart_button:

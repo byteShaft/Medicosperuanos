@@ -52,17 +52,18 @@
             android:id="@+id/dr_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:maxLines="1"
             android:text="Doctor Name"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/specialist"
+            android:textStyle="italic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="ENT" />
+            android:maxLines="1"
+            android:text="" />
     </LinearLayout>
 
     <LinearLayout
@@ -79,19 +80,17 @@
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12/12/2017" />
+             />
 
         <TextView
             android:id="@+id/time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12:00" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
     <ImageButton
         android:id="@+id/navigate_button"
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

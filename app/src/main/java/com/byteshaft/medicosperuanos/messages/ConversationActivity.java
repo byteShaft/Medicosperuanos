@@ -1,6 +1,8 @@
 package com.byteshaft.medicosperuanos.messages;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -80,9 +83,18 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private String nextUrl;
     private String previousUrl;
     private ChatAdapter chatAdapter;
-    private ArrayList<ChatModel> messages;
+    public static ArrayList<ChatModel> messages;
     private RecyclerView conversation;
     private int id = 4;
+    private static String KEY_TEXT_REPLY = "key_text_reply";
+    public static boolean foreground = false;
+    private boolean status;
+    private String name;
+    private static ConversationActivity sInstance;
+
+    public static ConversationActivity getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +102,38 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.action_bar_for_messages);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        sInstance = this;
+        View v = inflater.inflate(R.layout.action_bar_for_messages, null);
+
+        TextView userName = (TextView)v.findViewById(R.id.action_bar_title);
+        userName.setTypeface(AppGlobals.typefaceNormal);
+        ImageView backPress = (ImageView) v.findViewById(R.id.back_press);
+        backPress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+        TextView userStatus = (TextView) v.findViewById(R.id.user_online);
+        getSupportActionBar().setCustomView(v);
         setContentView(R.layout.activity_conversation);
-        id = getIntent().getIntExtra("id", 4);
+        foreground = true;
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().getBoolean("notification")) {
+                getMessageText(getIntent(), getIntent().getIntExtra("sender_id", -1));
+            }
+        }
+        id = getIntent().getIntExtra("id", -1);
+        status = getIntent().getBooleanExtra("status", false);
+        this.name = getIntent().getStringExtra("name");
+        userName.setText(name);
+        status = getIntent().getBooleanExtra("status", false);
+        if (status) {
+            userStatus.setText("online");
+        } else {
+            userStatus.setText("offline");
+        }
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -116,6 +157,47 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         }
         chatAdapter = new ChatAdapter(messages);
         conversation.setAdapter(chatAdapter);
+        writeMessageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    conversation.scrollToPosition(messages.size() - 1);
+                } else {
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        foreground = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foreground = true;
+    }
+
+    private CharSequence getMessageText(Intent intent, int senderId) {
+        Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+        if (remoteInput != null) {
+            Log.i("TAG", String.valueOf(remoteInput.getCharSequence(KEY_TEXT_REPLY)));
+            sendMessage(senderId, String.valueOf(remoteInput.getCharSequence(KEY_TEXT_REPLY)),
+                    imageUrl);
+            return remoteInput.getCharSequence(KEY_TEXT_REPLY);
+        }
+        return null;
+    }
+
+    public void notifyData() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                chatAdapter.notifyDataSetChanged();
+                conversation.scrollToPosition(messages.size() - 1);
+            }
+        });
     }
 
     private void sendMessage(int id, String message, final String attachment) {
@@ -127,24 +209,28 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     case HttpRequest.STATE_DONE:
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
+                                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                                notificationManager.cancel(202);
                                 JSONObject singleMessage;
-                                if (attachment != null && !attachment.trim().isEmpty())
+                                Log.i("TAG", httpRequest.getResponseText());
                                 try {
                                     singleMessage = new JSONObject(httpRequest.getResponseText());
-                                    ChatModel chatModel = new ChatModel();
-                                    if (AppGlobals.isDoctor()) {
-                                        chatModel.setId(singleMessage.getInt("patient"));
-                                    } else {
-                                        chatModel.setId(singleMessage.getInt("doctor"));
+                                    if (singleMessage.isNull("attachment")) {
+                                        ChatModel chatModel = new ChatModel();
+                                        if (AppGlobals.isDoctor()) {
+                                            chatModel.setId(singleMessage.getInt("patient"));
+                                        } else {
+                                            chatModel.setId(singleMessage.getInt("doctor"));
+                                        }
+                                        chatModel.setMessage(singleMessage.getString("text"));
+                                        if (!singleMessage.isNull("attachment")) {
+                                            chatModel.setImageUrl(singleMessage.getString("attachment"));
+                                        }
+                                        chatModel.setTimeStamp(singleMessage.getString("created_at"));
+                                        messages.add(chatModel);
+                                        chatAdapter.notifyDataSetChanged();
+                                        conversation.scrollToPosition(messages.size() - 1);
                                     }
-                                    chatModel.setMessage(singleMessage.getString("text"));
-                                    if (!singleMessage.isNull("attachment")) {
-                                        chatModel.setImageUrl(singleMessage.getString("attachment"));
-                                    }
-                                    chatModel.setTimeStamp(singleMessage.getString("created_at"));
-                                    messages.add(chatModel);
-                                    chatAdapter.notifyDataSetChanged();
-                                    conversation.scrollToPosition(messages.size() - 1);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -230,19 +316,18 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             case HttpRequest.STATE_DONE:
                 Helpers.dismissProgressDialog();
                 switch (httpRequest.getStatus()) {
-                    case HttpRequest.ERROR_NETWORK_UNREACHABLE:
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", httpRequest.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
                             if (!jsonObject.isNull("next")) {
-                                nextUrl = jsonObject.getString("");
+                                nextUrl = jsonObject.getString("next");
                             }
                             if (!jsonObject.isNull("previous")) {
                                 previousUrl = jsonObject.getString("previous");
                             }
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            for (int j = 0; j < jsonArray.length();j++) {
+                            for (int j = 0; j < jsonArray.length(); j++) {
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
                                 if (AppGlobals.isDoctor()) {
@@ -436,7 +521,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         builder.show();
     }
 
-    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder>{
+    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder> {
 
 
         private static final int RIGHT_MSG = 0;
@@ -444,7 +529,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         private static final int RIGHT_MSG_IMG = 2;
         private static final int LEFT_MSG_IMG = 3;
         private ArrayList<ChatModel> modelArrayList;
-
 
 
         public ChatAdapter(ArrayList<ChatModel> modelArrayList) {
@@ -460,17 +544,17 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public MyChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view;
-            if (viewType == RIGHT_MSG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right,parent,false);
+            if (viewType == RIGHT_MSG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false);
                 return new MyChatViewHolder(view);
-            }else if (viewType == LEFT_MSG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left,parent,false);
+            } else if (viewType == LEFT_MSG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false);
                 return new MyChatViewHolder(view);
-            }else if (viewType == RIGHT_MSG_IMG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img,parent,false);
+            } else if (viewType == RIGHT_MSG_IMG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img, parent, false);
                 return new MyChatViewHolder(view);
-            }else{
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img,parent,false);
+            } else {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img, parent, false);
                 return new MyChatViewHolder(view);
             }
         }
@@ -490,16 +574,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public int getItemViewType(int position) {
             ChatModel model = modelArrayList.get(position);
-             if (model.getImageUrl() != null){
+            if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
-                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                     return RIGHT_MSG_IMG;
-                }else {
+                } else {
                     return LEFT_MSG_IMG;
                 }
-            } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
+            } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                 return RIGHT_MSG;
-            }else{
+            } else {
                 return LEFT_MSG;
             }
         }
@@ -530,7 +614,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 Glide.with(profilePhoto.getContext()).load(urlPhotoUser).centerCrop().transform(new CircleTransform(profilePhoto.getContext())).override(40, 40).into(profilePhoto);
             }
 
-            public  String getDate(String createdAt) {
+            public String getDate(String createdAt) {
                 // Create a DateFormatter object for displaying date in specified format.
                 SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
                 formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));

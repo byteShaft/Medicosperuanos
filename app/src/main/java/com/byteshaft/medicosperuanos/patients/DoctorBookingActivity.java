@@ -247,6 +247,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", id);
+                intent.putExtra("name", drName);
+                intent.putExtra("status", availableForChat);
                 startActivity(intent);
                 break;
             case R.id.favt_button:
