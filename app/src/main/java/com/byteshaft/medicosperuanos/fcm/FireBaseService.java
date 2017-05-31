@@ -3,6 +3,7 @@ package com.byteshaft.medicosperuanos.fcm;
 import android.util.Log;
 
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
@@ -14,5 +15,8 @@ public class FireBaseService extends FirebaseInstanceIdService {
         String token = FirebaseInstanceId.getInstance().getToken();
         Log.e("TAG", "Token " + token);
         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FCM_TOKEN, token);
+        if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
+            Helpers.sendKey(token);
+        }
     }
 }

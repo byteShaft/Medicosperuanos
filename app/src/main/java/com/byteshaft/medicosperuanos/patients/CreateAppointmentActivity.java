@@ -88,6 +88,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private ListView listView;
     private int amount = 0;
     private static CreateAppointmentActivity sInstance;
+    private String date;
 
 
     public static CreateAppointmentActivity getInstance() {

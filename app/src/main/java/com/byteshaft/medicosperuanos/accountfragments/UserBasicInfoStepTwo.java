@@ -77,7 +77,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
     private AlertDialog alertDialog;
     private AlertDialog.Builder alertDialogBuilder;
 
-
     private ArrayList<States> statesList;
     private StatesAdapter statesAdapter;
 
@@ -89,7 +88,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
     private ArrayList<AffiliateClinic> affiliateClinicsList;
     private AffiliateClinicAdapter affiliateClinicAdapter;
-
 
     private int cityPosition;
     private int statePosition;
@@ -446,10 +444,12 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         data.append(FormData.TYPE_CONTENT_TEXT, "gender", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER));
         data.append(FormData.TYPE_CONTENT_TEXT, "location", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION));
         data.append(FormData.TYPE_CONTENT_TEXT, "address", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS));
-        if (!AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL).trim().isEmpty()) {
-            data.append(FormData.TYPE_CONTENT_FILE, "photo", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
+        if (!AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL).trim().isEmpty()
+                && !UserBasicInfoStepOne.imageUrl.trim().isEmpty()) {
+            data.append(FormData.TYPE_CONTENT_FILE, "photo",
+                    UserBasicInfoStepOne.imageUrl);
             alertDialogBuilder = new AlertDialog.Builder(getActivity());
-            alertDialogBuilder.setTitle(getResources().getString(R.string.updating));
+            alertDialogBuilder.setTitle(getResources().getString(R.string.updating_profile));
             alertDialogBuilder.setCancelable(false);
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.progress_alert_dialog, null);
@@ -479,6 +479,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         if (AppGlobals.isInfoAvailable()) {
             method = "PUT";
         }
+        Log.i("TAG", "METHOD " + method);
         mRequest.open(method, String.format("%sprofile", AppGlobals.BASE_URL));
         mRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -576,7 +577,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                         }
                         break;
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "res" + request.getResponseText());
+                        Log.i("TAG", "UPDATED" + request.getResponseText());
                         Toast.makeText(getActivity(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
@@ -587,6 +588,9 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                             String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
                             String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+
+
+                            Log.i("TAG", "server url " + imageUrl);
 
                             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
                             String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
@@ -631,8 +635,11 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             AppGlobals.saveNotificationState(showNotification);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, emergencyContact);
                             Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL,imageUrl);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL,
+                                    UserBasicInfoStepOne.imageUrl);
                             AppGlobals.gotInfo(true);
+                            MainActivity.setProfilePicture();
                             startActivity(new Intent(getActivity(), MainActivity.class));
                         } catch (JSONException e) {
                             e.printStackTrace();

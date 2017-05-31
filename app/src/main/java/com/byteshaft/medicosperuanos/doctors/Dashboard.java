@@ -3,6 +3,7 @@ package com.byteshaft.medicosperuanos.doctors;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +45,20 @@ public class Dashboard extends Fragment {
     private JSONObject dashBoardValues;
     private boolean foreground = false;
     private DashboardAdapter dashboardAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.dashboard_fragment, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getDashBoardDetails();
+            }
+        });
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.dashboard));
         foreground = true;
@@ -132,6 +143,8 @@ public class Dashboard extends Fragment {
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
+                        swipeRefreshLayout.setRefreshing(false);
+                        swipeRefresh = false;
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 try {
@@ -151,6 +164,8 @@ public class Dashboard extends Fragment {
         dashBoardRequest.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefresh = false;
                 if (exception.getLocalizedMessage().equals("Network is unreachable")) {
                     Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
                 }

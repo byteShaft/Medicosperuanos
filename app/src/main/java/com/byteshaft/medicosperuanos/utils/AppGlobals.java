@@ -240,7 +240,9 @@ public class AppGlobals extends Application {
 
     public static void clearSettings() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().clear().apply();
+        String token = sharedPreferences.getString(KEY_FCM_TOKEN, "");
+        sharedPreferences.edit().clear().commit();
+        sharedPreferences.edit().putString(KEY_FCM_TOKEN, token).apply();
     }
 
     public static void saveDataToSharedPreferences(String key, String value) {

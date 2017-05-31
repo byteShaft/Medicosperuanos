@@ -231,10 +231,14 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             data.remove(position);
                             try {
                                 jsonObject.put("state", true);
+                                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+
                             data.add(position, jsonObject);
+                            Log.i("TAG", String.valueOf(data.get(position)));
+
                         } else {
                             try {
                                 if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
@@ -258,10 +262,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             data.remove(position);
                             try {
                                 jsonObject.put("state", false);
+                                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                             data.add(position, jsonObject);
+                            Log.i("TAG", String.valueOf(data.get(position)));
                         }
                     }
 
@@ -270,13 +276,19 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             try {
                 viewHolder.startTime.setText(jsonObject.getString("start_time"));
                 viewHolder.endTime.setText(jsonObject.getString("end_time"));
+                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
                 if (map != null) {
-                    if (map != null && !map.containsKey(jsonObject.getString("start_time").trim())) {
+                    if (!map.containsKey(jsonObject.getString("start_time").trim())) {
                         viewHolder.state.setChecked(false);
                     } else {
                         viewHolder.state.setChecked(true);
                         alreadySelectedSchedule.add(jsonObject);
                     }
+                }
+                if (jsonObject.getBoolean("state")) {
+                    viewHolder.state.setChecked(true);
+                } else {
+                    viewHolder.state.setChecked(false);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

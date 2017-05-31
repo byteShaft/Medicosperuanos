@@ -399,7 +399,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 JSONArray dateJSONArray = jsonObject.getJSONArray("schedule");
                                 for (int j = 0; j < dateJSONArray.length(); j++) {
                                     JSONObject dateJObject = dateJSONArray.getJSONObject(j);
-                                    myFavoriteDoctorsList.setSchduleDate(dateJObject.getString("date"));
+                                    myFavoriteDoctorsList.setScheduleDate(dateJObject.getString("date"));
                                     myFavoriteDoctorsList.setTimeId(dateJObject.getInt("id"));
                                     JSONArray timeJSONArray = dateJObject.getJSONArray("time_slots");
                                     ArrayList<TimeSlots> arrayList = new ArrayList<>();
@@ -521,6 +521,7 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                     Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
                     intent.putExtra("start_time", doctorDetails.getStartTime());
                     SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
+                    intent.putExtra("date", format1.format(currentDate.getTime()));
                     String date = format1.format(currentDate.getTime());
                     intent.putExtra("schedule_date", date);
                     Log.e("Date", String.valueOf(currentDate.getTime()));

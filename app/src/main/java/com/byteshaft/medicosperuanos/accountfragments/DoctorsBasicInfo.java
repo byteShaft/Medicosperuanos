@@ -313,8 +313,10 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         data.append(FormData.TYPE_CONTENT_TEXT, "location", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION));
         data.append(FormData.TYPE_CONTENT_TEXT, "address", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS));
         Log.i("TAG", "key image url " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
-        if (!AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL).trim().isEmpty()) {
-            data.append(FormData.TYPE_CONTENT_FILE, "photo", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
+        if (!AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL).trim().isEmpty()
+                && !UserBasicInfoStepOne.imageUrl.trim().isEmpty()) {
+            data.append(FormData.TYPE_CONTENT_FILE, "photo",
+                    UserBasicInfoStepOne.imageUrl);
             alertDialogBuilder = new AlertDialog.Builder(getActivity());
             alertDialogBuilder.setTitle(getResources().getString(R.string.updating));
             alertDialogBuilder.setCancelable(false);
@@ -600,6 +602,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                         Log.i("TAG", request.getResponseText());
                         Helpers.showSnackBar(getView(), R.string.profile_updated);
                         parseServerResponse(request);
+                        MainActivity.setProfilePicture();
                         new android.os.Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {

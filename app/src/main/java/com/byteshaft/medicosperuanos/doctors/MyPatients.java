@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -71,10 +72,20 @@ public class MyPatients extends Fragment {
     private HttpRequest request;
     private Toolbar toolbar;
     private ArrayList<com.byteshaft.medicosperuanos.gettersetter.MyPatients> searchList;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.my_patients, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getPatientsDetails();
+            }
+        });
         mListView = (ListView) mBaseView.findViewById(R.id.patients_list);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.my_patient));
@@ -326,12 +337,15 @@ public class MyPatients extends Fragment {
     }
 
     private void getPatientsDetails() {
+        myPatientsList = new ArrayList<com.byteshaft.medicosperuanos.gettersetter.MyPatients>();
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
+                        swipeRefreshLayout.setRefreshing(false);
+                        swipeRefresh = false;
                         System.out.println(request.getResponseURL());
                         Helpers.dismissProgressDialog();
                         switch (request.getStatus()) {
@@ -390,6 +404,7 @@ public class MyPatients extends Fragment {
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
                 Helpers.dismissProgressDialog();
+                swipeRefresh = false;
                 Helpers.showSnackBar(getView(), getResources().getString(R.string.check_internet));
             }
         });
@@ -397,7 +412,9 @@ public class MyPatients extends Fragment {
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
-        Helpers.showProgressDialog(getActivity(), "Getting patients ...");
+        if (!swipeRefresh && myPatientsList.size() < 1) {
+            Helpers.showProgressDialog(getActivity(), "Getting patients ...");
+        }
     }
 
 

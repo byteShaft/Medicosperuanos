@@ -54,14 +54,6 @@ public class FavoriteDoctorsList {
 
     private String primaryPhoneNumber;
 
-    public String getScheduleDate() {
-        return scheduleDate;
-    }
-
-    public void setScheduleDate(String scheduleDate) {
-        this.scheduleDate = scheduleDate;
-    }
-
     public boolean isBlocked() {
         return isBlocked;
     }
@@ -180,7 +172,7 @@ public class FavoriteDoctorsList {
         return scheduleDate;
     }
 
-    public void setSchduleDate(String scheduleDate) {
+    public void setScheduleDate(String scheduleDate) {
         this.scheduleDate = scheduleDate;
     }
 

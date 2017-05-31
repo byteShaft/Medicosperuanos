@@ -83,6 +83,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private String patientNameString;
     private String patientAgeString;
     private String circleImageViewString;
+    private String date;
 
     public static DoctorBookingActivity getInstance() {
         return sInstance;
@@ -101,10 +102,30 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         timeSlots = new ArrayList<>();
         HashSet<Date> events = new HashSet<>();
         events.add(new Date());
-        currentDate = Helpers.getDate();
+        startTime = getIntent().getStringExtra("start_time");
+        isBlocked = getIntent().getBooleanExtra("block", false);
+        final String startTime = getIntent().getStringExtra("start_time");
+        drName = getIntent().getStringExtra("name");
+        drSpecialist = getIntent().getStringExtra("specialist");
+        drStars = getIntent().getFloatExtra("stars", 0);
+        phoneNumber = getIntent().getStringExtra("number");
+        drPhoto = getIntent().getStringExtra("photo");
+        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        id = getIntent().getIntExtra("user", -1);
+        currentDate = getIntent().getStringExtra("date");
         com.byteshaft.medicosperuanos.uihelpers.CalendarView cv = ((com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                 findViewById(R.id.calendar_view));
-        cv.updateCalendar(events);
+        Log.i("TAG", "current date"+ currentDate);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date convertedDate = new Date();
+        try {
+            Log.i("TAG", "current date"+ dateFormat.parse(currentDate));
+            convertedDate = dateFormat.parse(currentDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        cv.updateCalendar(convertedDate);
 
         // assign event handler
         cv.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {
@@ -146,16 +167,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         mFavButton.setOnClickListener(this);
         Log.i("TAG", "boolean for button " + AppGlobals.isDoctorFavourite);
 
-        startTime = getIntent().getStringExtra("start_time");
-        isBlocked = getIntent().getBooleanExtra("block", false);
-        final String startTime = getIntent().getStringExtra("start_time");
-        drName = getIntent().getStringExtra("name");
-        drSpecialist = getIntent().getStringExtra("specialist");
-        drStars = getIntent().getFloatExtra("stars", 0);
-        phoneNumber = getIntent().getStringExtra("number");
-        drPhoto = getIntent().getStringExtra("photo");
-        availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
-        id = getIntent().getIntExtra("user", -1);
         Log.i("TAG", "ID" + id);
         location = getIntent().getStringExtra("location");
         fromDoctor = getIntent().getBooleanExtra("from_doctor", false);

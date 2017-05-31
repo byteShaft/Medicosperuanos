@@ -21,6 +21,12 @@
 
     </android.support.v7.widget.CardView>
 
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_layout"
+        android:layout_below="@+id/card_view">
 
     <com.baoyz.swipemenulistview.SwipeMenuListView
         android:id="@+id/listView"
@@ -31,6 +37,8 @@
         android:scrollbars="none"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <View
         android:id="@+id/state"

@@ -76,6 +76,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private String location;
     private String name;
     private boolean isAvailable_to_chat;
+    private String date;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -99,6 +100,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         final String photo = getIntent().getStringExtra("photo");
         isAvailable_to_chat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
+        date = getIntent().getStringExtra("date");
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
         doctorName.setText(name);
@@ -139,6 +141,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), DoctorBookingActivity.class);
                 intent.putExtra("name", name);
+                intent.putExtra("date", date);
                 intent.putExtra("specialist", specialist);
                 intent.putExtra("stars", stars);
                 intent.putExtra("number", number);

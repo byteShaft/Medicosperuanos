@@ -188,10 +188,11 @@ public class Helpers {
         ImageLoadingListener animateFirstListener;
         DisplayImageOptions options;
         options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.mipmap.image_placeholder)
                 .showImageOnLoading(R.mipmap.image_placeholder)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
-                .cacheInMemory(true)
-                .cacheOnDisc(true).considerExifParams(true).build();
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                .cacheInMemory(false)
+                .cacheOnDisc(false).considerExifParams(true).build();
         animateFirstListener = new AnimateFirstDisplayListener();
         sImageLoader.displayImage(url, circleImageView, options, animateFirstListener);
     }
@@ -200,10 +201,11 @@ public class Helpers {
         ImageLoadingListener animateFirstListener;
         DisplayImageOptions options;
         options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.mipmap.image_placeholder)
                 .showImageOnLoading(R.mipmap.image_placeholder)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
-                .cacheInMemory(true)
-                .cacheOnDisc(true).considerExifParams(true).build();
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                .cacheInMemory(false)
+                .cacheOnDisc(false).considerExifParams(true).build();
         animateFirstListener = new AnimateFirstDisplayListener();
         sImageLoader.displayImage(url, imageView, options, animateFirstListener);
     }
@@ -219,11 +221,8 @@ public class Helpers {
                                       Bitmap loadedImage) {
             if (loadedImage != null) {
                 ImageView imageView = (ImageView) view;
-                boolean firstDisplay = !displayedImages.contains(imageUri);
-                if (firstDisplay) {
-                    FadeInBitmapDisplayer.animate(imageView, 500);
-                    displayedImages.add(imageUri);
-                }
+                FadeInBitmapDisplayer.animate(imageView, 500);
+                displayedImages.add(imageUri);
             }
         }
     }

@@ -19,6 +19,8 @@ import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -44,37 +46,48 @@ public class Service extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
         Log.i("DATA" + " good ", remoteMessage.getData().toString());
-        doctorName = remoteMessage.getData().get("doctor_name");
-        appointmentReason = remoteMessage.getData().get("appointment_reason");
-        appointmentState = remoteMessage.getData().get("reason");
-        senderName = remoteMessage.getData().get("sender_name");
-        messageBody = remoteMessage.getData().get("text");
-        senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
-        senderImageUrl = remoteMessage.getData().get("sender_image_url");
-        if (remoteMessage.getData().containsKey("attachment")) {
-            attachment = remoteMessage.getData().get("attachment");
-        }
+        Log.i("DATA" + " boolean ", String.valueOf(remoteMessage.getData().containsKey("status")));
+        if (remoteMessage.getData().containsKey("status")) {
+            if (remoteMessage.getData().get("status").equals("OK")) {
+                Helpers.sendKey(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(String.format("doctor-activate-%s",
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
+                Log.i("DATA" + " good ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
 
-        if (remoteMessage.getData().get("type").equals("appointment")) {
-            sendNotification();
+            }
         } else {
-            if (!ConversationActivity.foreground) {
-                replyNotification();
+            doctorName = remoteMessage.getData().get("doctor_name");
+            appointmentReason = remoteMessage.getData().get("appointment_reason");
+            appointmentState = remoteMessage.getData().get("reason");
+            senderName = remoteMessage.getData().get("sender_name");
+            messageBody = remoteMessage.getData().get("text");
+            senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
+            senderImageUrl = remoteMessage.getData().get("sender_image_url");
+            if (remoteMessage.getData().containsKey("attachment")) {
+                attachment = remoteMessage.getData().get("attachment");
+            }
+
+            if (remoteMessage.getData().get("type").equals("appointment")) {
+                sendNotification();
             } else {
-                createdAt = remoteMessage.getData().get("created_at");
+                if (!ConversationActivity.foreground) {
+                    replyNotification();
+                } else {
+                    createdAt = remoteMessage.getData().get("created_at");
 //                {sender_image_url=/media/1494489383303.jpg, text=pppp, type=message, sender_id=2, sender_name=Bilal Shahid}
-                ChatModel chatModel = new ChatModel();
-                chatModel.setFullName(senderName);
-                chatModel.setTimeStamp(createdAt);
-                chatModel.setId(senderId);
-                chatModel.setMessage(messageBody);
-                if (attachment != null && !attachment.trim().isEmpty()) {
-                    chatModel.setImageUrl(attachment
-                            .replace("http://localhost", AppGlobals.SERVER_IP));
+                    ChatModel chatModel = new ChatModel();
+                    chatModel.setFullName(senderName);
+                    chatModel.setTimeStamp(createdAt);
+                    chatModel.setId(senderId);
+                    chatModel.setMessage(messageBody);
+                    if (attachment != null && !attachment.trim().isEmpty()) {
+                        chatModel.setImageUrl(attachment
+                                .replace("http://localhost", AppGlobals.SERVER_IP));
+                    }
+                    chatModel.setSenderProfilePic(senderImageUrl);
+                    ConversationActivity.messages.add(chatModel);
+                    ConversationActivity.getInstance().notifyData();
                 }
-                chatModel.setSenderProfilePic(senderImageUrl);
-                ConversationActivity.messages.add(chatModel);
-                ConversationActivity.getInstance().notifyData();
             }
         }
     }

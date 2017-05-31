@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,10 +45,20 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
     private String previousUrl;
     private ArrayList<ChatModel> chatWithList;
     private Adapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.activity_main_messages, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getMessages();
+            }
+        });
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.messages));
         getMessages();
@@ -84,6 +95,8 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
     public void onReadyStateChange(HttpRequest httpRequest, int i) {
         switch (i) {
             case HttpRequest.STATE_DONE:
+                swipeRefresh = false;
+                swipeRefreshLayout.setRefreshing(false);
                 Helpers.dismissProgressDialog();
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
@@ -111,6 +124,8 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
 
     @Override
     public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefresh = false;
         switch (i) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
                 Helpers.showSnackBar(getView(), getResources().getString(R.string.connection_time_out));
