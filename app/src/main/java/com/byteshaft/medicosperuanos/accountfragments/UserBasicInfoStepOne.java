@@ -217,8 +217,6 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
             year = Integer.valueOf(dateOfBirth[2]);
             month = Integer.valueOf(dateOfBirth[1]) -1;
             day = Integer.valueOf(dateOfBirth[0]);
-
-
         }
         datePickerDialog = new DatePickerDialog(getActivity(),
                 this,

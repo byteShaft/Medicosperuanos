@@ -219,7 +219,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
-        toolbar.addView(searchContainer);
 
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -269,11 +268,10 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onResume() {
         super.onResume();
+        toolbar.addView(searchContainer);
         foreground = true;
         getDoctorList();
     }
-
-
 
     public void getDoctorList() {
         if (!swipeRefresh && doctors.size() < 1) {
