@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMap;
+import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMapForImage;
 
 public class SelectedImages extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class SelectedImages extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_selected_images);
         arrayList = new ArrayList<>();
         printMap(DoctorsAppointment.photosHashMap);
@@ -45,6 +47,23 @@ public class SelectedImages extends AppCompatActivity {
         }
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if (adapter != null) {
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default: return false;
+        }
+    }
 
     private class ImagesAdapter extends BaseAdapter {
 
@@ -86,7 +105,7 @@ public class SelectedImages extends AppCompatActivity {
                     }
                 }
             });
-            getBitMap(DoctorsAppointment.photosHashMap.get(imagesList.get(position)), viewHolder.imageView);
+            getBitMapForImage(DoctorsAppointment.photosHashMap.get(imagesList.get(position)), viewHolder.imageView);
             return convertView;
         }
 

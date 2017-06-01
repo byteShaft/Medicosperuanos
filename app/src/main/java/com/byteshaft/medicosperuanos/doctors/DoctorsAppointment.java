@@ -661,6 +661,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     method = "PUT";
                                     saveButton.setText("Update");
                                 }
+                                medicationSpinnerAdapter.notifyDataSetChanged();
+                                diagnosticSpinnerAdapter.notifyDataSetChanged();
+                                mDiagnosticsSpinner.setSelection(0);
+                                mMedicationSpinner.setSelection(0);
                                 break;
                             case HttpURLConnection.HTTP_NOT_FOUND:
                                 System.out.println("rana" + request.getResponseText());

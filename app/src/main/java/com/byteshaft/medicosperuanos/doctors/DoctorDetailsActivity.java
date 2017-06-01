@@ -1,8 +1,6 @@
 package com.byteshaft.medicosperuanos.doctors;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -77,6 +75,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private String name;
     private boolean isAvailable_to_chat;
     private String date;
+    private String nextUrl;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -179,9 +178,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url = String.format("%sdoctors/%s/review",
-                AppGlobals.BASE_URL, id);
-        Log.i("TAG", "url" + url);
         request.open("GET", String.format("%sdoctors/%s/review",
                 AppGlobals.BASE_URL, id));
         request.setRequestHeader("Authorization", "Token " +
@@ -204,10 +200,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.review_all_button:
-                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
-                reviewDialog.setTitle("All Reviews");
-                reviewDialog.show();
-
+//                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
+//                reviewDialog.setTitle("All Reviews");
+//                reviewDialog.show();
+                reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList, arrayList.size());
+                reviewList.setAdapter(reviewAdapter);
                 break;
             case R.id.call_button:
                 if (ContextCompat.checkSelfPermission(this,
@@ -318,10 +315,16 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "review " + request.getResponseText());
                         arrayList = new ArrayList<>();
-                        reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
-                        reviewList.setAdapter(reviewAdapter);
+                        int size = 0;
                         try {
                             JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            if (jsonArray.length() > 10) {
+                                size = 10;
+                            } else {
+                                size = jsonArray.length();
+                            }
+                            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList, size);
+                            reviewList.setAdapter(reviewAdapter);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 Review review = new Review();
@@ -362,10 +365,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
         private ViewHolder viewHolder;
         private ArrayList<Review> arrayList;
+        private int size = 0;
 
-        public ReviewAdapter(Context context, ArrayList<Review> arrayList) {
+        public ReviewAdapter(Context context, ArrayList<Review> arrayList, int size) {
             super(context, R.layout.delegate_dashboard);
             this.arrayList = arrayList;
+            this.size = size;
         }
 
         @NonNull
@@ -412,13 +417,13 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             if (days > 0)
                 return days + " days ago";
             else if (days == 0 && hours > 0) return hours + " hours ago";
-            else if (days == 0 && hours == 0 && minutes > 0) return hours + " minutes ago";
+            else if (days == 0 && hours == 0 && minutes > 0) return minutes + " minutes ago";
             else return seconds + " seconds ago";
         }
 
         @Override
         public int getCount() {
-            return arrayList.size();
+            return size;
         }
     }
 
@@ -430,27 +435,27 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
 
-    private class AllReviewDialog extends Dialog {
-        private Button closeButton;
-
-        public AllReviewDialog(Activity activity) {
-            super(activity);
-        }
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.dialog_all_review);
-            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
-            reviewList = (ListView) findViewById(R.id.all_review_list);
-            closeButton = (Button) findViewById(R.id.close_dialog);
-            closeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dismiss();
-                }
-            });
-            reviewList.setAdapter(reviewAdapter);
-        }
-    }
+//    private class AllReviewDialog extends Dialog {
+//        private Button closeButton;
+//
+//        public AllReviewDialog(Activity activity) {
+//            super(activity);
+//        }
+//
+//        @Override
+//        protected void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//            setContentView(R.layout.dialog_all_review);
+//            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
+//            reviewList = (ListView) findViewById(R.id.all_review_list);
+//            closeButton = (Button) findViewById(R.id.close_dialog);
+//            closeButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    dismiss();
+//                }
+//            });
+//            reviewList.setAdapter(reviewAdapter);
+//        }
+//    }
 }

@@ -22,7 +22,6 @@ public class FullscreenImageView extends Activity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_fullscreen_image_view);
         webView = (WebView) findViewById(R.id.image_view);
-
         Intent intent = getIntent();
         String url = intent.getStringExtra("url");
         webView.getSettings().setLoadWithOverviewMode(true);

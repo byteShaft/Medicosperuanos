@@ -12,9 +12,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -224,25 +226,19 @@ public class AppGlobals extends Application {
         return sharedPreferences.getBoolean(KEY_SHOW_NEWS, false);
     }
 
-    public static void saveFavourite(String drId, boolean isFavourite) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean(drId, isFavourite).apply();
-    }
-
-    public static boolean isFavourite(String id) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(id, false);
-    }
-
     public static SharedPreferences getPreferenceManager() {
         return getContext().getSharedPreferences("shared_prefs", MODE_PRIVATE);
     }
 
     public static void clearSettings() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        String token = sharedPreferences.getString(KEY_FCM_TOKEN, "");
         sharedPreferences.edit().clear().commit();
-        sharedPreferences.edit().putString(KEY_FCM_TOKEN, token).apply();
+        try {
+            FirebaseInstanceId.getInstance().deleteInstanceId();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        FirebaseInstanceId.getInstance().getToken();
     }
 
     public static void saveDataToSharedPreferences(String key, String value) {

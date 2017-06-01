@@ -62,7 +62,7 @@ public class Appointments extends Fragment implements
     private Button totalAppointments;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean swipeRefresh = false;
-    String agendaDate;
+    private String agendaDate;
 
     public static Appointments getInstance() {
         return sInstance;
@@ -89,8 +89,8 @@ public class Appointments extends Fragment implements
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
 //        calendarView.updateCalendar(events);
-        TextView dateTextview = (TextView) calendarView.findViewById(R.id.calendar_date_display);
-        dateTextview.setTextColor(getResources().getColor(R.color.header_background));
+        TextView dateTextView = (TextView) calendarView.findViewById(R.id.calendar_date_display);
+        dateTextView.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
         agendaDate = Helpers.getDate();
         getAgendaList(agendaDate);

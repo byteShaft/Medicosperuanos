@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -227,6 +228,7 @@ public class Dashboard extends Fragment {
                 viewHolder.tvAchievement.setBackgroundColor(
                         getResources().getColor(R.color.attended_background));
             } else if (text.equals(AppGlobals.APPOINTMENT_FOR_CONFIRMATION)) {
+                Log.i("TAG", "TEXT" + text);
                 viewHolder.tvAchievementTitle.setText(text);
                 viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
                         .getInt("appointments_to_be_confirmed")));
