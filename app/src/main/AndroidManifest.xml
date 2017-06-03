@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.byteshaft.medicosperuanos">
 
     <!--
@@ -69,6 +70,9 @@
         <activity
             android:name=".accountfragments.AccountManagerActivity"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity android:name=".directorychooser.DirectoryChooserActivity" />
+
         <activity
             android:name=".doctors.DoctorDetailsActivity"
             android:windowSoftInputMode="adjustResize" />

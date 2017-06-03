@@ -355,7 +355,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.i("TAG", jsonObject.toString());
+        Log.i("TAG", "DELETE" + jsonObject.toString());
         request.send(jsonObject.toString());
     }
 

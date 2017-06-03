@@ -17,6 +17,7 @@ allprojects {
         maven { url "https://jitpack.io" }
         jcenter()
         maven { url "https://dl.bintray.com/hani-momanii/maven"}
+        maven { url 'http://guardian.github.com/maven/repo-releases' }
     }
 }
 
