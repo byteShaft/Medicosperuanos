@@ -832,7 +832,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Log.i("TAG", request.getResponseURL());
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        alertDialog.dismiss();
+                        if (alertDialog != null) {
+                            alertDialog.dismiss();
+                        }
                         Log.i("TAG", request.getResponseText());
                         Appointments.getInstance().updateAppointmentStatus(AppGlobals.ATTENDED, id, position);
                         finish();
