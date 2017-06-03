@@ -55,6 +55,9 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                chatWithList = new ArrayList<ChatModel>();
+                adapter = new Adapter(getActivity().getApplicationContext(), chatWithList);
+                mMessagesListView.setAdapter(adapter);
                 swipeRefresh = true;
                 getMessages();
             }
@@ -110,6 +113,7 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
                                 chatModel.setId(singleMessage.getInt("user_id"));
                                 chatModel.setMessage(singleMessage.getString("latest_text"));
                                 chatModel.setImageUrl(AppGlobals.SERVER_IP+singleMessage.getString("photo_url"));
+                                chatModel.setAvailable_to_chat(singleMessage.getBoolean("available_to_chat"));
                                 chatWithList.add(chatModel);
                                 adapter.notifyDataSetChanged();
                             }

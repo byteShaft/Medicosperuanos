@@ -375,7 +375,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         swipeRefreshLayout.setRefreshing(false);
-//                        Log.i("TAG", "response " + request.getResponseText());
+                        Log.i("TAG", "response " + request.getResponseText());
                         if (request.getResponseText().trim().isEmpty()) {
                             return;
                         }
@@ -586,7 +586,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 public void onClick(View view) {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
                             ConversationActivity.class);
-                    intent.putExtra("id", singleDoctor.getId());
+                    intent.putExtra("id", singleDoctor.getUserId());
                     intent.putExtra("name", singleDoctor.getFirstName() + " " + singleDoctor.getLastName());
                     intent.putExtra("status", singleDoctor.isAvailableToChat());
                     startActivity(intent);

@@ -80,12 +80,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private static final int REQUEST_CAMERA = 1;
     private static final int SELECT_FILE = 2;
     private static final int STORAGE_PERMISSION = 2;
+    private static final int REQUEST_CAMERA_PERMISSION = 101;
     private String nextUrl;
     private String previousUrl;
     private ChatAdapter chatAdapter;
     public static ArrayList<ChatModel> messages;
     private RecyclerView conversation;
-    private int id = 4;
+    private int id = -1;
     private static String KEY_TEXT_REPLY = "key_text_reply";
     public static boolean foreground = false;
     private boolean status;
@@ -105,7 +106,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         LayoutInflater inflater = LayoutInflater.from(this);
         sInstance = this;
         View v = inflater.inflate(R.layout.action_bar_for_messages, null);
-
         TextView userName = (TextView)v.findViewById(R.id.action_bar_title);
         userName.setTypeface(AppGlobals.typefaceNormal);
         ImageView backPress = (ImageView) v.findViewById(R.id.back_press);
@@ -209,6 +209,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     case HttpRequest.STATE_DONE:
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
+                                imageUrl = null;
+                                cameraButton.setBackground(null);
+                                cameraButton.setBackgroundResource(R.mipmap.camera);
                                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                                 notificationManager.cancel(202);
                                 JSONObject singleMessage;
@@ -266,9 +269,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if (message.trim().isEmpty()) {
             msg = "attachment";
         } else msg = message;
-        formData.append(FormData.TYPE_CONTENT_TEXT, "patient", String.valueOf(id));
+        String user = "doctor";
+        if (AppGlobals.isDoctor()) {
+            user = "patient";
+        }
+        formData.append(FormData.TYPE_CONTENT_TEXT, user, String.valueOf(id));
         formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
-        Log.i("TAG", attachment);
         if (attachment != null && !attachment.trim().isEmpty()) {
             formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
             request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
@@ -426,8 +432,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
                 break;
             case R.id.send_button:
-                sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
-                writeMessageEditText.getText().clear();
+                if (!writeMessageEditText.getText().toString().trim().isEmpty() || !imageUrl.trim().isEmpty()) {
+                    sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
+                    writeMessageEditText.getText().clear();
+                } else {
+                    Helpers.showSnackBar(findViewById(android.R.id.content),
+                            getResources().getString(R.string.message_error));
+                }
                 break;
         }
     }
@@ -499,8 +510,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
+                    if (ContextCompat.checkSelfPermission(ConversationActivity.this,
+                            Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(ConversationActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                REQUEST_CAMERA_PERMISSION);
+                    } else {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, REQUEST_CAMERA);
+                    }
                 } else if (items[item].equals("Choose from Library")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
@@ -577,9 +596,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
                         AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
-                    return RIGHT_MSG_IMG;
-                } else {
                     return LEFT_MSG_IMG;
+                } else {
+                    return RIGHT_MSG_IMG;
                 }
             } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                 return RIGHT_MSG;

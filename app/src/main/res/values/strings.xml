@@ -166,6 +166,7 @@
     <string name="create_folder_error_already_exists">Folder already exists</string>
     <string name="create_folder_error">Could not create folder</string>
     <string name="up_label">Up</string>
+    <string name="message_error">cannot send empty message</string>
 
 </resources>
 
