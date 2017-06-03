@@ -943,7 +943,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         final Dialog dialog = new Dialog(DoctorsAppointment.this);
         dialog.setContentView(R.layout.medication_diagnostics_search_list);
         int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.95);
-        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.70);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
         dialog.getWindow().setLayout(width, height);
         dialog.setCancelable(false);
         dialog.setTitle(dialogTitle);
@@ -1202,7 +1202,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         public MedicationAdapter(Context context,
                                  ArrayList<DiagnosticMedication> diagnosticMedications) {
-            super(context, R.layout.delegate_diagnostic);
+            super(context, R.layout.delegate_medication);
             this.diagnosticMedications = diagnosticMedications;
         }
 
