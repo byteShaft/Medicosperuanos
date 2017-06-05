@@ -332,6 +332,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 review.setReviewText(jsonObject.getString("message"));
                                 review.setReviewStars(jsonObject.getInt("stars"));
                                 String currentTime = jsonObject.getString("created_at");
+                                review.setFullName(jsonObject.getString("patient_full_name"));
                                 Log.i("TAG", currentTime);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -400,6 +401,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 viewHolder.userComment.setText(output);
             }
             Log.i("TAG", "time " + review.getReviewTime());
+            viewHolder.userName.setText(review.getFullName());
             viewHolder.time.setText(timeConvert(review.getReviewTime()));
 
             return convertView;

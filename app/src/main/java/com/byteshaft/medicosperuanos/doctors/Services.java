@@ -316,7 +316,6 @@ public class Services extends Fragment implements View.OnClickListener {
                                         int serviceIdMain = jsonObject.getInt("id");
                                         boolean serviceState = jsonObject.getBoolean("is_active");
 
-
                                         JSONObject serviceObject = jsonObject.getJSONObject("service");
                                         int serviceId = serviceObject.getInt("id");
                                         for (com.byteshaft.medicosperuanos.gettersetter.Services service :

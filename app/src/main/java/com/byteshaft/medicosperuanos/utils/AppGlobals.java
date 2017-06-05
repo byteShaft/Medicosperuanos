@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
@@ -233,12 +234,7 @@ public class AppGlobals extends Application {
     public static void clearSettings() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().clear().commit();
-        try {
-            FirebaseInstanceId.getInstance().deleteInstanceId();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        FirebaseInstanceId.getInstance().getToken();
+        new GetToken().execute();
     }
 
     public static void saveDataToSharedPreferences(String key, String value) {
@@ -333,5 +329,26 @@ public class AppGlobals extends Application {
             }
         });
     }
+
+    private static class GetToken extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                FirebaseInstanceId.getInstance().deleteInstanceId();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            FirebaseInstanceId.getInstance().getToken();
+
+        }
+    }
 }
+
 

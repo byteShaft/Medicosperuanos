@@ -74,7 +74,6 @@ public class Service extends FirebaseMessagingService {
                     replyNotification();
                 } else {
                     createdAt = remoteMessage.getData().get("created_at");
-//                {sender_image_url=/media/1494489383303.jpg, text=pppp, type=message, sender_id=2, sender_name=Bilal Shahid}
                     ChatModel chatModel = new ChatModel();
                     chatModel.setFullName(senderName);
                     chatModel.setTimeStamp(createdAt);

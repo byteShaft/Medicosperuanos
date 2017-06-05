@@ -185,29 +185,37 @@ public class Helpers {
     }
 
     public static void getBitMap(String url, CircleImageView circleImageView) {
-        ImageLoadingListener animateFirstListener;
-        DisplayImageOptions options;
-        options = new DisplayImageOptions.Builder()
-                .showImageOnFail(R.mipmap.image_placeholder)
-                .showImageOnLoading(R.mipmap.image_placeholder)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-                .cacheInMemory(false)
-                .cacheOnDisc(false).considerExifParams(true).build();
-        animateFirstListener = new AnimateFirstDisplayListener();
-        sImageLoader.displayImage(url, circleImageView, options, animateFirstListener);
+        if (url.length() > 31) {
+            ImageLoadingListener animateFirstListener;
+            DisplayImageOptions options;
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnFail(R.mipmap.image_placeholder)
+                    .showImageOnLoading(R.mipmap.image_placeholder)
+                    .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                    .cacheInMemory(false)
+                    .cacheOnDisc(false).considerExifParams(true).build();
+            animateFirstListener = new AnimateFirstDisplayListener();
+            sImageLoader.displayImage(url, circleImageView, options, animateFirstListener);
+        } else {
+            circleImageView.setImageResource(R.mipmap.image_placeholder);
+        }
     }
 
     public static void getBitMap(String url, ImageView imageView) {
-        ImageLoadingListener animateFirstListener;
-        DisplayImageOptions options;
-        options = new DisplayImageOptions.Builder()
-                .showImageOnFail(R.mipmap.image_placeholder)
-                .showImageOnLoading(R.mipmap.image_placeholder)
-                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
-                .cacheInMemory(false)
-                .cacheOnDisc(false).considerExifParams(true).build();
-        animateFirstListener = new AnimateFirstDisplayListener();
-        sImageLoader.displayImage(url, imageView, options, animateFirstListener);
+        if (url.length() > 31) {
+            ImageLoadingListener animateFirstListener;
+            DisplayImageOptions options;
+            options = new DisplayImageOptions.Builder()
+                    .showImageOnFail(R.mipmap.image_placeholder)
+                    .showImageOnLoading(R.mipmap.image_placeholder)
+                    .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                    .cacheInMemory(false)
+                    .cacheOnDisc(false).considerExifParams(true).build();
+            animateFirstListener = new AnimateFirstDisplayListener();
+            sImageLoader.displayImage(url, imageView, options, animateFirstListener);
+        }  else {
+            imageView.setImageResource(R.mipmap.image_placeholder);
+        }
     }
 
     public static void getBitMapForImage(String url, ImageView imageView) {

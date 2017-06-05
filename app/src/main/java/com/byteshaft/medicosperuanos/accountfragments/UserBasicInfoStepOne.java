@@ -208,9 +208,9 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         mRadioGroup.setOnCheckedChangeListener(this);
         mProfilePicture.setOnClickListener(this);
         final Calendar calendar = Calendar.getInstance();
-        int year = Calendar.YEAR;
-        int month = Calendar.MONTH;
-        int day = Calendar.DAY_OF_MONTH;
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
         if (AppGlobals.isInfoAvailable() && AppGlobals.isLogin()) {
             String[] dateOfBirth = AppGlobals.getStringFromSharedPreferences(
                     AppGlobals.KEY_DATE_OF_BIRTH).split("/");

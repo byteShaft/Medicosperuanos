@@ -182,6 +182,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        Log.i("TAG", "id " + id);
         position = getIntent().getIntExtra("position", -1);
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
@@ -1040,8 +1041,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
         });
         dialog.show();
-        selectedDiagnosticsList = new ArrayList<DiagnosticMedication>();
-        selectedMedicationList = new ArrayList<DiagnosticMedication>();
+        selectedDiagnosticsList = new ArrayList<>();
+        selectedMedicationList = new ArrayList<>();
         diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
         mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
         medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
@@ -1072,7 +1073,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                         }
                 }
             }
@@ -1126,7 +1126,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             this.diagnosticMedications = diagnosticMedications;
         }
 
-        @NonNull
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
@@ -1153,14 +1152,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     if (checkBoxView != null) {
                         if (b) {
                             selectedDiagnostic.put(position, diagnostic.getId());
-//                            selectedDiagnosticsList.add(diagnostic);
                             selectedDiagnosticsHashMap.put(diagnostic.getId(), diagnostic);
                         } else {
                             Log.i("TAG", diagnostic.getDiagnosticMedication());
                             selectedDiagnostic.remove(position);
-//                            int index = selectedDiagnosticsList.indexOf(diagnostic);
-//                            Log.i("INDEX", "" + index);
-//                            selectedDiagnosticsList.remove(diagnostic);
                             selectedDiagnosticsHashMap.remove(diagnostic.getId());
                             Log.i("TAG", diagnostic.getDiagnosticMedication());
                         }
@@ -1296,7 +1291,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             ImageButton minus;
             ImageButton add;
             TextView quantity;
-
         }
     }
 

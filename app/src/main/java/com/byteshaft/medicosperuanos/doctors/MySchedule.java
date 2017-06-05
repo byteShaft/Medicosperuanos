@@ -468,7 +468,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                                 }
                             }
 //                            Log.i("Map", map.toString());
-                            scheduleAdapter.notifyDataSetChanged();
                             ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
                             if (jsonObjects.size() > 0) {
                                 for (int j = 0; j < jsonObjects.size(); j++) {
@@ -482,6 +481,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                                 }
                                 scheduleList.put(currentDate, jsonObjects);
                             }
+                            scheduleAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

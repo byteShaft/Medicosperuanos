@@ -11,6 +11,16 @@ public class Review {
     private float reviewStars;
     private long reviewTime;
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    private String fullName;
+
     public long getReviewTime() {
         return  reviewTime;
     }

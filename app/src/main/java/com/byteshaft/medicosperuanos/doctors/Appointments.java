@@ -260,7 +260,6 @@ public class Appointments extends Fragment implements
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                         }
                 }
             }
