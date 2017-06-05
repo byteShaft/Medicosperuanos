@@ -173,8 +173,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_doctors_appointment);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
-        getDiagnostic();
-        getMedications();
+
         view = (View) findViewById(R.id.layout_for_name);
         mFname = getIntent().getStringExtra("first_name");
         mLname = getIntent().getStringExtra("last_name");
@@ -185,6 +184,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         Log.i("TAG", "id " + id);
         position = getIntent().getIntExtra("position", -1);
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
+
+        getAppointmentDetails();
+//        getDiagnostic();
+//        getMedications();
 
         providedServicesIds = new ArrayList<>();
         removedImages = new ArrayList<>();
@@ -563,6 +566,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         JSONObject destinationObject = jsonObject.getJSONObject("destination");
                                         selectedTargetId = destinationObject.getInt("id");
                                         JSONArray jsonArray = jsonObject.getJSONArray("diagnostics");
+                                        Log.i("TAG", "diagnostics" +jsonArray.toString());
                                         JSONArray providedServicesArray = jsonObject.getJSONArray("services_provided");
                                         for (int i = 0; i < providedServicesArray.length(); i++) {
                                             JSONObject serviceObject = providedServicesArray.getJSONObject(i);
@@ -579,8 +583,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                                     CheckBox checkbox = (CheckBox) view;
                                                     checkbox.setChecked(true);
                                                 }
-
-                                            //do something with your child element
                                         }
 
                                         for (int i = 0; i < jsonArray.length(); i++) {
@@ -591,6 +593,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             diagnosticMedication.setDiagnosticMedication(diagnosticObject
                                                     .getString("name"));
                                             selectedDiagnosticsList.add(diagnosticMedication);
+                                            diagnosticsList.add(diagnosticMedication);
                                         }
                                         JSONObject appointmentObject = jsonObject.getJSONObject("appointment");
                                         JSONArray services = appointmentObject.getJSONArray("services");
@@ -646,6 +649,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         mConclusionsEditText.setText(conclusion);
                                         mReturnDateEditText.setText(dateOfReturn);
                                         JSONArray treatmentsArray = jsonObject.getJSONArray("treatments");
+                                        Log.i("TAG", "treatments" +jsonArray.toString());
                                         for (int i = 0; i < treatmentsArray.length(); i++) {
                                             JSONObject treatment = treatmentsArray.getJSONObject(i);
                                             DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
@@ -654,6 +658,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             diagnosticMedication.setId(treatmentDetail.getInt("id"));
                                             diagnosticMedication.setDiagnosticMedication(treatmentDetail.getString("name"));
                                             selectedMedicationList.add(diagnosticMedication);
+                                            medicationList.add(diagnosticMedication);
                                         }
                                         for (int k = 0; k < diagnosticsList.size(); k++) {
                                             DiagnosticMedication diagnosticMedication =
@@ -689,9 +694,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 diagnosticSpinnerAdapter.notifyDataSetChanged();
                                 mDiagnosticsSpinner.setSelection(0);
                                 mMedicationSpinner.setSelection(0);
+                                getMedications();
+                                getDiagnostic();
                                 break;
                             case HttpURLConnection.HTTP_NOT_FOUND:
-                                System.out.println("rana" + request.getResponseText());
+                                getMedications();
+                                getDiagnostic();
                         }
                 }
             }
@@ -699,7 +707,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         appointmentDetails.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-                exception.printStackTrace();
+                getDiagnostic();
+                getMedications();
             }
         });
         String url = String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, id);
@@ -1063,12 +1072,18 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     JSONObject diagnosticsObject = new JSONObject(request.getResponseText());
                                     JSONArray diagnosticsArray = diagnosticsObject.getJSONArray("results");
                                     System.out.println("new List view" + " " + diagnosticsArray);
+                                    ArrayList<Integer> arrayList = new ArrayList<Integer>();
+                                    for (DiagnosticMedication diagnosticMedications: diagnosticsList) {
+                                        arrayList.add(diagnosticMedications.getId());
+                                    }
                                     for (int i = 0; i < diagnosticsArray.length(); i++) {
                                         JSONObject jsonObject = diagnosticsArray.getJSONObject(i);
-                                        DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
-                                        diagnosticMedication.setId(jsonObject.getInt("id"));
-                                        diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
-                                        diagnosticsList.add(diagnosticMedication);
+                                        if (!arrayList.contains(jsonObject.getInt("id"))) {
+                                            DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
+                                            diagnosticMedication.setId(jsonObject.getInt("id"));
+                                            diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            diagnosticsList.add(diagnosticMedication);
+                                        }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -1095,17 +1110,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     JSONObject treatmentsObject = new JSONObject(request.getResponseText());
                                     JSONArray treatmentsArray = treatmentsObject.getJSONArray("results");
                                     System.out.println(treatmentsArray + "treatment");
+                                    ArrayList<Integer> arrayList = new ArrayList<Integer>();
+                                    for (DiagnosticMedication diagnosticMedications: medicationList) {
+                                        arrayList.add(diagnosticMedications.getId());
+                                    }
                                     for (int i = 0; i < treatmentsArray.length(); i++) {
                                         JSONObject jsonObject = treatmentsArray.getJSONObject(i);
-                                        DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
-                                        diagnosticMedication.setId(jsonObject.getInt("id"));
-                                        diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
-                                        medicationList.add(diagnosticMedication);
+                                        if (!arrayList.contains(jsonObject.getInt("id"))) {
+                                            DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
+                                            diagnosticMedication.setId(jsonObject.getInt("id"));
+                                            diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            medicationList.add(diagnosticMedication);
+                                        }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                getAppointmentDetails();
 
                         }
                 }
