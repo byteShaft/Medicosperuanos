@@ -14,10 +14,10 @@ import android.support.v4.app.RemoteInput;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
+import com.byteshaft.medicosperuanos.messages.MainMessages;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -137,7 +137,7 @@ public class Service extends FirebaseMessagingService {
     }
 
     private void sendNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, MainMessages.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);

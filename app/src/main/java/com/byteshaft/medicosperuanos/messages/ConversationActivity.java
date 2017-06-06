@@ -150,7 +150,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         deleteButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         cameraButton.setOnClickListener(this);
-        if (imageUrl.trim().isEmpty() && imageUrl != null) {
+        if (imageUrl != null && imageUrl.trim().isEmpty()) {
             profilePic = Helpers.getBitMapOfProfilePic(imageUrl);
             cameraButton.setImageResource(0);
             cameraButton.setImageBitmap(profilePic);
@@ -593,6 +593,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public int getItemViewType(int position) {
             ChatModel model = modelArrayList.get(position);
+            Log.i("TAG", "Model id" + model.getId());
             if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
                         AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
@@ -600,7 +601,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 } else {
                     return RIGHT_MSG_IMG;
                 }
-            } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
+            } else if (model.getId() == Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                 return RIGHT_MSG;
             } else {
                 return LEFT_MSG;

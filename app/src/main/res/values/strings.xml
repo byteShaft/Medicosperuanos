@@ -155,6 +155,7 @@
     <string name="medications">Select Medications</string>
     <string name="schedule_updated">Schedule Successfully updated</string>
     <string name="connection_time_out">Connection timeout</string>
+    <string name="connection_lost">Connection Lost</string>
     <string name="getting_appointments">Getting appointments</string>
     <string name="cancel_label">Cancel</string>
     <string name="confirm_label">Confirm</string>
