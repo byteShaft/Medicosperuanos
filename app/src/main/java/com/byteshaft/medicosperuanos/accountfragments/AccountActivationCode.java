@@ -169,6 +169,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
                         Toast.makeText(getActivity(), "Please enter correct account Verification code", Toast.LENGTH_LONG).show();
                         break;
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             System.out.println( "data" + jsonObject);

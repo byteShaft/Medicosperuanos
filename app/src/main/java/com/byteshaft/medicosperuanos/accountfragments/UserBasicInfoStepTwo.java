@@ -520,7 +520,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                             String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
-                            String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+                            String profileId = jsonObject.getString("user");
 
                             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
                             String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
@@ -587,7 +587,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                             String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
-                            String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+                            String profileId = jsonObject.getString("user");
 
 
                             Log.i("TAG", "server url " + imageUrl);

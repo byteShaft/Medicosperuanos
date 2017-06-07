@@ -120,7 +120,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date convertedDate = new Date();
         try {
-            Log.i("TAG", "current date"+ dateFormat.parse(currentDate));
             convertedDate = dateFormat.parse(currentDate);
         } catch (ParseException e) {
             e.printStackTrace();

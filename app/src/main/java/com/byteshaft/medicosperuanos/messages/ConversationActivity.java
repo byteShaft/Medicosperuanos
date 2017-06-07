@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.medicosperuanos.utils.RotateUtil;
@@ -75,7 +76,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private boolean isBlock = false;
     private File destination;
     private Uri selectedImageUri;
-    private static String imageUrl = "";
     private Bitmap profilePic;
     private static final int REQUEST_CAMERA = 1;
     private static final int SELECT_FILE = 2;
@@ -92,6 +92,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private boolean status;
     private String name;
     private static ConversationActivity sInstance;
+    private String imageUrl;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -126,6 +127,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         }
         id = getIntent().getIntExtra("id", -1);
         status = getIntent().getBooleanExtra("status", false);
+        imageUrl = getIntent().getStringExtra("image_url");
         this.name = getIntent().getStringExtra("name");
         userName.setText(name);
         status = getIntent().getBooleanExtra("status", false);
@@ -210,6 +212,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
                                 imageUrl = null;
+                                cameraButton.setBackgroundResource(R.mipmap.camera);
                                 cameraButton.setBackground(null);
                                 cameraButton.setBackgroundResource(R.mipmap.camera);
                                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -220,11 +223,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                     singleMessage = new JSONObject(httpRequest.getResponseText());
                                     if (singleMessage.isNull("attachment")) {
                                         ChatModel chatModel = new ChatModel();
-                                        if (AppGlobals.isDoctor()) {
-                                            chatModel.setId(singleMessage.getInt("patient"));
-                                        } else {
-                                            chatModel.setId(singleMessage.getInt("doctor"));
-                                        }
+                                        chatModel.setId(singleMessage.getInt("creator"));
+                                        chatModel.setPatientId(singleMessage.getInt("patient"));
+                                        chatModel.setDoctorId(singleMessage.getInt("doctor"));
                                         chatModel.setMessage(singleMessage.getString("text"));
                                         if (!singleMessage.isNull("attachment")) {
                                             chatModel.setImageUrl(singleMessage.getString("attachment"));
@@ -288,12 +289,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.send(formData);
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             ChatModel chatModel = new ChatModel();
-            if (AppGlobals.isDoctor()) {
-                chatModel.setId(4);
-            } else {
+//            if (AppGlobals.isDoctor()) {
+//                chatModel.setId(4);
+//            } else {
                 chatModel.setId(Integer.parseInt(AppGlobals.
-                        getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
-            }
+                        getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
+//            }
             chatModel.setMessage(message);
             chatModel.setImageUrl(imageUrl);
             SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
@@ -316,6 +317,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.send();
     }
 
+    private void getNextMessages(String url) {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", url);
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
     @Override
     public void onReadyStateChange(HttpRequest httpRequest, int i) {
         switch (i) {
@@ -327,20 +338,22 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         try {
                             JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
                             if (!jsonObject.isNull("next")) {
-                                nextUrl = jsonObject.getString("next");
+                                nextUrl = jsonObject.getString("next")
+                                        .replace("http://localhost/api/", AppGlobals.BASE_URL);
+                                getNextMessages(nextUrl);
                             }
                             if (!jsonObject.isNull("previous")) {
                                 previousUrl = jsonObject.getString("previous");
                             }
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            for (int j = 0; j < jsonArray.length(); j++) {
+                            int length = jsonArray.length()-1;
+                            for(int j = length; j >= 0; j--) {
+                                Log.i("TAG", "looper running " + j);
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
-                                if (AppGlobals.isDoctor()) {
-                                    chatModel.setId(singleMessage.getInt("patient"));
-                                } else {
-                                    chatModel.setId(singleMessage.getInt("doctor"));
-                                }
+                                chatModel.setPatientId(singleMessage.getInt("patient"));
+                                chatModel.setDoctorId(singleMessage.getInt("doctor"));
+                                chatModel.setId(singleMessage.getInt("creator"));
                                 chatModel.setMessage(singleMessage.getString("text"));
                                 if (!singleMessage.isNull("attachment")) {
                                     chatModel.setImageUrl(singleMessage.getString("attachment")
@@ -593,15 +606,15 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public int getItemViewType(int position) {
             ChatModel model = modelArrayList.get(position);
-            Log.i("TAG", "Model id" + model.getId());
             if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
-                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
                     return LEFT_MSG_IMG;
                 } else {
                     return RIGHT_MSG_IMG;
                 }
-            } else if (model.getId() == Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
+            } else if (model.getId() == Integer.valueOf(
+                    AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
                 return RIGHT_MSG;
             } else {
                 return LEFT_MSG;
@@ -629,14 +642,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 txtMessage.setText(message);
             }
 
-            public void setProfilePhoto(String urlPhotoUser) {
+            public void setProfilePhoto(final String urlPhotoUser) {
                 if (profilePhoto == null) return;
-                Glide.with(profilePhoto.getContext()).load(urlPhotoUser).centerCrop().transform(new CircleTransform(profilePhoto.getContext())).override(40, 40).into(profilePhoto);
+                Glide.with(profilePhoto.getContext()).load(imageUrl).centerCrop()
+                        .transform(new CircleTransform(profilePhoto.getContext())).override(60, 60)
+                        .into(profilePhoto);
             }
 
             public String getDate(String createdAt) {
                 // Create a DateFormatter object for displaying date in specified format.
-                SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
                 formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));
                 Date date = null;
                 try {
@@ -644,12 +659,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
+                Log.i("TAG", "milliseconds "+ date.getTime());
                 return String.valueOf(date.getTime());
             }
 
             public void setTvTimestamp(String timestamp) {
                 if (tvTimestamp == null) return;
-                Log.i("TAG", getDate(timestamp));
+                Log.i("TAG", timestamp);
                 tvTimestamp.setText(converteTimestamp(getDate(timestamp)));
             }
 
@@ -659,6 +675,17 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         .override(100, 100)
                         .fitCenter()
                         .into(picInChat);
+                picInChat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.i("TAG", "click");
+                        int position = getAdapterPosition();
+                        ChatModel model = modelArrayList.get(position);
+                        Intent intent = new Intent(getApplicationContext(), FullscreenImageView.class);
+                        intent.putExtra("url", model.getImageUrl());
+                        startActivity(intent);
+                    }
+                });
             }
 
         }

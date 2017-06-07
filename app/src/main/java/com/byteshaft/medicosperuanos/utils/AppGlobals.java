@@ -54,7 +54,7 @@ public class AppGlobals extends Application {
     public static final String REVIEW_URL = BASE_URL + "public/medicosperuanos/%s/review";
     public static final String KEY_USER_NAME = "user_name";
     public static final String KEY_FIRST_NAME = "first_name";
-    public static final String KEY_PROFILE_ID = "id";
+    public static final String KEY_PROFILE_ID = "profile_id";
     public static final String KEY_LAST_NAME = "last_name";
     public static final String KEY_DOC_SPECIALITY = "speciality";
     public static final String KEY_DOC_ID = "identity_document";

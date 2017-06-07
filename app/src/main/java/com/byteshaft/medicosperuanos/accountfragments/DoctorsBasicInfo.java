@@ -624,7 +624,8 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         try {
             JSONObject jsonObject = new JSONObject(request.getResponseText());
 
-            String userId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+            String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
+            String profileId = jsonObject.getString("user");
             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
 
@@ -657,6 +658,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
             //saving values
             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
+            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, firstName);
             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, lastName);
 

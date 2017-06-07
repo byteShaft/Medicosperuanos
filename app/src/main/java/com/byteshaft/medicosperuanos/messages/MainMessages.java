@@ -76,6 +76,7 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
                 intent.putExtra("id", chatModel.getId());
                 intent.putExtra("name", chatModel.getFullName());
                 intent.putExtra("status", chatModel.isAvailable_to_chat());
+                intent.putExtra("image_url", chatModel.getImageUrl());
                 startActivity(intent);
             }
         });

@@ -207,7 +207,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                                     String phoneOne = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
                                     String phoneTwo = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
-                                    String profileId = jsonObject.getString(AppGlobals.KEY_PROFILE_ID);
+                                    String profileId = jsonObject.getString("user");
                                     String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
                                     boolean notificationState = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NOTIFICATION);
                                     boolean showNewsState = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NEWS);

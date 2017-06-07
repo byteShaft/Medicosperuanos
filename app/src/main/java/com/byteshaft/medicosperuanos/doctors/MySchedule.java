@@ -389,7 +389,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             ArrayList<JSONObject> jsonObjectJSONArray = scheduleList.get(currentDate);
             for (JSONObject singleJson : jsonObjectJSONArray) {
                 if (singleJson.getBoolean("state") && !alreadySelectedSchedule.contains(singleJson)) {
-//                    singleJson.remove("state");
                     JSONObject time = new JSONObject();
                     time.put("start_time", singleJson.get("start_time").toString().trim());
                     time.put("end_time", singleJson.get("end_time").toString().trim());
