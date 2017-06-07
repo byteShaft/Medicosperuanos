@@ -231,13 +231,13 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             data.remove(position);
                             try {
                                 jsonObject.put("state", true);
-                                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
+                                Log.i("TAG", "ADAPTER onCheckedChanged" + String.valueOf(jsonObject.getBoolean("state")));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
 
                             data.add(position, jsonObject);
-                            Log.i("TAG", String.valueOf(data.get(position)));
+                            Log.i("TAG", "ADAPTER onCheckedChanged" +String.valueOf(data.get(position)));
 
                         } else {
                             try {
@@ -262,21 +262,20 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             data.remove(position);
                             try {
                                 jsonObject.put("state", false);
-                                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
+                                Log.i("TAG", "ADAPTER onCheckedChanged" + String.valueOf(jsonObject.getBoolean("state")));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                             data.add(position, jsonObject);
-                            Log.i("TAG", String.valueOf(data.get(position)));
+                            Log.i("TAG","ADAPTER onCheckedChanged"+ String.valueOf(data.get(position)));
                         }
                     }
-
                 }
             });
             try {
                 viewHolder.startTime.setText(jsonObject.getString("start_time"));
                 viewHolder.endTime.setText(jsonObject.getString("end_time"));
-                Log.i("TAG", "STATE" + String.valueOf(jsonObject.getBoolean("state")));
+                Log.i("TAG", "ADAPTER" + String.valueOf(jsonObject.getBoolean("state")));
                 if (map != null) {
                     if (!map.containsKey(jsonObject.getString("start_time").trim())) {
                         viewHolder.state.setChecked(false);
@@ -487,6 +486,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Helpers.showSnackBar(getView(), R.string.success);
+                        scheduleAdapter.notifyDataSetChanged();
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (Helpers.getAlertDialog() == null) {
