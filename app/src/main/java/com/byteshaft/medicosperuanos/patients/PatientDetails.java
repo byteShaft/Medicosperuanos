@@ -65,6 +65,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private String emergencyContactString;
     private int patientId;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
+    private boolean chatStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         docIdString = getIntent().getStringExtra("identity_document");
         patientAddressString = getIntent().getStringExtra("address");
         circleImageViewString = getIntent().getStringExtra("photo");
-
+        chatStatus = getIntent().getBooleanExtra("status", false);
         phonePrimaryString = getIntent().getStringExtra("phone_primary");
         phoneSecondaryString = getIntent().getStringExtra("phone_secondary");
         stateEditTextString = getIntent().getStringExtra("state");
@@ -211,6 +212,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 appointmentIntent.putExtra("dob", patientAgeString);
                 appointmentIntent.putExtra("photo", circleImageViewString);
                 appointmentIntent.putExtra("patientID", patientId);
+                appointmentIntent.putExtra("date", Helpers.getDate());
                 appointmentIntent.putExtra("from_doctor", true);
                 startActivity(appointmentIntent);
                 break;
@@ -230,6 +232,8 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", patientId);
+                intent.putExtra("name",patientNameString);
+                intent.putExtra("status", chatStatus);
                 startActivity(intent);
                 break;
         }

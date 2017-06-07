@@ -7,14 +7,17 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -51,7 +54,7 @@ public class AppGlobals extends Application {
     public static final String REVIEW_URL = BASE_URL + "public/medicosperuanos/%s/review";
     public static final String KEY_USER_NAME = "user_name";
     public static final String KEY_FIRST_NAME = "first_name";
-    public static final String KEY_PROFILE_ID = "id";
+    public static final String KEY_PROFILE_ID = "profile_id";
     public static final String KEY_LAST_NAME = "last_name";
     public static final String KEY_DOC_SPECIALITY = "speciality";
     public static final String KEY_DOC_ID = "identity_document";
@@ -224,23 +227,14 @@ public class AppGlobals extends Application {
         return sharedPreferences.getBoolean(KEY_SHOW_NEWS, false);
     }
 
-    public static void saveFavourite(String drId, boolean isFavourite) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean(drId, isFavourite).apply();
-    }
-
-    public static boolean isFavourite(String id) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(id, false);
-    }
-
     public static SharedPreferences getPreferenceManager() {
         return getContext().getSharedPreferences("shared_prefs", MODE_PRIVATE);
     }
 
     public static void clearSettings() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().clear().commit();
+        new GetToken().execute();
     }
 
     public static void saveDataToSharedPreferences(String key, String value) {
@@ -335,5 +329,26 @@ public class AppGlobals extends Application {
             }
         });
     }
+
+    private static class GetToken extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                FirebaseInstanceId.getInstance().deleteInstanceId();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            FirebaseInstanceId.getInstance().getToken();
+
+        }
+    }
 }
+
 

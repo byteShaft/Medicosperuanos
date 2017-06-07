@@ -88,6 +88,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private ListView listView;
     private int amount = 0;
     private static CreateAppointmentActivity sInstance;
+    private String date;
 
 
     public static CreateAppointmentActivity getInstance() {
@@ -221,6 +222,8 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", id);
+                intent.putExtra("name", drName);
+                intent.putExtra("status", availableForChat);
                 startActivity(intent);
                 break;
             case R.id.btn_fav:
@@ -351,6 +354,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
             for (Map.Entry<Integer, Integer> entry : selectedServicesArrayList.entrySet()) {
                 jsonArray.put(entry.getValue());
             }
+            Log.i("TAG", jsonArray.toString());
             jsonObject.put("services", jsonArray);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -473,7 +477,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 viewHolder = (ServiceViewHolder) convertView.getTag();
             }
             final Services services = arrayList.get(position);
-            Log.i("TAG", "service id " + services.getServiceId());
             viewHolder.serviceName.setText(services.getServiceName());
             viewHolder.servicePrice.setText(services.getServicePrice());
             final View finalConvertView = convertView;

@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity
 
     private SwitchCompat doctorOnlineSwitch;
     private SwitchCompat patientOnlineSwitch;
-    private CircleImageView profilePicture;
+    private static CircleImageView profilePicture;
     private HttpRequest request;
     private boolean isError;
 
@@ -288,12 +288,16 @@ public class MainActivity extends AppCompatActivity
             alertDialog.show();
 
         } else {
-            if (AppGlobals.isLogin() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
-                String url = String.format("%s" + AppGlobals
-                        .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
-                Log.i("TAG", "url " + url);
-                getBitMap(url, profilePicture);
-            }
+            setProfilePicture();
+        }
+    }
+
+    public static void setProfilePicture() {
+        if (AppGlobals.isLogin() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
+            String url = String.format("%s" + AppGlobals
+                    .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
+            Log.i("TAG", "url " + url);
+            getBitMap(url, profilePicture);
         }
     }
 
@@ -387,7 +391,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_messages) {
             loadFragment(new MainMessages());
         } else if (id == R.id.nav_profile) {
-            loadFragment(new UserBasicInfoStepOne(false));
+            if (!UserBasicInfoStepOne.foreground) {
+                loadFragment(new UserBasicInfoStepOne(false));
+            }
         } else if (id == R.id.nav_schedule) {
             loadFragment(new MySchedule());
         } else if (id == R.id.nav_my_services) {

@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextPaint;
@@ -76,11 +77,21 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private float mUserRating;
     private String mUserReview;
     private int doctorsId;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
         setHasOptionsMenu(true);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getPatientAppointments();
+            }
+        });
         searchContainer = new LinearLayout(getActivity());
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar.LayoutParams containerParams = new Toolbar.LayoutParams
@@ -252,8 +263,10 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     }
 
     private void getPatientAppointments() {
-        Helpers.showProgressDialog(getActivity(),
-                getResources().getString(R.string.fetching_my_appointments));
+        if (!swipeRefresh && appointments.size() < 1) {
+            Helpers.showProgressDialog(getActivity(),
+                    getResources().getString(R.string.fetching_my_appointments));
+        }
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -267,6 +280,8 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                swipeRefresh = false;
+                swipeRefreshLayout.setRefreshing(false);
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
@@ -307,6 +322,8 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
+        swipeRefresh = false;
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private class Adapter extends ArrayAdapter<PatientAppointment> {

@@ -86,7 +86,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
     private static final int SELECT_FILE = 2;
     private File destination;
     private Uri selectedImageUri;
-    private static String imageUrl = "";
+    public static String imageUrl = "";
     private Bitmap profilePic;
     private CircleImageView mProfilePicture;
     private EditText mDocID;
@@ -124,6 +124,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
     private static final int LOCATION_PERMISSION = 1;
     private static final int STORAGE_CAMERA_PERMISSION = 2;
     private boolean fromAccountManager;
+    public static boolean foreground = false;
 
 
     @Override
@@ -140,6 +141,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         if (bundle != null) {
             fromAccountManager = bundle.getBoolean("boolean", false);
         }
+        foreground = true;
         mProfilePicture = (CircleImageView) mBaseView.findViewById(R.id.user_dp);
         mDocID = (EditText) mBaseView.findViewById(R.id.doctor_id_edit_text);
         mFirstName = (EditText) mBaseView.findViewById(R.id.first_name_edit_text);
@@ -172,10 +174,10 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                 mRadioGroup.check(R.id.radio_button_female);
                 mGenderButtonString = gender;
             }
-
             if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
                 String url = String.format("%s" + AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
+                Log.i("TAG", "URL " + url);
                 getBitMap(url, mProfilePicture);
             }
             if (AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL) != null) {
@@ -205,18 +207,39 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         mDateOfBirth.setOnClickListener(this);
         mRadioGroup.setOnCheckedChangeListener(this);
         mProfilePicture.setOnClickListener(this);
-
         final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        if (AppGlobals.isInfoAvailable() && AppGlobals.isLogin()) {
+            String[] dateOfBirth = AppGlobals.getStringFromSharedPreferences(
+                    AppGlobals.KEY_DATE_OF_BIRTH).split("/");
+            year = Integer.valueOf(dateOfBirth[2]);
+            month = Integer.valueOf(dateOfBirth[1]) -1;
+            day = Integer.valueOf(dateOfBirth[0]);
+        }
         datePickerDialog = new DatePickerDialog(getActivity(),
                 this,
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH));
+                year,
+                month,
+                day);
         if (imageUrl.trim().isEmpty() && imageUrl != null) {
             profilePic = Helpers.getBitMapOfProfilePic(imageUrl);
             mProfilePicture.setImageBitmap(profilePic);
         }
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        foreground = true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        foreground = false;
     }
 
     @Override
@@ -256,6 +279,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, mAddressString);
                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, mLocationString);
                     if (!imageUrl.trim().isEmpty()) {
+                        Log.i("TAG", "image" + imageUrl);
                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL, imageUrl);
                     }
                     if (!AppGlobals.isDoctor()) {

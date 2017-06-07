@@ -1,6 +1,8 @@
 package com.byteshaft.medicosperuanos.messages;
 
 import android.Manifest;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.RemoteInput;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -33,6 +36,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.medicosperuanos.utils.RotateUtil;
@@ -72,17 +76,27 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private boolean isBlock = false;
     private File destination;
     private Uri selectedImageUri;
-    private static String imageUrl = "";
     private Bitmap profilePic;
     private static final int REQUEST_CAMERA = 1;
     private static final int SELECT_FILE = 2;
     private static final int STORAGE_PERMISSION = 2;
+    private static final int REQUEST_CAMERA_PERMISSION = 101;
     private String nextUrl;
     private String previousUrl;
     private ChatAdapter chatAdapter;
-    private ArrayList<ChatModel> messages;
+    public static ArrayList<ChatModel> messages;
     private RecyclerView conversation;
-    private int id = 4;
+    private int id = -1;
+    private static String KEY_TEXT_REPLY = "key_text_reply";
+    public static boolean foreground = false;
+    private boolean status;
+    private String name;
+    private static ConversationActivity sInstance;
+    private String imageUrl;
+
+    public static ConversationActivity getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +104,39 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.action_bar_for_messages);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        sInstance = this;
+        View v = inflater.inflate(R.layout.action_bar_for_messages, null);
+        TextView userName = (TextView)v.findViewById(R.id.action_bar_title);
+        userName.setTypeface(AppGlobals.typefaceNormal);
+        ImageView backPress = (ImageView) v.findViewById(R.id.back_press);
+        backPress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+        TextView userStatus = (TextView) v.findViewById(R.id.user_online);
+        getSupportActionBar().setCustomView(v);
         setContentView(R.layout.activity_conversation);
-        id = getIntent().getIntExtra("id", 4);
+        foreground = true;
+        id = getIntent().getIntExtra("id", -1);
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().getBoolean("notification")) {
+                getMessageText(getIntent(), getIntent().getIntExtra("sender_id", -1));
+                id = getIntent().getIntExtra("sender_id", -1);
+            }
+        }
+        status = getIntent().getBooleanExtra("status", false);
+        imageUrl = getIntent().getStringExtra("image_url");
+        this.name = getIntent().getStringExtra("name");
+        userName.setText(name);
+        status = getIntent().getBooleanExtra("status", false);
+        if (status) {
+            userStatus.setText("online");
+        } else {
+            userStatus.setText("offline");
+        }
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -109,13 +153,54 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         deleteButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         cameraButton.setOnClickListener(this);
-        if (imageUrl.trim().isEmpty() && imageUrl != null) {
+        if (imageUrl != null && imageUrl.trim().isEmpty()) {
             profilePic = Helpers.getBitMapOfProfilePic(imageUrl);
             cameraButton.setImageResource(0);
             cameraButton.setImageBitmap(profilePic);
         }
         chatAdapter = new ChatAdapter(messages);
         conversation.setAdapter(chatAdapter);
+        writeMessageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    conversation.scrollToPosition(messages.size() - 1);
+                } else {
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        foreground = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foreground = true;
+    }
+
+    private CharSequence getMessageText(Intent intent, int senderId) {
+        Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+        if (remoteInput != null) {
+            Log.i("TAG", String.valueOf(remoteInput.getCharSequence(KEY_TEXT_REPLY)));
+            sendMessage(senderId, String.valueOf(remoteInput.getCharSequence(KEY_TEXT_REPLY)),
+                    imageUrl);
+            return remoteInput.getCharSequence(KEY_TEXT_REPLY);
+        }
+        return null;
+    }
+
+    public void notifyData() {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                chatAdapter.notifyDataSetChanged();
+                conversation.scrollToPosition(messages.size() - 1);
+            }
+        });
     }
 
     private void sendMessage(int id, String message, final String attachment) {
@@ -127,24 +212,28 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     case HttpRequest.STATE_DONE:
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
+                                imageUrl = null;
+                                cameraButton.setImageBitmap(null);
+                                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                                notificationManager.cancel(202);
                                 JSONObject singleMessage;
-                                if (attachment != null && !attachment.trim().isEmpty())
+                                Log.i("TAG", httpRequest.getResponseText());
                                 try {
                                     singleMessage = new JSONObject(httpRequest.getResponseText());
-                                    ChatModel chatModel = new ChatModel();
-                                    if (AppGlobals.isDoctor()) {
-                                        chatModel.setId(singleMessage.getInt("patient"));
-                                    } else {
-                                        chatModel.setId(singleMessage.getInt("doctor"));
+                                    if (singleMessage.isNull("attachment")) {
+                                        ChatModel chatModel = new ChatModel();
+                                        chatModel.setId(singleMessage.getInt("creator"));
+                                        chatModel.setPatientId(singleMessage.getInt("patient"));
+                                        chatModel.setDoctorId(singleMessage.getInt("doctor"));
+                                        chatModel.setMessage(singleMessage.getString("text"));
+                                        if (!singleMessage.isNull("attachment")) {
+                                            chatModel.setImageUrl(singleMessage.getString("attachment"));
+                                        }
+                                        chatModel.setTimeStamp(singleMessage.getString("created_at"));
+                                        messages.add(chatModel);
+                                        chatAdapter.notifyDataSetChanged();
+                                        conversation.scrollToPosition(messages.size() - 1);
                                     }
-                                    chatModel.setMessage(singleMessage.getString("text"));
-                                    if (!singleMessage.isNull("attachment")) {
-                                        chatModel.setImageUrl(singleMessage.getString("attachment"));
-                                    }
-                                    chatModel.setTimeStamp(singleMessage.getString("created_at"));
-                                    messages.add(chatModel);
-                                    chatAdapter.notifyDataSetChanged();
-                                    conversation.scrollToPosition(messages.size() - 1);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -180,9 +269,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if (message.trim().isEmpty()) {
             msg = "attachment";
         } else msg = message;
-        formData.append(FormData.TYPE_CONTENT_TEXT, "patient", String.valueOf(id));
+        String user = "doctor";
+        if (AppGlobals.isDoctor()) {
+            user = "patient";
+        }
+        formData.append(FormData.TYPE_CONTENT_TEXT, user, String.valueOf(id));
         formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
-        Log.i("TAG", attachment);
         if (attachment != null && !attachment.trim().isEmpty()) {
             formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
             request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
@@ -196,12 +288,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.send(formData);
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             ChatModel chatModel = new ChatModel();
-            if (AppGlobals.isDoctor()) {
-                chatModel.setId(4);
-            } else {
+//            if (AppGlobals.isDoctor()) {
+//                chatModel.setId(4);
+//            } else {
                 chatModel.setId(Integer.parseInt(AppGlobals.
-                        getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
-            }
+                        getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
+//            }
             chatModel.setMessage(message);
             chatModel.setImageUrl(imageUrl);
             SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
@@ -224,32 +316,43 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.send();
     }
 
+    private void getNextMessages(String url) {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(this);
+        request.setOnErrorListener(this);
+        request.open("GET", url);
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
+    }
+
     @Override
     public void onReadyStateChange(HttpRequest httpRequest, int i) {
         switch (i) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", httpRequest.getResponseURL());
                 Helpers.dismissProgressDialog();
                 switch (httpRequest.getStatus()) {
-                    case HttpRequest.ERROR_NETWORK_UNREACHABLE:
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", httpRequest.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
                             if (!jsonObject.isNull("next")) {
-                                nextUrl = jsonObject.getString("");
+                                nextUrl = jsonObject.getString("next")
+                                        .replace("http://localhost/api/", AppGlobals.BASE_URL);
+//                                getNextMessages(nextUrl);
                             }
                             if (!jsonObject.isNull("previous")) {
                                 previousUrl = jsonObject.getString("previous");
                             }
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            for (int j = 0; j < jsonArray.length();j++) {
+                            int length = jsonArray.length()-1;
+                            for(int j = length; j >= 0; j--) {
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
-                                if (AppGlobals.isDoctor()) {
-                                    chatModel.setId(singleMessage.getInt("patient"));
-                                } else {
-                                    chatModel.setId(singleMessage.getInt("doctor"));
-                                }
+                                chatModel.setPatientId(singleMessage.getInt("patient"));
+                                chatModel.setDoctorId(singleMessage.getInt("doctor"));
+                                chatModel.setId(singleMessage.getInt("creator"));
                                 chatModel.setMessage(singleMessage.getString("text"));
                                 if (!singleMessage.isNull("attachment")) {
                                     chatModel.setImageUrl(singleMessage.getString("attachment")
@@ -341,8 +444,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
                 break;
             case R.id.send_button:
-                sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
-                writeMessageEditText.getText().clear();
+                if (!writeMessageEditText.getText().toString().trim().isEmpty() || !imageUrl.trim().isEmpty()) {
+                    sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
+                    writeMessageEditText.getText().clear();
+                } else {
+                    Helpers.showSnackBar(findViewById(android.R.id.content),
+                            getResources().getString(R.string.message_error));
+                }
                 break;
         }
     }
@@ -414,8 +522,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
+                    if (ContextCompat.checkSelfPermission(ConversationActivity.this,
+                            Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(ConversationActivity.this,
+                                new String[]{Manifest.permission.CAMERA},
+                                REQUEST_CAMERA_PERMISSION);
+                    } else {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, REQUEST_CAMERA);
+                    }
                 } else if (items[item].equals("Choose from Library")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
@@ -436,7 +552,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         builder.show();
     }
 
-    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder>{
+    private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder> {
 
 
         private static final int RIGHT_MSG = 0;
@@ -444,7 +560,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         private static final int RIGHT_MSG_IMG = 2;
         private static final int LEFT_MSG_IMG = 3;
         private ArrayList<ChatModel> modelArrayList;
-
 
 
         public ChatAdapter(ArrayList<ChatModel> modelArrayList) {
@@ -460,17 +575,17 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public MyChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view;
-            if (viewType == RIGHT_MSG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right,parent,false);
+            if (viewType == RIGHT_MSG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false);
                 return new MyChatViewHolder(view);
-            }else if (viewType == LEFT_MSG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left,parent,false);
+            } else if (viewType == LEFT_MSG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false);
                 return new MyChatViewHolder(view);
-            }else if (viewType == RIGHT_MSG_IMG){
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img,parent,false);
+            } else if (viewType == RIGHT_MSG_IMG) {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img, parent, false);
                 return new MyChatViewHolder(view);
-            }else{
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img,parent,false);
+            } else {
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img, parent, false);
                 return new MyChatViewHolder(view);
             }
         }
@@ -490,16 +605,17 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         @Override
         public int getItemViewType(int position) {
             ChatModel model = modelArrayList.get(position);
-             if (model.getImageUrl() != null){
+            if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
-                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
-                    return RIGHT_MSG_IMG;
-                }else {
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
                     return LEFT_MSG_IMG;
+                } else {
+                    return RIGHT_MSG_IMG;
                 }
-            } else if (model.getId() != Integer.valueOf(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))){
+            } else if (model.getId() == Integer.valueOf(
+                    AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
                 return RIGHT_MSG;
-            }else{
+            } else {
                 return LEFT_MSG;
             }
         }
@@ -525,14 +641,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 txtMessage.setText(message);
             }
 
-            public void setProfilePhoto(String urlPhotoUser) {
+            public void setProfilePhoto(final String urlPhotoUser) {
                 if (profilePhoto == null) return;
-                Glide.with(profilePhoto.getContext()).load(urlPhotoUser).centerCrop().transform(new CircleTransform(profilePhoto.getContext())).override(40, 40).into(profilePhoto);
+                Glide.with(profilePhoto.getContext()).load(imageUrl).centerCrop()
+                        .transform(new CircleTransform(profilePhoto.getContext())).override(60, 60)
+                        .into(profilePhoto);
             }
 
-            public  String getDate(String createdAt) {
+            public String getDate(String createdAt) {
                 // Create a DateFormatter object for displaying date in specified format.
-                SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
+                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
                 formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));
                 Date date = null;
                 try {
@@ -545,16 +663,26 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             public void setTvTimestamp(String timestamp) {
                 if (tvTimestamp == null) return;
-                Log.i("TAG", getDate(timestamp));
                 tvTimestamp.setText(converteTimestamp(getDate(timestamp)));
             }
 
             public void setPicInChat(String url) {
                 if (picInChat == null) return;
                 Glide.with(picInChat.getContext()).load(url)
-                        .override(100, 100)
-                        .fitCenter()
+                        .override(150, 150)
+                        .centerCrop()
                         .into(picInChat);
+                picInChat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.i("TAG", "click");
+                        int position = getAdapterPosition();
+                        ChatModel model = modelArrayList.get(position);
+                        Intent intent = new Intent(getApplicationContext(), FullscreenImageView.class);
+                        intent.putExtra("url", model.getImageUrl());
+                        startActivity(intent);
+                    }
+                });
             }
 
         }

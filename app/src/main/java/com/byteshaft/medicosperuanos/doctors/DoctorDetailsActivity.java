@@ -1,8 +1,6 @@
 package com.byteshaft.medicosperuanos.doctors;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -74,6 +72,10 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     private static DoctorDetailsActivity sInstance;
     private ProgressBar progressBar;
     private String location;
+    private String name;
+    private boolean isAvailable_to_chat;
+    private String date;
+    private String nextUrl;
 
     public static DoctorDetailsActivity getInstance() {
         return sInstance;
@@ -88,15 +90,16 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         sInstance = this;
         reviewList = (ListView) findViewById(R.id.review_list);
         startTime = getIntent().getStringExtra("start_time");
-        final String name = getIntent().getStringExtra("name");
+        name = getIntent().getStringExtra("name");
         final String specialist = getIntent().getStringExtra("specialist");
         final float stars = getIntent().getFloatExtra("stars", 0);
         number = getIntent().getStringExtra("number");
         location = getIntent().getStringExtra("location");
         isBlocked = getIntent().getBooleanExtra("block", false);
         final String photo = getIntent().getStringExtra("photo");
-        final boolean availableForChat = getIntent().getBooleanExtra("available_to_chat", false);
+        isAvailable_to_chat = getIntent().getBooleanExtra("available_to_chat", false);
         id = getIntent().getIntExtra("user", -1);
+        date = getIntent().getStringExtra("date");
 
         doctorName = (TextView) findViewById(R.id.doctor_name);
         doctorName.setText(name);
@@ -137,10 +140,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), DoctorBookingActivity.class);
                 intent.putExtra("name", name);
+                intent.putExtra("date", date);
                 intent.putExtra("specialist", specialist);
                 intent.putExtra("stars", stars);
                 intent.putExtra("number", number);
-                intent.putExtra("available_to_chat", availableForChat);
+                intent.putExtra("available_to_chat", isAvailable_to_chat);
                 intent.putExtra("user", id);
                 intent.putExtra("photo", photo);
                 intent.putExtra("block", isBlocked);
@@ -149,7 +153,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 startActivity(intent);
             }
         });
-        if (!availableForChat) {
+        if (!isAvailable_to_chat) {
             status.setImageResource(R.mipmap.ic_offline_indicator);
         } else {
             status.setImageResource(R.mipmap.ic_online_indicator);
@@ -174,9 +178,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        String url = String.format("%sdoctors/%s/review",
-                AppGlobals.BASE_URL, id);
-        Log.i("TAG", "url" + url);
         request.open("GET", String.format("%sdoctors/%s/review",
                 AppGlobals.BASE_URL, id));
         request.setRequestHeader("Authorization", "Token " +
@@ -199,10 +200,11 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.review_all_button:
-                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
-                reviewDialog.setTitle("All Reviews");
-                reviewDialog.show();
-
+//                AllReviewDialog reviewDialog = new AllReviewDialog(DoctorDetailsActivity.this);
+//                reviewDialog.setTitle("All Reviews");
+//                reviewDialog.show();
+                reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList, arrayList.size());
+                reviewList.setAdapter(reviewAdapter);
                 break;
             case R.id.call_button:
                 if (ContextCompat.checkSelfPermission(this,
@@ -219,6 +221,8 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 Intent intent = new Intent(getApplicationContext(),
                         ConversationActivity.class);
                 intent.putExtra("id", id);
+                intent.putExtra("name", name);
+                intent.putExtra("status", isAvailable_to_chat);
                 startActivity(intent);
                 break;
             case R.id.heart_button:
@@ -311,10 +315,16 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", "review " + request.getResponseText());
                         arrayList = new ArrayList<>();
-                        reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
-                        reviewList.setAdapter(reviewAdapter);
+                        int size = 0;
                         try {
                             JSONArray jsonArray = new JSONArray(request.getResponseText());
+                            if (jsonArray.length() > 10) {
+                                size = 10;
+                            } else {
+                                size = jsonArray.length();
+                            }
+                            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList, size);
+                            reviewList.setAdapter(reviewAdapter);
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 Review review = new Review();
@@ -322,6 +332,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 review.setReviewText(jsonObject.getString("message"));
                                 review.setReviewStars(jsonObject.getInt("stars"));
                                 String currentTime = jsonObject.getString("created_at");
+                                review.setFullName(jsonObject.getString("patient_full_name"));
                                 Log.i("TAG", currentTime);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -355,10 +366,12 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
 
         private ViewHolder viewHolder;
         private ArrayList<Review> arrayList;
+        private int size = 0;
 
-        public ReviewAdapter(Context context, ArrayList<Review> arrayList) {
+        public ReviewAdapter(Context context, ArrayList<Review> arrayList, int size) {
             super(context, R.layout.delegate_dashboard);
             this.arrayList = arrayList;
+            this.size = size;
         }
 
         @NonNull
@@ -388,6 +401,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                 viewHolder.userComment.setText(output);
             }
             Log.i("TAG", "time " + review.getReviewTime());
+            viewHolder.userName.setText(review.getFullName());
             viewHolder.time.setText(timeConvert(review.getReviewTime()));
 
             return convertView;
@@ -405,13 +419,13 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             if (days > 0)
                 return days + " days ago";
             else if (days == 0 && hours > 0) return hours + " hours ago";
-            else if (days == 0 && hours == 0 && minutes > 0) return hours + " minutes ago";
+            else if (days == 0 && hours == 0 && minutes > 0) return minutes + " minutes ago";
             else return seconds + " seconds ago";
         }
 
         @Override
         public int getCount() {
-            return arrayList.size();
+            return size;
         }
     }
 
@@ -423,27 +437,27 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     }
 
 
-    private class AllReviewDialog extends Dialog {
-        private Button closeButton;
-
-        public AllReviewDialog(Activity activity) {
-            super(activity);
-        }
-
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.dialog_all_review);
-            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
-            reviewList = (ListView) findViewById(R.id.all_review_list);
-            closeButton = (Button) findViewById(R.id.close_dialog);
-            closeButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    dismiss();
-                }
-            });
-            reviewList.setAdapter(reviewAdapter);
-        }
-    }
+//    private class AllReviewDialog extends Dialog {
+//        private Button closeButton;
+//
+//        public AllReviewDialog(Activity activity) {
+//            super(activity);
+//        }
+//
+//        @Override
+//        protected void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//            setContentView(R.layout.dialog_all_review);
+//            reviewAdapter = new ReviewAdapter(getApplicationContext(), arrayList);
+//            reviewList = (ListView) findViewById(R.id.all_review_list);
+//            closeButton = (Button) findViewById(R.id.close_dialog);
+//            closeButton.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    dismiss();
+//                }
+//            });
+//            reviewList.setAdapter(reviewAdapter);
+//        }
+//    }
 }

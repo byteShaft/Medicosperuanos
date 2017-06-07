@@ -242,6 +242,12 @@ public class Services extends Fragment implements View.OnClickListener {
                 }
             }
         });
+        request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+                Helpers.dismissProgressDialog();
+            }
+        });
         request.open("POST", String.format("%sdoctor/services/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -315,8 +321,6 @@ public class Services extends Fragment implements View.OnClickListener {
                                         int doctorId = jsonObject.getInt("doctor");
                                         int serviceIdMain = jsonObject.getInt("id");
                                         boolean serviceState = jsonObject.getBoolean("is_active");
-
-
                                         JSONObject serviceObject = jsonObject.getJSONObject("service");
                                         int serviceId = serviceObject.getInt("id");
                                         for (com.byteshaft.medicosperuanos.gettersetter.Services service :

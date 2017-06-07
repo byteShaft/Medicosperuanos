@@ -52,4 +52,6 @@
     <color name="multiple_image_select_toolbarPrimaryText">#FFFFFF</color>
     <color name="multiple_image_select_albumTextBackground">#99FFFFFF</color>
     <color name="multiple_image_select_imageSelectBackground">#000000</color>
+    <color name="bright_blue">#33B5E5</color>
+    <color name="selection_background_color">#FEBB20</color>
 </resources>

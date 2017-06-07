@@ -69,6 +69,9 @@
         <activity
             android:name=".accountfragments.AccountManagerActivity"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity android:name=".directorychooser.DirectoryChooserActivity" />
+
         <activity
             android:name=".doctors.DoctorDetailsActivity"
             android:windowSoftInputMode="adjustResize" />

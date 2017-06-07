@@ -112,6 +112,7 @@
     <string name="time_slot_booked">Time Slot already Booked</string>
     <string name="sample_message">Sample Message</string>
     <string name="updating">Setting up profile</string>
+    <string name="updating_profile">Updating profile</string>
     <string name="updating_attention">Updating Attention</string>
     <string name="finishing_up">Finishing up</string>
     <string name="appointments">Appointments</string>
@@ -134,26 +135,39 @@
     <string name="review_failed">Review Submitted Failed !</string>
     <string name="review_submitted">Review Submitted!</string>
     <string name="review_submitted_successfully">You have reviewed successfully</string>
-    <string name="getting_doctor_list">fetching doctors list…</string>
+    <string name="getting_doctor_list">Getting doctors list…</string>
     <string name="getting_schedule">fetching schedule…</string>
     <string name="setting_up_schedule">setting up schedule…</string>
     <string name="updating_schedule">updating schedule…</string>
     <string name="getting_patients">fetching patients…</string>
     <string name="getting_favourite_doctors">fetching favourite doctor</string>
-    <string name="fetching_my_appointments">fetching…</string>
+    <string name="fetching_my_appointments">Getting appointments…</string>
     <string name="no_services">No Service</string>
     <string name="no_services_message">No Service set by this doctor</string>
     <string name="schedule_is_not_set_by_any_of_your_favorite_doctors">Schedule is not set by any of your favorite doctors</string>
     <string name="select_service">Select Required Service</string>
     <string name="accept_appointment_first">You must accept this appointment first…</string>
     <string name="network_unreachable">Network is unreachable</string>
-    <string name="already_taken">Cannot delete booked slot</string>
+    <string name="already_taken">Cannot remove booked slot</string>
     <string name="slot_deleted">slot deleted</string>
     <string name="cannot_reject_attended_appointment">cannot reject attended appointment</string>
     <string name="diagnostics">Select Diagnostics</string>
     <string name="medications">Select Medications</string>
     <string name="schedule_updated">Schedule Successfully updated</string>
     <string name="connection_time_out">Connection timeout</string>
+    <string name="connection_lost">Connection Lost</string>
+    <string name="getting_appointments">Getting appointments</string>
+    <string name="cancel_label">Cancel</string>
+    <string name="confirm_label">Confirm</string>
+    <string name="selected_folder_label">Selected folder:</string>
+    <string name="create_folder_label">Create folder</string>
+    <string name="create_folder_msg">Create new folder with name "%1$s"?</string>
+    <string name="create_folder_success">Created new folder</string>
+    <string name="create_folder_error_no_write_access">Cannot write to this folder</string>
+    <string name="create_folder_error_already_exists">Folder already exists</string>
+    <string name="create_folder_error">Could not create folder</string>
+    <string name="up_label">Up</string>
+    <string name="message_error">cannot send empty message</string>
 
 </resources>
 

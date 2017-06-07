@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -88,6 +89,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private ArrayList<DoctorDetails> searchList;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
     private static DoctorsList sInstance;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
+    private boolean foreground = false;
 
     public static DoctorsList getInstance() {
         return sInstance;
@@ -99,7 +103,16 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         sDoctorServices = new HashMap<>();
         locationsArrayList = new ArrayList<>();
         sInstance = this;
+        foreground = true;
         mBaseView = inflater.inflate(R.layout.search_doctor, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getDoctorList();
+            }
+        });
         mListView = (ListView) mBaseView.findViewById(R.id.doctors_list);
         noDoctor = (TextView) mBaseView.findViewById(R.id.no_doctor);
         searchContainer = new LinearLayout(getActivity());
@@ -206,7 +219,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         LinearLayout.LayoutParams clearParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         clearParams.gravity = Gravity.CENTER;
         // Add search view to toolbar and hide it
-        toolbar.addView(searchContainer);
 
         setHasOptionsMenu(true);
         mListView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -226,6 +238,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 DoctorDetails doctorDetails = doctors.get(i);
                 Intent intent = new Intent(getActivity(), DoctorDetailsActivity.class);
+                intent.putExtra("date", doctorDetails.getDate());
                 intent.putExtra("start_time", doctorDetails.getStartTime());
                 StringBuilder stringBuilder = new StringBuilder();
                 if (doctorDetails.getGender().equals("M")) {
@@ -255,11 +268,15 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onResume() {
         super.onResume();
+        toolbar.addView(searchContainer);
+        foreground = true;
         getDoctorList();
     }
 
     public void getDoctorList() {
-        Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_doctor_list));
+        if (!swipeRefresh && doctors.size() < 1) {
+            Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_doctor_list));
+        }
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -274,6 +291,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onPause() {
         super.onPause();
+        foreground = false;
         toolbar.removeView(searchContainer);
 
     }
@@ -352,19 +370,23 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                swipeRefresh = false;
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-//                        Log.i("TAG", "response " + request.getResponseText());
+                        swipeRefreshLayout.setRefreshing(false);
+                        Log.i("TAG", "response " + request.getResponseText());
                         if (request.getResponseText().trim().isEmpty()) {
                             return;
                         }
                         addedDates = new ArrayList<>();
                         showingPosition = new HashMap<>();
                         doctors = new ArrayList<>();
-                        customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
-                                R.layout.doctors_search_delagete, doctors);
-                        mListView.setAdapter(customAdapter);
+                        if (foreground) {
+                            customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                    R.layout.doctors_search_delagete, doctors);
+                            mListView.setAdapter(customAdapter);
+                        }
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
@@ -399,9 +421,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                     Log.i("TAG", "size " + doctors.size());
                                     doctors.add(doctorDetails);
-                                    customAdapter.notifyDataSetChanged();
+                                    if (foreground) {
+                                        customAdapter.notifyDataSetChanged();
+                                    }
                                     JSONArray services = doctorDetail.getJSONArray("services");
-                                    Log.i("TAG", services.toString());
+                                    Log.i("TAG", "services"+ services.toString());
                                     if (services.length() > 0) {
                                         ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList = new ArrayList<>();
                                         for (int s = 0; s < services.length(); s++) {
@@ -450,6 +474,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
 //        if (exception.getLocalizedMessage())
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefresh = false;
         if (exception.getLocalizedMessage().equals("Network is unreachable")) {
             Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
         }
@@ -562,7 +588,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 public void onClick(View view) {
                     Intent intent = new Intent(getActivity().getApplicationContext(),
                             ConversationActivity.class);
-                    intent.putExtra("id", singleDoctor.getId());
+                    intent.putExtra("id", singleDoctor.getUserId());
+                    intent.putExtra("name", singleDoctor.getFirstName() + " " + singleDoctor.getLastName());
+                    intent.putExtra("status", singleDoctor.isAvailableToChat());
                     startActivity(intent);
                 }
             });

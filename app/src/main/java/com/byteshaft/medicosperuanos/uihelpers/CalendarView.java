@@ -172,13 +172,18 @@ public class CalendarView extends LinearLayout {
      * Display dates correctly in hori
      */
     public void updateCalendar() {
-        updateCalendar(null);
+        updateCalendar(null, null);
+    }
+
+    public void updateCalendar(Date date) {
+        selectedDate = date;
+        updateCalendar(null, null);
     }
 
     /**
      * Display dates correctly in hori
      */
-    public void updateCalendar(HashSet<Date> events) {
+    public void updateCalendar(HashSet<Date> events, Date date) {
         ArrayList<Date> cells = new ArrayList<>();
 //        ArrayList<String> weekDay = new ArrayList<>();
         Calendar calendar = (Calendar) currentDate.clone();

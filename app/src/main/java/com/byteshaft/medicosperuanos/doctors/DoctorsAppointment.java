@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -42,6 +41,8 @@ import android.widget.TimePicker;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.ViewHolder;
+import com.byteshaft.medicosperuanos.directorychooser.DirectoryChooserActivity;
+import com.byteshaft.medicosperuanos.directorychooser.DirectoryChooserConfig;
 import com.byteshaft.medicosperuanos.gettersetter.DiagnosticMedication;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.gettersetter.Targets;
@@ -73,6 +74,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class DoctorsAppointment extends AppCompatActivity implements View.OnClickListener,
@@ -116,6 +118,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     private ArrayList<DiagnosticMedication> selectedDiagnosticsList;
     private ArrayList<DiagnosticMedication> selectedMedicationList;
+    private HashMap<Integer, DiagnosticMedication> selectedDiagnosticsHashMap;
+    private HashMap<Integer, DiagnosticMedication> selectedMedicationsHashMap;
     private HashMap<Integer, Integer> selectedDiagnostic;
     private HashMap<Integer, Integer> selectedMedication;
     private ArrayList<Targets> targetsArrayList;
@@ -169,8 +173,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_doctors_appointment);
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar);
-        getDiagnostic();
-        getMedications();
+
         view = (View) findViewById(R.id.layout_for_name);
         mFname = getIntent().getStringExtra("first_name");
         mLname = getIntent().getStringExtra("last_name");
@@ -178,8 +181,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
+        Log.i("TAG", "id " + id);
         position = getIntent().getIntExtra("position", -1);
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
+
+        getAppointmentDetails();
+//        getDiagnostic();
+//        getMedications();
 
         providedServicesIds = new ArrayList<>();
         removedImages = new ArrayList<>();
@@ -190,6 +198,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         selectedMedicationList = new ArrayList<>();
         selectedDiagnostic = new HashMap<>();
         selectedMedication = new HashMap<>();
+        selectedDiagnosticsHashMap = new HashMap<>();
+        selectedMedicationsHashMap = new HashMap<>();
         imagesArray = new ArrayList<>();
         photosHashMap = new HashMap<>();
 
@@ -255,10 +265,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
                     }
                 }, calendar.get(Calendar.HOUR), calendar.get(Calendar.MINUTE), false);
-        diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
-        mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
-        medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
-        mMedicationSpinner.setAdapter(medicationSpinnerAdapter);
 
         mMedicationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -316,10 +322,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
 
         }
-
-
     }
-
 
     @Override
     protected void onResume() {
@@ -351,7 +354,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 startActivity(new Intent(this, SelectedImages.class));
                 break;
             case R.id.take_screenshot:
-                takeScreenshot();
+                final Intent chooserIntent = new Intent(this, DirectoryChooserActivity.class);
+
+                final DirectoryChooserConfig config = DirectoryChooserConfig.builder()
+                        .newDirectoryName(getResources().getString(R.string.app_name))
+                        .allowReadOnlyDirectory(true)
+                        .allowNewDirectoryNameModification(true)
+                        .build();
+
+                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_CONFIG, config);
+
+                startActivityForResult(chooserIntent, 10);
                 break;
             case R.id.attach_icon:
                 Intent intent = new Intent(this, AlbumSelectActivity.class);
@@ -361,13 +374,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 }
                 intent.putExtra(Constants.INTENT_EXTRA_LIMIT, limit);
                 startActivityForResult(intent, Constants.REQUEST_CODE);
-//                ImageToPdf();
-//                Intent intent = new Intent(DoctorsAppointment.this, ImagesSelectorActivity.class);
-//                intent.putExtra(SelectorSettings.SELECTOR_MAX_IMAGE_NUMBER, 5);
-//                intent.putExtra(SelectorSettings.SELECTOR_MIN_IMAGE_SIZE, 100000);
-//                intent.putExtra(SelectorSettings.SELECTOR_SHOW_CAMERA, false);
-//                intent.putStringArrayListExtra(SelectorSettings.SELECTOR_INITIAL_SELECTED_LIST, imagesArray);
-//                startActivityForResult(intent, REQUEST_CODE);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -385,14 +391,24 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
 
         }
+        if (requestCode == 10) {
+            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
+                Log.i("TAG", "selected " + data
+                        .getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR));
+                String selectedFolder = data
+                        .getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+                takeScreenshot(selectedFolder);
+            } else {
+                // Nothing selected
+            }
+        }
     }
 
-
-    private void takeScreenshot() {
+    private void takeScreenshot(String folder) {
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
         try {
-            mPath = Environment.getExternalStorageDirectory().toString() + "/" + now + ".jpg";
+            mPath = folder + "/" + now + ".jpg";
             View v1 = getWindow().getDecorView().getRootView();
             v1.setDrawingCacheEnabled(true);
             Bitmap bitmap = Bitmap.createBitmap(v1.getDrawingCache());
@@ -510,13 +526,15 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             mExplanationEditText.setError(null);
         }
         
-//        if (diagnosticsList.size() < 1) {
-//            Helpers.showSnackBar(findViewById(android.R.id.content), "Select diagnostic");
-//        }
-//
-//        if (medicationList.size() < 1) {
-//            Helpers.showSnackBar(findViewById(android.R.id.content), "Select medication");
-//        }
+        if (selectedDiagnosticsList.size() < 1) {
+            Helpers.showSnackBar(findViewById(android.R.id.content), "Select diagnostic");
+            valid = false;
+        }
+
+        if (selectedMedicationList.size() < 1) {
+            Helpers.showSnackBar(findViewById(android.R.id.content), "Select medication");
+            valid = false;
+        }
 
         return valid;
     }
@@ -538,12 +556,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 if (!request.getResponseText().trim().isEmpty()) {
+                                    diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+                                    mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
+                                    medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
+                                    mMedicationSpinner.setAdapter(medicationSpinnerAdapter);
                                     try {
                                         JSONObject jsonObject = new JSONObject(request.getResponseText());
                                         updateId = jsonObject.getInt("id");
                                         JSONObject destinationObject = jsonObject.getJSONObject("destination");
                                         selectedTargetId = destinationObject.getInt("id");
                                         JSONArray jsonArray = jsonObject.getJSONArray("diagnostics");
+                                        Log.i("TAG", "diagnostics" +jsonArray.toString());
                                         JSONArray providedServicesArray = jsonObject.getJSONArray("services_provided");
                                         for (int i = 0; i < providedServicesArray.length(); i++) {
                                             JSONObject serviceObject = providedServicesArray.getJSONObject(i);
@@ -560,8 +583,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                                     CheckBox checkbox = (CheckBox) view;
                                                     checkbox.setChecked(true);
                                                 }
-
-                                            //do something with your child element
                                         }
 
                                         for (int i = 0; i < jsonArray.length(); i++) {
@@ -572,6 +593,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             diagnosticMedication.setDiagnosticMedication(diagnosticObject
                                                     .getString("name"));
                                             selectedDiagnosticsList.add(diagnosticMedication);
+                                            diagnosticsList.add(diagnosticMedication);
                                         }
                                         JSONObject appointmentObject = jsonObject.getJSONObject("appointment");
                                         JSONArray services = appointmentObject.getJSONArray("services");
@@ -627,6 +649,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         mConclusionsEditText.setText(conclusion);
                                         mReturnDateEditText.setText(dateOfReturn);
                                         JSONArray treatmentsArray = jsonObject.getJSONArray("treatments");
+                                        Log.i("TAG", "treatments" +jsonArray.toString());
                                         for (int i = 0; i < treatmentsArray.length(); i++) {
                                             JSONObject treatment = treatmentsArray.getJSONObject(i);
                                             DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
@@ -635,12 +658,15 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             diagnosticMedication.setId(treatmentDetail.getInt("id"));
                                             diagnosticMedication.setDiagnosticMedication(treatmentDetail.getString("name"));
                                             selectedMedicationList.add(diagnosticMedication);
+                                            medicationList.add(diagnosticMedication);
                                         }
                                         for (int k = 0; k < diagnosticsList.size(); k++) {
                                             DiagnosticMedication diagnosticMedication =
                                                     diagnosticsList.get(k);
                                             for (DiagnosticMedication diagnosticMedication1 : selectedDiagnosticsList) {
                                                 if (diagnosticMedication.getId() == diagnosticMedication1.getId()) {
+                                                    selectedDiagnosticsHashMap.put(diagnosticMedication.getId(),
+                                                            diagnosticMedication);
                                                     selectedDiagnostic.put(k, diagnosticMedication.getId());
                                                 }
                                             }
@@ -652,6 +678,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             for (DiagnosticMedication diagnosticMedication1 : selectedMedicationList) {
                                                 if (diagnosticMedication.getId() == diagnosticMedication1.getId()) {
                                                     selectedMedication.put(o, diagnosticMedication.getId());
+                                                    selectedMedicationsHashMap.put(diagnosticMedication.getId(),
+                                                            diagnosticMedication);
+                                                    diagnosticMedication.setQuantity(diagnosticMedication1.getQuantity());
                                                 }
                                             }
                                         }
@@ -661,9 +690,16 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     method = "PUT";
                                     saveButton.setText("Update");
                                 }
+                                medicationSpinnerAdapter.notifyDataSetChanged();
+                                diagnosticSpinnerAdapter.notifyDataSetChanged();
+                                mDiagnosticsSpinner.setSelection(0);
+                                mMedicationSpinner.setSelection(0);
+                                getMedications();
+                                getDiagnostic();
                                 break;
                             case HttpURLConnection.HTTP_NOT_FOUND:
-                                System.out.println("rana" + request.getResponseText());
+                                getMedications();
+                                getDiagnostic();
                         }
                 }
             }
@@ -671,7 +707,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         appointmentDetails.setOnErrorListener(new HttpRequest.OnErrorListener() {
             @Override
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-                exception.printStackTrace();
+                getDiagnostic();
+                getMedications();
             }
         });
         String url = String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, id);
@@ -805,7 +842,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Log.i("TAG", request.getResponseURL());
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        alertDialog.dismiss();
+                        if (alertDialog != null) {
+                            alertDialog.dismiss();
+                        }
                         Log.i("TAG", request.getResponseText());
                         Appointments.getInstance().updateAppointmentStatus(AppGlobals.ATTENDED, id, position);
                         finish();
@@ -916,9 +955,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         final Dialog dialog = new Dialog(DoctorsAppointment.this);
         dialog.setContentView(R.layout.medication_diagnostics_search_list);
         int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.95);
-        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.70);
+        int height = (int) (getResources().getDisplayMetrics().heightPixels * 0.90);
         dialog.getWindow().setLayout(width, height);
-        dialog.setCancelable(true);
+        dialog.setCancelable(false);
         dialog.setTitle(dialogTitle);
         EditText searchEditText = (EditText) dialog.findViewById(R.id.search_edit_text);
         searchEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -996,13 +1035,27 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
-                medicationSpinnerAdapter.notifyDataSetChanged();
-                diagnosticSpinnerAdapter.notifyDataSetChanged();
-                mDiagnosticsSpinner.setSelection(0);
-                mMedicationSpinner.setSelection(0);
+                for (Map.Entry entry : selectedDiagnosticsHashMap.entrySet()) {
+                    System.out.println(entry.getKey() + ", " + entry.getValue());
+                    selectedDiagnosticsList.add((DiagnosticMedication) entry.getValue());
+                    diagnosticSpinnerAdapter.notifyDataSetChanged();
+                    mDiagnosticsSpinner.setSelection(0);
+                }
+                for (Map.Entry entry : selectedMedicationsHashMap.entrySet()) {
+                    System.out.println(entry.getKey() + ", " + entry.getValue());
+                    selectedMedicationList.add((DiagnosticMedication) entry.getValue());
+                    medicationSpinnerAdapter.notifyDataSetChanged();
+                    mMedicationSpinner.setSelection(0);
+                }
             }
         });
         dialog.show();
+        selectedDiagnosticsList = new ArrayList<>();
+        selectedMedicationList = new ArrayList<>();
+        diagnosticSpinnerAdapter = new DiagnosticSpinnerAdapter(selectedDiagnosticsList);
+        mDiagnosticsSpinner.setAdapter(diagnosticSpinnerAdapter);
+        medicationSpinnerAdapter = new MedicationSpinnerAdapter(selectedMedicationList);
+        mMedicationSpinner.setAdapter(medicationSpinnerAdapter);
     }
 
 
@@ -1019,17 +1072,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     JSONObject diagnosticsObject = new JSONObject(request.getResponseText());
                                     JSONArray diagnosticsArray = diagnosticsObject.getJSONArray("results");
                                     System.out.println("new List view" + " " + diagnosticsArray);
+                                    ArrayList<Integer> arrayList = new ArrayList<Integer>();
+                                    for (DiagnosticMedication diagnosticMedications: diagnosticsList) {
+                                        arrayList.add(diagnosticMedications.getId());
+                                    }
                                     for (int i = 0; i < diagnosticsArray.length(); i++) {
                                         JSONObject jsonObject = diagnosticsArray.getJSONObject(i);
-                                        DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
-                                        diagnosticMedication.setId(jsonObject.getInt("id"));
-                                        diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
-                                        diagnosticsList.add(diagnosticMedication);
+                                        if (!arrayList.contains(jsonObject.getInt("id"))) {
+                                            DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
+                                            diagnosticMedication.setId(jsonObject.getInt("id"));
+                                            diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            diagnosticsList.add(diagnosticMedication);
+                                        }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                         }
                 }
             }
@@ -1052,17 +1110,22 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     JSONObject treatmentsObject = new JSONObject(request.getResponseText());
                                     JSONArray treatmentsArray = treatmentsObject.getJSONArray("results");
                                     System.out.println(treatmentsArray + "treatment");
+                                    ArrayList<Integer> arrayList = new ArrayList<Integer>();
+                                    for (DiagnosticMedication diagnosticMedications: medicationList) {
+                                        arrayList.add(diagnosticMedications.getId());
+                                    }
                                     for (int i = 0; i < treatmentsArray.length(); i++) {
                                         JSONObject jsonObject = treatmentsArray.getJSONObject(i);
-                                        DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
-                                        diagnosticMedication.setId(jsonObject.getInt("id"));
-                                        diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
-                                        medicationList.add(diagnosticMedication);
+                                        if (!arrayList.contains(jsonObject.getInt("id"))) {
+                                            DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
+                                            diagnosticMedication.setId(jsonObject.getInt("id"));
+                                            diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            medicationList.add(diagnosticMedication);
+                                        }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                getAppointmentDetails();
 
                         }
                 }
@@ -1083,7 +1146,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             this.diagnosticMedications = diagnosticMedications;
         }
 
-        @NonNull
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
@@ -1110,10 +1172,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     if (checkBoxView != null) {
                         if (b) {
                             selectedDiagnostic.put(position, diagnostic.getId());
-                            selectedDiagnosticsList.add(diagnostic);
+                            selectedDiagnosticsHashMap.put(diagnostic.getId(), diagnostic);
                         } else {
+                            Log.i("TAG", diagnostic.getDiagnosticMedication());
                             selectedDiagnostic.remove(position);
-                            selectedDiagnosticsList.remove(diagnostic);
+                            selectedDiagnosticsHashMap.remove(diagnostic.getId());
+                            Log.i("TAG", diagnostic.getDiagnosticMedication());
                         }
                     }
                 }
@@ -1155,7 +1219,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
         public MedicationAdapter(Context context,
                                  ArrayList<DiagnosticMedication> diagnosticMedications) {
-            super(context, R.layout.delegate_diagnostic);
+            super(context, R.layout.delegate_medication);
             this.diagnosticMedications = diagnosticMedications;
         }
 
@@ -1181,11 +1245,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             final DiagnosticMedication diagnostic = diagnosticMedications.get(position);
             viewHolder.diagnosticListTextView.setText(diagnostic.getDiagnosticMedication());
             viewHolder.idTextView.setText(String.valueOf(diagnostic.getId()));
-            if (selectedMedication.containsKey(position)) {
-                viewHolder.checkBox.setChecked(true);
-            } else {
-                viewHolder.checkBox.setChecked(false);
-            }
             viewHolder.quantity.setText(String.valueOf(diagnostic.getQuantity()));
             viewHolder.add.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1212,14 +1271,21 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     if (checkBoxView != null) {
                         if (b) {
                             selectedMedication.put(position, diagnostic.getId());
-                            selectedMedicationList.add(diagnostic);
+//                            selectedMedicationList.add(diagnostic);
+                            selectedMedicationsHashMap.put(diagnostic.getId(), diagnostic);
                         } else {
                             selectedMedication.remove(position);
-                            selectedMedicationList.remove(diagnostic);
+//                            selectedMedicationList.remove(diagnostic);
+                            selectedMedicationsHashMap.remove(diagnostic.getId());
                         }
                     }
                 }
             });
+            if (selectedMedication.containsKey(position)) {
+                viewHolder.checkBox.setChecked(true);
+            } else {
+                viewHolder.checkBox.setChecked(false);
+            }
             return convertView;
         }
 
@@ -1245,7 +1311,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             ImageButton minus;
             ImageButton add;
             TextView quantity;
-
         }
     }
 
@@ -1287,6 +1352,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
             viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
             viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
+            Log.i("TAG", "called");
             return view;
         }
 
@@ -1335,6 +1401,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             DiagnosticMedication diagnosticMedication = diagnosticMedicationArrayList.get(i);
             viewHolder.id.setText(String.valueOf(diagnosticMedication.getId()));
             viewHolder.textView.setText(diagnosticMedication.getDiagnosticMedication());
+            Log.i("TAG", "called");
             return view;
         }
 

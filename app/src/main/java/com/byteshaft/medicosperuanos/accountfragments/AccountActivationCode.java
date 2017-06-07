@@ -18,6 +18,7 @@ import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -168,6 +169,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
                         Toast.makeText(getActivity(), "Please enter correct account Verification code", Toast.LENGTH_LONG).show();
                         break;
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             System.out.println( "data" + jsonObject);
@@ -185,6 +187,7 @@ public class AccountActivationCode extends Fragment implements View.OnClickListe
                             }
                             AppGlobals.loginState(true);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
+                            FirebaseMessaging.getInstance().subscribeToTopic(String.format("doctor-activate-%s", userId));
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_TOKEN, token);
                             Log.i("token", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
                             FragmentManager fragmentManager = getFragmentManager();

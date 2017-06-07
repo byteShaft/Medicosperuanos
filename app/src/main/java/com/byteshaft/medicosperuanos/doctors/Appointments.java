@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -59,6 +60,9 @@ public class Appointments extends Fragment implements
     private Button pendingAppointments;
     private Button attendedAppointments;
     private Button totalAppointments;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean swipeRefresh = false;
+    private String agendaDate;
 
     public static Appointments getInstance() {
         return sInstance;
@@ -67,6 +71,14 @@ public class Appointments extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.appointments, container, false);
+        swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefresh = true;
+                getAgendaList(agendaDate);
+            }
+        });
         sInstance = this;
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.appointments));
@@ -76,12 +88,12 @@ public class Appointments extends Fragment implements
         com.byteshaft.medicosperuanos.uihelpers.CalendarView calendarView = (
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
-        calendarView.updateCalendar(events);
-        TextView dateTextview = (TextView) calendarView.findViewById(R.id.calendar_date_display);
-        dateTextview.setTextColor(getResources().getColor(R.color.header_background));
+//        calendarView.updateCalendar(events);
+        TextView dateTextView = (TextView) calendarView.findViewById(R.id.calendar_date_display);
+        dateTextView.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
-        Helpers.showProgressDialog(getActivity(), "Please wait...");
-        getAgendaList(Helpers.getDate());
+        agendaDate = Helpers.getDate();
+        getAgendaList(agendaDate);
         confirmaedAppointments = (Button) mBaseView.findViewById(R.id.confirmed_appointments);
         pendingAppointments = (Button) mBaseView.findViewById(R.id.to_be_confirmed_appointments);
         attendedAppointments = (Button) mBaseView.findViewById(R.id.attended_appointments);
@@ -101,9 +113,10 @@ public class Appointments extends Fragment implements
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Helpers.showProgressDialog(getActivity(), "Please wait...");
-                agendaArrayList.clear();
-                String agendaDate = dateFormat.format(formattedDate);
+                agendaArrayList = new ArrayList<Agenda>();
+                arrayAdapter = new Adapter(getActivity(), agendaArrayList);
+                mListView.setAdapter(arrayAdapter);
+                agendaDate = dateFormat.format(formattedDate);
                 getAgendaList(agendaDate);
             }
         });
@@ -167,6 +180,9 @@ public class Appointments extends Fragment implements
     }
 
     private void getAgendaList(String date) {
+        if (!swipeRefresh && agendaArrayList.size() < 1) {
+            Helpers.showProgressDialog(getActivity(), getResources().getString(R.string.getting_appointments));
+        }
         request = new HttpRequest(getActivity());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -244,7 +260,6 @@ public class Appointments extends Fragment implements
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-
                         }
                 }
             }
@@ -256,7 +271,7 @@ public class Appointments extends Fragment implements
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
@@ -265,7 +280,7 @@ public class Appointments extends Fragment implements
                 switch (index) {
                     // close
                     case 0:
-                        if(agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
+                        if (agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
                             Helpers.showSnackBar(getView(), getResources().getString(R.string.cannot_reject_attended_appointment));
                             return false;
                         }
@@ -293,9 +308,14 @@ public class Appointments extends Fragment implements
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                swipeRefreshLayout.setRefreshing(false);
+                swipeRefresh = false;
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        agendaArrayList = new ArrayList<>();
+                        arrayAdapter = new Adapter(getActivity(), agendaArrayList);
+                        mListView.setAdapter(arrayAdapter);
                         Log.i("agenda List ", request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
@@ -338,12 +358,7 @@ public class Appointments extends Fragment implements
                                 }
                                 agenda.setPatientServices(servicesArrayList);
                                 agendaArrayList.add(agenda);
-                                if (arrayAdapter == null) {
-                                    arrayAdapter = new Adapter(getActivity(), agendaArrayList);
-                                    mListView.setAdapter(arrayAdapter);
-                                } else {
-                                    arrayAdapter.notifyDataSetChanged();
-                                }
+                                arrayAdapter.notifyDataSetChanged();
 
                             }
                         } catch (JSONException e) {
@@ -356,6 +371,8 @@ public class Appointments extends Fragment implements
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         Helpers.dismissProgressDialog();
+        swipeRefresh = false;
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private class Adapter extends ArrayAdapter {
