@@ -120,12 +120,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getSupportActionBar().setCustomView(v);
         setContentView(R.layout.activity_conversation);
         foreground = true;
+        id = getIntent().getIntExtra("id", -1);
         if (getIntent().getExtras() != null) {
             if (getIntent().getExtras().getBoolean("notification")) {
                 getMessageText(getIntent(), getIntent().getIntExtra("sender_id", -1));
+                id = getIntent().getIntExtra("sender_id", -1);
             }
         }
-        id = getIntent().getIntExtra("id", -1);
         status = getIntent().getBooleanExtra("status", false);
         imageUrl = getIntent().getStringExtra("image_url");
         this.name = getIntent().getStringExtra("name");
@@ -212,9 +213,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_CREATED:
                                 imageUrl = null;
-                                cameraButton.setBackgroundResource(R.mipmap.camera);
-                                cameraButton.setBackground(null);
-                                cameraButton.setBackgroundResource(R.mipmap.camera);
+                                cameraButton.setImageBitmap(null);
                                 NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
                                 notificationManager.cancel(202);
                                 JSONObject singleMessage;
@@ -331,6 +330,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     public void onReadyStateChange(HttpRequest httpRequest, int i) {
         switch (i) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", httpRequest.getResponseURL());
                 Helpers.dismissProgressDialog();
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
@@ -340,7 +340,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             if (!jsonObject.isNull("next")) {
                                 nextUrl = jsonObject.getString("next")
                                         .replace("http://localhost/api/", AppGlobals.BASE_URL);
-                                getNextMessages(nextUrl);
+//                                getNextMessages(nextUrl);
                             }
                             if (!jsonObject.isNull("previous")) {
                                 previousUrl = jsonObject.getString("previous");
@@ -348,7 +348,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
                             int length = jsonArray.length()-1;
                             for(int j = length; j >= 0; j--) {
-                                Log.i("TAG", "looper running " + j);
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
                                 chatModel.setPatientId(singleMessage.getInt("patient"));
@@ -659,21 +658,19 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                Log.i("TAG", "milliseconds "+ date.getTime());
                 return String.valueOf(date.getTime());
             }
 
             public void setTvTimestamp(String timestamp) {
                 if (tvTimestamp == null) return;
-                Log.i("TAG", timestamp);
                 tvTimestamp.setText(converteTimestamp(getDate(timestamp)));
             }
 
             public void setPicInChat(String url) {
                 if (picInChat == null) return;
                 Glide.with(picInChat.getContext()).load(url)
-                        .override(100, 100)
-                        .fitCenter()
+                        .override(150, 150)
+                        .centerCrop()
                         .into(picInChat);
                 picInChat.setOnClickListener(new View.OnClickListener() {
                     @Override
