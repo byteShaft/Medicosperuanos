@@ -309,6 +309,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", "review " + request.getResponseURL());
                 progressBar.setVisibility(View.GONE);
                 reviewList.setVisibility(View.VISIBLE);
                 switch (request.getStatus()) {

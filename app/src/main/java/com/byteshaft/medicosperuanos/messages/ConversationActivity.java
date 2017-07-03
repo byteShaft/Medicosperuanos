@@ -93,6 +93,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private String name;
     private static ConversationActivity sInstance;
     private String imageUrl;
+    private String photoUrl;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -128,7 +129,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             }
         }
         status = getIntent().getBooleanExtra("status", false);
-        imageUrl = getIntent().getStringExtra("image_url");
+        photoUrl = getIntent().getStringExtra("image_url");
+        Log.i("TAG", "image url " + imageUrl);
         this.name = getIntent().getStringExtra("name");
         userName.setText(name);
         status = getIntent().getBooleanExtra("status", false);

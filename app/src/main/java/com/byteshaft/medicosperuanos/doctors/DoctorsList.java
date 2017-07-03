@@ -396,7 +396,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                 JSONArray doctorList = mainJsonObject.getJSONArray("doctors");
                                 for (int j = 0; j < doctorList.length(); j++) {
                                     JSONObject doctorDetail = doctorList.getJSONObject(j);
-                                    Log.i("TAG", "list " + doctorDetail);
                                     DoctorDetails doctorDetails = new DoctorDetails();
                                     doctorDetails.setDate(date);
                                     JSONObject speciality = doctorDetail.getJSONObject("speciality");
@@ -425,7 +424,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                         customAdapter.notifyDataSetChanged();
                                     }
                                     JSONArray services = doctorDetail.getJSONArray("services");
-                                    Log.i("TAG", "services"+ services.toString());
                                     if (services.length() > 0) {
                                         ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList = new ArrayList<>();
                                         for (int s = 0; s < services.length(); s++) {

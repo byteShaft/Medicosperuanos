@@ -63,12 +63,14 @@ public class Helpers {
     }
 
     public static void showProgressDialog(Activity activity, String message) {
-        progressDialog = new ProgressDialog(activity);
-        progressDialog.setMessage(message);
-        progressDialog.setCancelable(false);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(activity);
+            progressDialog.setMessage(message);
+            progressDialog.setCancelable(false);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
     }
 
     public static void dismissProgressDialog() {

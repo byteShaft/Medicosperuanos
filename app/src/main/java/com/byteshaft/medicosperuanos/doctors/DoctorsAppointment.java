@@ -543,7 +543,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
         mReturnDateEditText.setText(i2 + "/" + (i1 + 1) + "/" + i);
         System.out.println(i2 + "/" + (i1 + 1) + "/" + i);
-
     }
 
     private void getAppointmentDetails() {
