@@ -11,7 +11,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -56,13 +58,16 @@ public class Appointments extends Fragment implements
     private ArrayList<Agenda> agendaArrayList;
     private Adapter arrayAdapter;
     private static Appointments sInstance;
-    private Button confirmaedAppointments;
+    private Button confirmedAppointments;
     private Button pendingAppointments;
     private Button attendedAppointments;
     private Button totalAppointments;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean swipeRefresh = false;
     private String agendaDate;
+    private float x1,x2;
+    static final int MIN_DISTANCE = 150;
+    private GestureDetector gestureDetector;
 
     public static Appointments getInstance() {
         return sInstance;
@@ -94,7 +99,7 @@ public class Appointments extends Fragment implements
         agendaArrayList = new ArrayList<>();
         agendaDate = Helpers.getDate();
         getAgendaList(agendaDate);
-        confirmaedAppointments = (Button) mBaseView.findViewById(R.id.confirmed_appointments);
+        confirmedAppointments = (Button) mBaseView.findViewById(R.id.confirmed_appointments);
         pendingAppointments = (Button) mBaseView.findViewById(R.id.to_be_confirmed_appointments);
         attendedAppointments = (Button) mBaseView.findViewById(R.id.attended_appointments);
         totalAppointments = (Button) mBaseView.findViewById(R.id.total_appointments_today);
@@ -156,6 +161,26 @@ public class Appointments extends Fragment implements
         // set creator
         mListView.setMenuCreator(creator);
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
+        mListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.i("TAG", String.valueOf(motionEvent.getAction()));
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        swipeRefreshLayout.setEnabled(false);
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        x2 = motionEvent.getX();
+                        float deltaX = x2 - x1;
+                        if (Math.abs(deltaX) > MIN_DISTANCE) {
+                        } else {
+                            // consider as something else - a screen tap for example
+                        }
+                        return false;
+                    default: gestureDetector.onTouchEvent(motionEvent); return false;
+                }
+            }
+        });
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -174,6 +199,45 @@ public class Appointments extends Fragment implements
                 intent.putExtra("services", agenda.getPatientServices());
                 intent.putExtra("position", i);
                 startActivity(intent);
+            }
+        });
+        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                if (v1 > 0){
+                    // you are going up
+                    Log.i("TAG", "scroll up");
+                } else {
+                    // you are going down
+                    Log.i("TAG", "scroll down");
+                    swipeRefreshLayout.setEnabled(true);
+                }
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                return false;
             }
         });
         return mBaseView;
@@ -205,6 +269,7 @@ public class Appointments extends Fragment implements
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
             public void onReadyStateChange(HttpRequest request, int readyState) {
+                Log.i("TAG", request.getResponseURL());
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
                         Helpers.dismissProgressDialog();
@@ -249,7 +314,7 @@ public class Appointments extends Fragment implements
                             case HttpURLConnection.HTTP_OK:
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
-                                    confirmaedAppointments.setText(String.valueOf(dashBoardValues
+                                    confirmedAppointments.setText(String.valueOf(dashBoardValues
                                             .getString("appointments_confirmed")));
                                     pendingAppointments.setText(String.valueOf(dashBoardValues
                                             .getInt("appointments_to_be_confirmed")));

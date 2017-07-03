@@ -285,6 +285,9 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        appointments = new ArrayList<>();
+                        patientAppointmentAdapter = new Adapter(getContext(), appointments);
+                        appointmentList.setAdapter(patientAppointmentAdapter);
                         Log.i("TAG", "patient appointments " + request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());

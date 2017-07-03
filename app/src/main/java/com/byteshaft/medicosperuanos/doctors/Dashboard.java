@@ -148,6 +148,7 @@ public class Dashboard extends Fragment {
                         swipeRefresh = false;
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                Log.i("TAG", "res "+ request.getResponseText());
                                 try {
                                     dashBoardValues = new JSONObject(request.getResponseText());
                                 } catch (JSONException e) {

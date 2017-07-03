@@ -1,9 +1,6 @@
 package com.byteshaft.medicosperuanos.messages;
 
 
-/**
- * Created by Alessandro Barreto on 17/06/2016.
- */
 public class ChatModel {
 
     private int id;
