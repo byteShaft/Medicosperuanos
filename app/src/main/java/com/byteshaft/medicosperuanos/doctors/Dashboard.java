@@ -23,6 +23,7 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +44,7 @@ public class Dashboard extends Fragment {
     private BarChart mChart;
     private ListView list;
     private ArrayList<String> dashBoardItems = new ArrayList<>();
+    private ArrayList<BarEntry> incomeArrayList;
     private JSONObject dashBoardValues;
     private boolean foreground = false;
     private DashboardAdapter dashboardAdapter;
@@ -75,38 +77,11 @@ public class Dashboard extends Fragment {
         list = (ListView) mBaseView.findViewById(R.id.dashboard_list_main_view);
         mChart = (BarChart) mBaseView.findViewById(R.id.chart);
         mChart.setPinchZoom(false);
+        mChart.setDrawGridBackground(false);
+        mChart.setDrawGridBackground(false);
+        mChart.setAutoScaleMinMaxEnabled(true);
         mChart.animateXY(2000, 2000);
-
-        ArrayList<BarEntry> list = new ArrayList<>();
-        list.add(new BarEntry(1, 2));
-        list.add(new BarEntry(3, 4));
-        list.add(new BarEntry(4, 12));
-        list.add(new BarEntry(10, 8));
-
-        ArrayList<BarEntry> rejectedList = new ArrayList<>();
-        list.add(new BarEntry(10, 12));
-        list.add(new BarEntry(13, 14));
-        list.add(new BarEntry(41, 12));
-        list.add(new BarEntry(11, 18));
-
-        BarDataSet income = new BarDataSet(list, "income");
-        BarDataSet rejected = new BarDataSet(rejectedList, "rejected");
-        BarDataSet accepted = new BarDataSet(list, "accepted");
-
-        income.setColor(R.color.buttonColor);
-        rejected.setColor(R.color.colorAccent);
-        accepted.setColor(R.color.common_google_signin_btn_text_dark);
-
-        ArrayList<String> date = new ArrayList<>();
-        date.add("January");
-        date.add("January");
-        date.add("Feb");
-        date.add("January");
-        date.add("January");
-        date.add("January");
-
-        BarData data = new BarData(income, rejected, accepted);
-        mChart.setData(data);
+        incomeArrayList = new ArrayList<>();
 
         doctorName.setTypeface(AppGlobals.typefaceNormal);
         doctorEmail.setTypeface(AppGlobals.typefaceNormal);
@@ -148,9 +123,23 @@ public class Dashboard extends Fragment {
                         swipeRefresh = false;
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                Log.i("TAG", "res "+ request.getResponseText());
+                                Log.i("TAG", "res " + request.getResponseText());
                                 try {
                                     dashBoardValues = new JSONObject(request.getResponseText());
+                                    JSONArray jsonArray = dashBoardValues.getJSONArray("thirty_days_stats");
+                                    Log.i("Income Arrayyyyyyyyy", jsonArray.toString());
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject incomeObject = jsonArray.getJSONObject(i);
+                                        String[] strings = incomeObject.getString("date").split("-");
+                                        BarEntry incomeDetails = new BarEntry(
+                                                Integer.valueOf(strings[2]),
+                                                incomeObject.getInt("earning"));
+                                        incomeArrayList.add(incomeDetails);
+                                        BarDataSet income = new BarDataSet(incomeArrayList, "income");
+                                        income.setColor(R.color.buttonColor);
+                                        BarData data = new BarData(income);
+                                        mChart.setData(data);
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -210,38 +199,38 @@ public class Dashboard extends Fragment {
             }
             String text = arrayList.get(position);
             try {
-            if (text.equals(AppGlobals.INCOME_TODAY)) {
-                viewHolder.tvAchievementTitle.setText(text);
-                viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
-                        .getInt("income_amount")));
-                viewHolder.tvAchievement.setBackgroundColor(
-                        getResources().getColor(R.color.attended_background_color));
-            } else if (text.equals(AppGlobals.APPOINTMENT_TODAY)) {
-                viewHolder.tvAchievementTitle.setText(text);
-                viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
-                        .getInt("appointments_count")));
-                viewHolder.tvAchievement.setBackgroundColor(
-                        getResources().getColor(R.color.attended_background_color));
-            } else if (text.equals(AppGlobals.MESSAGES)) {
-                viewHolder.tvAchievementTitle.setText(text);
-                viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
-                        .getInt("incoming_message_count")));
-                viewHolder.tvAchievement.setBackgroundColor(
-                        getResources().getColor(R.color.attended_background));
-            } else if (text.equals(AppGlobals.APPOINTMENT_FOR_CONFIRMATION)) {
-                Log.i("TAG", "TEXT" + text);
-                viewHolder.tvAchievementTitle.setText(text);
-                viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
-                        .getInt("appointments_to_be_confirmed")));
-                viewHolder.tvAchievement.setBackgroundColor(
-                        getResources().getColor(R.color.pending_background_color));
-            } else if (text.equals(AppGlobals.APPOINTMENT_CANCELLED)) {
-                viewHolder.tvAchievementTitle.setText(text);
-                viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
-                        .getInt("appointments_cancelled")));
-                viewHolder.tvAchievement.setBackgroundColor(
-                        getResources().getColor(R.color.reject_background));
-            }
+                if (text.equals(AppGlobals.INCOME_TODAY)) {
+                    viewHolder.tvAchievementTitle.setText(text);
+                    viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
+                            .getInt("income_amount")));
+                    viewHolder.tvAchievement.setBackgroundColor(
+                            getResources().getColor(R.color.attended_background_color));
+                } else if (text.equals(AppGlobals.APPOINTMENT_TODAY)) {
+                    viewHolder.tvAchievementTitle.setText(text);
+                    viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
+                            .getInt("appointments_count")));
+                    viewHolder.tvAchievement.setBackgroundColor(
+                            getResources().getColor(R.color.attended_background_color));
+                } else if (text.equals(AppGlobals.MESSAGES)) {
+                    viewHolder.tvAchievementTitle.setText(text);
+                    viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
+                            .getInt("incoming_message_count")));
+                    viewHolder.tvAchievement.setBackgroundColor(
+                            getResources().getColor(R.color.attended_background));
+                } else if (text.equals(AppGlobals.APPOINTMENT_FOR_CONFIRMATION)) {
+                    Log.i("TAG", "TEXT" + text);
+                    viewHolder.tvAchievementTitle.setText(text);
+                    viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
+                            .getInt("appointments_to_be_confirmed")));
+                    viewHolder.tvAchievement.setBackgroundColor(
+                            getResources().getColor(R.color.pending_background_color));
+                } else if (text.equals(AppGlobals.APPOINTMENT_CANCELLED)) {
+                    viewHolder.tvAchievementTitle.setText(text);
+                    viewHolder.tvAchievement.setText(String.valueOf(dashBoardValues
+                            .getInt("appointments_cancelled")));
+                    viewHolder.tvAchievement.setBackgroundColor(
+                            getResources().getColor(R.color.reject_background));
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
