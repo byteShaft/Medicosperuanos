@@ -29,6 +29,7 @@ import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.DoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.AppointmentDetail;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
+import com.byteshaft.medicosperuanos.uihelpers.CalendarView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
@@ -42,6 +43,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -115,7 +117,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         currentDate = getIntent().getStringExtra("date");
         com.byteshaft.medicosperuanos.uihelpers.CalendarView cv = ((com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                 findViewById(R.id.calendar_view));
-        Log.i("TAG", "current date"+ currentDate);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date convertedDate = new Date();
@@ -125,6 +126,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
             e.printStackTrace();
         }
         cv.updateCalendar(convertedDate);
+        CalendarView.currentDate.set(Calendar.DATE, convertedDate.getDate());
+        cv.updateCalendar(convertedDate);
+        Log.i("TAG", "current date"+ convertedDate);
 
         // assign event handler
         cv.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {
