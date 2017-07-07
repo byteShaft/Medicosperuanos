@@ -181,7 +181,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         mReason = getIntent().getStringExtra("reason");
         mDate = getIntent().getStringExtra("date");
         id = getIntent().getIntExtra("id", -1);
-        Log.i("TAG", "id " + id);
+        Log.i("TAG", "appointment id " + id);
         position = getIntent().getIntExtra("position", -1);
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
@@ -765,6 +765,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.setOnFileUploadProgressListener(this);
+        Log.i("TAG", "appointmentid "  + appointmentId);
         request.open(method, String.format("%sdoctor/appointments/%s/attention", AppGlobals.BASE_URL, appointmentId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -783,6 +784,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             alertDialog.show();
         }
         try {
+//            getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time);
             request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
         } catch (JSONException e) {
             e.printStackTrace();

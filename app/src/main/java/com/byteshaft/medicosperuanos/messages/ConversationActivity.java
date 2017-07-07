@@ -243,7 +243,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             case HttpURLConnection.HTTP_BAD_REQUEST:
                                 Log.i("TAG", httpRequest.getResponseText());
                                 break;
-
                         }
                 }
 
@@ -258,6 +257,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         break;
                     case HttpRequest.ERROR_NETWORK_UNREACHABLE:
                         Helpers.showSnackBar(findViewById(android.R.id.content), e.getLocalizedMessage());
+                        break;
+                    case HttpRequest.ERROR_LOST_CONNECTION:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_lost));
                         break;
                 }
             }
