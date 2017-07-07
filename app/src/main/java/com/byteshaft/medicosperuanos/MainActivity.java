@@ -65,21 +65,21 @@ public class MainActivity extends AppCompatActivity
     private HttpRequest request;
     private boolean isError;
 
-    String address;
-    int city;
-    String dob;
-    String firstName;
-    String gender;
-    String identityDocument;
-    int insuranceCarrier;
-    String lastName;
-    String location;
-    String phoneNumberPrimary;
-    int state;
-    String consultationTime;
-    int speciality;
-    int subscriptionPlan;
-    String collegeId;
+    private String address;
+    private int city;
+    private String dob;
+    private String firstName;
+    private String gender;
+    private String identityDocument;
+    private int insuranceCarrier;
+    private String lastName;
+    private String location;
+    private String phoneNumberPrimary;
+    private int state;
+    private String consultationTime;
+    private int speciality;
+    private int subscriptionPlan;
+    private String collegeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

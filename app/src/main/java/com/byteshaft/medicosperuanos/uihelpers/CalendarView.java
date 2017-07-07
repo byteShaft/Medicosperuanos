@@ -32,6 +32,7 @@ import java.util.HashSet;
  */
 
 public class CalendarView extends LinearLayout {
+
     // for logging
     private static final String LOGTAG = "Calendar View";
 
@@ -45,7 +46,7 @@ public class CalendarView extends LinearLayout {
     private String dateFormat;
 
     // current displayed month
-    private Calendar currentDate = Calendar.getInstance();
+    public static Calendar currentDate = Calendar.getInstance();
 
     //event handling
     private EventHandler eventHandler = null;
@@ -90,7 +91,6 @@ public class CalendarView extends LinearLayout {
 
     private void loadDateFormat(AttributeSet attrs) {
         TypedArray ta = getContext().obtainStyledAttributes(attrs, R.styleable.CalendarView);
-
         try {
             // try to load provided date format, and fallback to default otherwise
             dateFormat = ta.getString(R.styleable.CalendarView_dateFormat);
@@ -116,7 +116,6 @@ public class CalendarView extends LinearLayout {
         btnNext.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 currentDate.add(Calendar.DAY_OF_YEAR, 1);
                 selectedDate = currentDate.getTime();
                 eventHandler.onDayPress(selectedDate);

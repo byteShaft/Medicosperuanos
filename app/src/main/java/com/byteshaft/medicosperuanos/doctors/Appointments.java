@@ -189,6 +189,10 @@ public class Appointments extends Fragment implements
                     Helpers.showSnackBar(getView(), R.string.accept_appointment_first);
                     return;
                 }
+                if (agenda.getAgendaState().equals(AppGlobals.REJECTED)) {
+                    Helpers.showSnackBar(getView(), R.string.rejected_appointment_cannot_be_opened);
+                    return;
+                }
                 Intent intent = new Intent(getActivity(), DoctorsAppointment.class);
                 intent.putExtra("id", agenda.getAgendaId());
                 intent.putExtra("reason", agenda.getReason());
@@ -354,6 +358,10 @@ public class Appointments extends Fragment implements
                         return true;
                     // tick
                     case 1:
+                        if (agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
+                            Helpers.showSnackBar(getView(), getResources().getString(R.string.cannot_reject_attended_appointment));
+                            return false;
+                        }
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
                         getDashBoardDetails();
                         return true;
