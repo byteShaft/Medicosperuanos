@@ -24,6 +24,16 @@ public class FavoriteDoctorsList {
     private String lastName;
     private boolean isBlocked;
 
+    public boolean isTaken() {
+        return isTaken;
+    }
+
+    public void setTaken(boolean taken) {
+        isTaken = taken;
+    }
+
+    private boolean isTaken;
+
     public boolean isAvailableToChat() {
         return availableToChat;
     }

@@ -27,6 +27,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.DoctorDetailsActivity;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
@@ -389,9 +390,20 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                         DoctorDetailsActivity.getInstance().finish();
                                     }
                                     finish();
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MainActivity.getInstance().loadFragment(new MyAppointments());
+                                        }
+                                    }, 600);
                                 } else {
                                     finish();
-                                }
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            MainActivity.getInstance().loadFragment(new MyAppointments());
+                                        }
+                                    }, 600);                                }
                             }
                         }, 500);
                         break;

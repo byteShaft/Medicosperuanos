@@ -168,6 +168,8 @@
     <string name="create_folder_error">Could not create folder</string>
     <string name="up_label">Up</string>
     <string name="message_error">cannot send empty message</string>
+    <string name="appointment_already_taken">appointment already taken</string>
+    <string name="rejected_appointment_cannot_be_opened">cannot open rejected appointment</string>
 
 </resources>
 

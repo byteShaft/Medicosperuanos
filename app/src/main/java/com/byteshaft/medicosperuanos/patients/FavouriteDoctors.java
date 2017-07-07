@@ -379,7 +379,10 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                         JSONObject internalObject = singleService.getJSONObject("service");
                                         service.setServiceName(internalObject.getString("name"));
                                         service.setServicePrice(singleService.getString("price"));
-                                        servicesArrayList.add(service);
+                                        if (singleService.getBoolean("is_active")) {
+                                            servicesArrayList.add(service);
+                                        }
+
                                     }
                                     sFavtDoctorServices.put(jsonObject.getInt("id"), servicesArrayList);
                                 }
@@ -518,28 +521,34 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                 @Override
                 public void onItem(TimeSlots time) {
                     FavoriteDoctorsList doctorDetails = favoriteDoctorsList.get(position);
-                    Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
-                    intent.putExtra("start_time", doctorDetails.getStartTime());
-                    SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
-                    intent.putExtra("date", format1.format(currentDate.getTime()));
-                    String date = format1.format(currentDate.getTime());
-                    intent.putExtra("schedule_date", date);
-                    Log.e("Date", String.valueOf(currentDate.getTime()));
-                    intent.putExtra("name", doctorDetails.getDoctorsName());
-                    intent.putExtra("specialist", doctorDetails.getSpeciality());
-                    intent.putExtra("stars", doctorDetails.getStars());
-                    AppGlobals.isDoctorFavourite = doctorDetails.isFavorite();
-                    intent.putExtra("block", doctorDetails.isBlocked());
-                    intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
-                    intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
-                    intent.putExtra("user", doctorDetails.getId());
-                    intent.putExtra("photo", doctorDetails.getDoctorImage());
-                    intent.putExtra("location", doctorDetails.getLocation());
-                    intent.putExtra("appointment_id", time.getSlotId());
-                    intent.putExtra("start_time", time.getStartTime());
-                    intent.putExtra("services_array", sFavtDoctorServices);
-                    startActivity(intent);
+                    if (!time.isTaken()) {
+                        Intent intent = new Intent(getActivity(), CreateAppointmentActivity.class);
+                        intent.putExtra("start_time", doctorDetails.getStartTime());
+                        SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
+                        intent.putExtra("date", format1.format(currentDate.getTime()));
+                        String date = format1.format(currentDate.getTime());
+                        intent.putExtra("schedule_date", date);
+                        Log.e("Date", String.valueOf(currentDate.getTime()));
+                        intent.putExtra("name", doctorDetails.getDoctorsName());
+                        intent.putExtra("specialist", doctorDetails.getSpeciality());
+                        intent.putExtra("stars", doctorDetails.getStars());
+                        AppGlobals.isDoctorFavourite = doctorDetails.isFavorite();
+                        intent.putExtra("block", doctorDetails.isBlocked());
+                        intent.putExtra("number", doctorDetails.getPrimaryPhoneNumber());
+                        intent.putExtra("available_to_chat", doctorDetails.isAvailableToChat());
+                        intent.putExtra("user", doctorDetails.getId());
+                        intent.putExtra("photo", doctorDetails.getDoctorImage());
+                        intent.putExtra("location", doctorDetails.getLocation());
+                        intent.putExtra("appointment_id", time.getSlotId());
+                        intent.putExtra("start_time", time.getStartTime());
+                        intent.putExtra("services_array", sFavtDoctorServices);
+                        startActivity(intent);
+                    } else {
+                        Helpers.showSnackBar(getActivity().findViewById(android.R.id.content),
+                                getResources().getString(R.string.appointment_already_taken));
+                    }
                 }
+
             }));
             return convertView;
         }

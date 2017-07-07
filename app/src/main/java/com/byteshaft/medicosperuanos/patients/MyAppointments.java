@@ -79,11 +79,13 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     private int doctorsId;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean swipeRefresh = false;
+    private boolean foreground = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.patient_my_appointment, container, false);
         setHasOptionsMenu(true);
+        foreground = true;
         swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -238,7 +240,14 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
     @Override
     public void onPause() {
         super.onPause();
+        foreground = false;
         toolbar.removeView(searchContainer);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        foreground = true;
     }
 
     @Override
@@ -286,6 +295,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         appointments = new ArrayList<>();
+                        if (foreground)
                         patientAppointmentAdapter = new Adapter(getContext(), appointments);
                         appointmentList.setAdapter(patientAppointmentAdapter);
                         Log.i("TAG", "patient appointments " + request.getResponseText());
