@@ -65,6 +65,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 .setTitle(getResources().getString(R.string.my_schedule));
         com.byteshaft.medicosperuanos.uihelpers.CalendarView cv = ((com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                 mBaseView.findViewById(R.id.calendar_view));
+        cv.setCanGoBack(true);
         currentDate = Helpers.getDate();
         // assign event handler
         cv.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {

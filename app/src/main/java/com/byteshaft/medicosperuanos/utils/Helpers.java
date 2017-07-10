@@ -203,6 +203,23 @@ public class Helpers {
         }
     }
 
+//    public static Bitmap getNotificationIcon(String url) {
+//        if (url.length() > 31) {
+//            ImageLoadingListener animateFirstListener;
+//            DisplayImageOptions options;
+//            options = new DisplayImageOptions.Builder()
+//                    .showImageOnFail(R.mipmap.image_placeholder)
+//                    .showImageOnLoading(R.mipmap.image_placeholder)
+//                    .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+//                    .cacheInMemory(false)
+//                    .cacheOnDisc(false).considerExifParams(true).build();
+//            animateFirstListener = new AnimateFirstDisplayListener();
+//            return sImageLoader.loadImageSync(url, options);
+//        } else {
+////            return BitmapFactory.decodeResource(AppGlobals.getContext().getResources(), R.mipmap.image_placeholder);
+//        }
+//    }
+
     public static void getBitMap(String url, ImageView imageView) {
         if (url.length() > 31) {
             ImageLoadingListener animateFirstListener;

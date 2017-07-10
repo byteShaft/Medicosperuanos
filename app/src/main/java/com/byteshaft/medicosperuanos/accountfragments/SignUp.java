@@ -170,7 +170,7 @@ public class SignUp extends Fragment implements View.OnClickListener,
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_USER_ID, userId);
                             FragmentManager fragmentManager = getFragmentManager();
                             fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                            AccountManagerActivity.getInstance().loadFragment(new AccountActivationCode());
+                            AccountManagerActivity.getInstance().loadFragment(new UserBasicInfoStepOne(true));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

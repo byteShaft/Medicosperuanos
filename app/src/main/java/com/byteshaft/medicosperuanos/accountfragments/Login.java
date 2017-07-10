@@ -213,11 +213,14 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     boolean showNewsState = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NEWS);
                                     boolean availableToChatState = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
 
+                                    if (!AppGlobals.isDoctor()) {
+                                        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, jsonObject.getString("emergency_contact"));
+                                    }
+
                                     AppGlobals.saveChatStatus(availableToChatState);
                                     AppGlobals.saveNotificationState(notificationState);
                                     AppGlobals.saveNewsState(showNewsState);
 
-                                    System.out.println("news " + showNewsState + " notification " + notificationState);
                                     JSONObject cityJson = jsonObject.getJSONObject("city");
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED,
                                             cityJson.getInt("id"));
@@ -225,7 +228,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     JSONObject stateJson = jsonObject.getJSONObject("state");
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
                                             stateJson.getInt("id"));
-
 
                                     if (AppGlobals.isDoctor()) {
                                         JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");

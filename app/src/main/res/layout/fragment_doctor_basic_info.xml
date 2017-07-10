@@ -165,7 +165,7 @@
             </RelativeLayout>
         </LinearLayout>
 
-        <Spinner
+        <com.byteshaft.medicosperuanos.uihelpers.MultiSelectionSpinner
             android:id="@+id/speciality_spinner"
             style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"

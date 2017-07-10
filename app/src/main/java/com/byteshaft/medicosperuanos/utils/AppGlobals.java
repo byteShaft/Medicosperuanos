@@ -293,6 +293,16 @@ public class AppGlobals extends Application {
         sharedPreferences.edit().putInt(key, value).apply();
     }
 
+    public static void saveDoctorSpecialities(String value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putString(KEY_SPECIALIST_SELECTED, value).apply();
+    }
+
+    public static String getDoctorSpecialities() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getString(KEY_SPECIALIST_SELECTED, "");
+    }
+
     public static int getDoctorProfileIds(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getInt(key, -1);

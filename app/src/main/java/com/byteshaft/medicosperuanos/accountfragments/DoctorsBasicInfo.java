@@ -32,6 +32,7 @@ import com.byteshaft.medicosperuanos.gettersetter.Cities;
 import com.byteshaft.medicosperuanos.gettersetter.Specialities;
 import com.byteshaft.medicosperuanos.gettersetter.States;
 import com.byteshaft.medicosperuanos.gettersetter.SubscriptionType;
+import com.byteshaft.medicosperuanos.uihelpers.MultiSelectionSpinner;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.FormData;
@@ -46,18 +47,21 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.R.attr.id;
 
 public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSelectedListener,
-        CompoundButton.OnCheckedChangeListener, View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnFileUploadProgressListener, HttpRequest.OnErrorListener {
+        CompoundButton.OnCheckedChangeListener, View.OnClickListener,
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnFileUploadProgressListener,
+        HttpRequest.OnErrorListener {
 
     private View mBaseView;
     private Button mSaveButton;
 
     private Spinner mStateSpinner;
     private Spinner mCitySpinner;
-    private Spinner mSpecialitySpinner;
+    private MultiSelectionSpinner mSpecialitySpinner;
     private Spinner mAffiliatedClinicsSpinner;
     private Spinner mSubscriptionSpinner;
 
@@ -75,7 +79,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     private String mCollegeIdEditTextString;
     private String mStatesSpinnerValueString;
     private String mCitiesSpinnerValueString;
-    private String mSpecialitySpinnerValueString;
+    private ArrayList<Integer> mSpecialitySpinnerArray;
     private String mAffiliatedClinicsSpinnerValueString;
     private String mSubscriptionSpinnerValueString;
     private String mNotificationCheckBoxString = "true";
@@ -126,6 +130,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         /// data list work
         statesList = new ArrayList<>();
         citiesList = new ArrayList<>();
+        mSpecialitySpinnerArray = new ArrayList<>();
         specialitiesList = new ArrayList<>();
         affiliateClinicsList = new ArrayList<>();
         subscriptionTypesList = new ArrayList<>();
@@ -133,7 +138,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mSaveButton = (Button) mBaseView.findViewById(R.id.save_button);
         mStateSpinner = (Spinner) mBaseView.findViewById(R.id.states_spinner);
         mCitySpinner = (Spinner) mBaseView.findViewById(R.id.cities_spinner);
-        mSpecialitySpinner = (Spinner) mBaseView.findViewById(R.id.speciality_spinner);
+        mSpecialitySpinner = (MultiSelectionSpinner) mBaseView.findViewById(R.id.speciality_spinner);
         mAffiliatedClinicsSpinner = (Spinner) mBaseView.findViewById(R.id.clinics_spinner);
         mSubscriptionSpinner = (Spinner) mBaseView.findViewById(R.id.subscriptions_spinner);
 
@@ -162,7 +167,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
         mStateSpinner.setOnItemSelectedListener(this);
         mCitySpinner.setOnItemSelectedListener(this);
-        mSpecialitySpinner.setOnItemSelectedListener(this);
+//        mSpecialitySpinner.setOnItemSelectedListener(this);
         mAffiliatedClinicsSpinner.setOnItemSelectedListener(this);
         mSubscriptionSpinner.setOnItemSelectedListener(this);
 
@@ -208,11 +213,11 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
                 break;
             case R.id.speciality_spinner:
-                Specialities specialities = specialitiesList.get(i);
-                mSpecialitySpinnerValueString = String.valueOf(specialities.getSpecialitiesId());
-                System.out.println(specialities.getSpecialitiesId());
-                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
-                        specialities.getSpecialitiesId());
+//                Specialities specialities = specialitiesList.get(i);
+//                mSpecialitySpinnerArray = String.valueOf(specialities.getSpecialitiesId());
+//                System.out.println(specialities.getSpecialitiesId());
+//                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
+//                        specialities.getSpecialitiesId());
                 break;
             case R.id.clinics_spinner:
                 AffiliateClinic affiliateClinic = affiliateClinicsList.get(i);
@@ -332,7 +337,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         }
         data.append(FormData.TYPE_CONTENT_TEXT, "state", mStatesSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "city", mCitiesSpinnerValueString);
-        data.append(FormData.TYPE_CONTENT_TEXT, "speciality", mSpecialitySpinnerValueString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "speciality", mSpecialitySpinnerArray.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "affiliate_clinic", mAffiliatedClinicsSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", mSubscriptionSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", mPhoneOneEditTextString);
@@ -404,6 +409,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                List<String> speciality = new ArrayList<String>();
                                 try {
                                     JSONObject spObject = new JSONObject(request.getResponseText());
                                     JSONArray spArray = spObject.getJSONArray("results");
@@ -418,13 +424,39 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         String specialityId = jsonObject.getString(AppGlobals.KEY_KEY_SPECIALITY_ID);
                                         System.out.println(jsonObject.getInt("id") + "boss pak specialities");
                                         specialities.setSpeciality(jsonObject.getString("name"));
+                                        speciality.add(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_KEY_SPECIALITY_ID, specialityId);
                                     }
 
                                     specialitiesAdapter = new SpecialitiesAdapter(getActivity(), specialitiesList);
-                                    mSpecialitySpinner.setAdapter(specialitiesAdapter);
-                                    mSpecialitySpinner.setSelection(specialistPosition);
+//                                    mSpecialitySpinner.setAdapter(specialitiesAdapter);
+                                    mSpecialitySpinner.setItems(speciality);
+                                    mSpecialitySpinner.setListener(new MultiSelectionSpinner.OnMultipleItemsSelectedListener() {
+                                        @Override
+                                        public void selectedIndices(List<Integer> indices) {
+                                            Log.i("selectedIndices", indices.toString());
+
+                                        }
+
+                                        @Override
+                                        public void selectedStrings(List<String> strings) {
+                                            Log.i("selectedStrings", strings.toString());
+                                            // here
+                                            for (String selected : strings) {
+                                                for (int i =0; i < specialitiesList.size(); i++) {
+                                                    Specialities specialities = specialitiesList.get(i);
+                                                    if (selected.equals(specialities.getSpeciality())) {
+                                                        mSpecialitySpinnerArray.add(specialities.getSpecialitiesId());
+                                                        System.out.println(specialities.getSpecialitiesId());
+                                                        AppGlobals.saveDoctorSpecialities(String.valueOf(mSpecialitySpinnerArray));
+                                                    }
+                                                }
+                                            }
+
+                                        }
+                                    });
+//                                    mSpecialitySpinner.setSelection(specialistPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
