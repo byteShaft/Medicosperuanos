@@ -37,12 +37,12 @@ import com.byteshaft.medicosperuanos.patients.FavouriteDoctors;
 import com.byteshaft.medicosperuanos.patients.MyAppointments;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity
     private String phoneNumberPrimary;
     private int state;
     private String consultationTime;
-    private int speciality;
+    private String[] speciality;
     private int subscriptionPlan;
     private String collegeId;
 
@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity
                     AppGlobals.KEY_FIRST_NAME) + " " +
                     AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
             docEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));
-            docSpeciality.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY));
             docExpDate.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE));
 
             address = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS);
@@ -151,7 +150,12 @@ public class MainActivity extends AppCompatActivity
             phoneNumberPrimary = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
             state = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_STATE_SELECTED);
             consultationTime = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME);
-            speciality = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SPECIALIST_SELECTED);
+            Set<String> stringSet = AppGlobals.getSpecialityFromSharedPreferences();
+            for (String string : stringSet) {
+                docSpeciality.setText(string);
+                break;
+            }
+//            speciality = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SPECIALIST_SELECTED);
             subscriptionPlan = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_SELECTED);
             collegeId = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_COLLEGE_ID);
 
@@ -178,7 +182,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                     changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
                                             String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
-                                            consultationTime,  String.valueOf(speciality), String.valueOf(subscriptionPlan), collegeId);
+                                            consultationTime, String.valueOf(subscriptionPlan), collegeId);
                                 doctorOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -236,7 +240,6 @@ public class MainActivity extends AppCompatActivity
             phoneNumberPrimary = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
             state = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_STATE_SELECTED);
             consultationTime = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME);
-            speciality = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SPECIALIST_SELECTED);
             subscriptionPlan = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_SELECTED);
             collegeId = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_COLLEGE_ID);
 
@@ -255,7 +258,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 changeStatus(b,address , String.valueOf(city), dob, firstName, gender, identityDocument,
                                         String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
-                                        consultationTime,  String.valueOf(speciality), String.valueOf(subscriptionPlan), collegeId);
+                                        consultationTime, String.valueOf(subscriptionPlan), collegeId);
                                 patientOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -303,43 +306,70 @@ public class MainActivity extends AppCompatActivity
 
     private void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
                               String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
-                              String consultation_time, String speciality, String subscription_plan, String collegeId) {
+                              String consultation_time, String subscription_plan, String collegeId) {
         request = new HttpRequest(this);
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         request.open("PUT", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        ArrayList<Integer> ids = new ArrayList<>();
+        String[] specialityIds = AppGlobals.getDoctorSpecialities().replace("[", "").replace("]", "").split(",");
+        for (int j = 0; j < specialityIds.length; j++) {
+            Log.i("TAG", "loop "+ specialityIds[j]);
+            ids.add(Integer.valueOf(specialityIds[j].trim()));
+        }
         request.send(dataWithChatStatus(status, address, city, dob, first_name, gender, identity_document,
                 insurance_carrier, last_name, location, phone_number_primary, state,
-                consultation_time, speciality, subscription_plan, collegeId));
+
+                consultation_time, ids, subscription_plan, collegeId));
     }
 
-    private String dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
+    private FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
                                    String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
-                                   String consultation_time, String speciality, String subscription_plan, String collegeId) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("available_to_chat", status);
-            jsonObject.put("address", address);
-            jsonObject.put("city", city);
-            jsonObject.put("dob", dob);
-            jsonObject.put("first_name", first_name);
-            jsonObject.put("gender", gender);
-            jsonObject.put("identity_document", identity_document);
-            jsonObject.put("insurance_carrier", insurance_carrier);
-            jsonObject.put("last_name", last_name);
-            jsonObject.put("location", location);
-            jsonObject.put("phone_number_primary", phone_number_primary);
-            jsonObject.put("state", state);
-            jsonObject.put("consultation_time", consultation_time);
-            jsonObject.put("speciality", speciality);
-            jsonObject.put("subscription_plan", subscription_plan);
-            jsonObject.put("college_id", collegeId);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonObject.toString();
+                                   String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
+        FormData formData  = new FormData();
+        formData.append(FormData.TYPE_CONTENT_TEXT, "available_to_chat", String.valueOf(status));
+        formData.append(FormData.TYPE_CONTENT_TEXT, "address", address);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "city", city);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "dob", dob);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "first_name", first_name);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "gender", gender);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "identity_document", identity_document);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "insurance_carrier", insurance_carrier);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "last_name", last_name);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "location", location);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", phone_number_primary);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "state", state);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "consultation_time", consultation_time);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "speciality[]", speciality.toString());
+        formData.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", subscription_plan);
+        formData.append(FormData.TYPE_CONTENT_TEXT, "college_id", collegeId);
+
+
+//
+//
+//        try {
+//            jsonObject.put("available_to_chat", status);
+//            jsonObject.put("address", address);
+//            jsonObject.put("city", city);
+//            jsonObject.put("dob", dob);
+//            jsonObject.put("first_name", first_name);
+//            jsonObject.put("gender", gender);
+//            jsonObject.put("identity_document", identity_document);
+//            jsonObject.put("insurance_carrier", insurance_carrier);
+//            jsonObject.put("last_name", last_name);
+//            jsonObject.put("location", location);
+//            jsonObject.put("phone_number_primary", phone_number_primary);
+//            jsonObject.put("state", state);
+//            jsonObject.put("consultation_time", consultation_time);
+//            jsonObject.put("speciality", speciality);
+//            jsonObject.put("subscription_plan", subscription_plan);
+//            jsonObject.put("college_id", collegeId);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        return formData;
 
     }
 

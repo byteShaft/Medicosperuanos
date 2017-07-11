@@ -18,10 +18,14 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Login extends Fragment implements View.OnClickListener, HttpRequest.OnErrorListener,
         HttpRequest.OnReadyStateChangeListener {
@@ -230,10 +234,20 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                             stateJson.getInt("id"));
 
                                     if (AppGlobals.isDoctor()) {
-                                        JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
-                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
-                                                specialityJsonObject.getInt("id"));
-                                        String speciality = specialityJsonObject.getString("name");
+                                        JSONArray specialityJsonArray = jsonObject.getJSONArray("speciality");
+                                        Log.i("Specialities", specialityJsonArray.toString());
+                                        ArrayList<Integer> ids = new ArrayList<Integer>();
+                                        Set<String> specialities = new HashSet<>();
+                                        for (int i = 0; i < specialityJsonArray.length(); i++) {
+                                            JSONObject jsonObject1 = specialityJsonArray.getJSONObject(i);
+                                            specialities.add(jsonObject1.getString("name"));
+                                            Log.i("TAG", "Login speciality "+ jsonObject1.getString("name"));
+                                            ids.add(jsonObject1.getInt("id"));
+                                        }
+                                        AppGlobals.saveSpecialityToSharedPreferences(specialities);
+                                        Log.i("TAG", "Login saved specialities "+ AppGlobals.getSpecialityFromSharedPreferences());
+                                        AppGlobals.saveDoctorSpecialities(String.valueOf(ids));
+                                        Log.i("TAG", "Login saved specialities ids "+ AppGlobals.getDoctorSpecialities());
 
                                         JSONObject subscriptionPlanObject = jsonObject.getJSONObject("subscription_plan");
                                         AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SUBSCRIPTION_SELECTED,
@@ -248,7 +262,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
 
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME, consultationTime);
-                                        AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY, speciality);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_COLLEGE_ID, collageId);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE, subscriptionType);
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);

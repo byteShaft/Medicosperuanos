@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -90,7 +91,12 @@ public class Dashboard extends Fragment {
         doctorName.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME)
                 + " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
         doctorEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));
-        doctorSp.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_SPECIALITY));
+        Set<String> stringSet = AppGlobals.getSpecialityFromSharedPreferences();
+        for (String string : stringSet) {
+            doctorSp.setText(string);
+            break;
+        }
+
         if (AppGlobals.isLogin() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
             String url = String.format("%s" + AppGlobals
                     .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);

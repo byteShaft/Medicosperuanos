@@ -311,7 +311,8 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                                 appointment.setDrLastName(doctorObject.getString("last_name"));
                                 appointment.setDoctorsId(doctorObject.getInt("id"));
                                 appointment.setGender(doctorObject.getString("gender"));
-                                JSONObject specialityJsonObject = doctorObject.getJSONObject("speciality");
+                                JSONArray specialityJsonArray = doctorObject.getJSONArray("speciality");
+                                JSONObject specialityJsonObject = specialityJsonArray.getJSONObject(0);
                                 appointment.setDrSpeciality(specialityJsonObject.getString("name"));
                                 JSONArray serviceArray = appointmentObject.getJSONArray("services");
                                 for (int j = 0; j < serviceArray.length(); j++) {

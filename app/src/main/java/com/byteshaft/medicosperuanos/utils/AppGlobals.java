@@ -22,6 +22,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -93,9 +95,7 @@ public class AppGlobals extends Application {
     public static final String KEY_SPECIALIST_SELECTED = "selected_specialist";
     public static final String KEY_INSURANCE_SELECTED = "selected_insurance";
 
-    public static final String KEY_INSURANCE_ID = "id";
-    public static final String KEY_KEY_SPECIALITY_ID = "id";
-    public static final String KEY_KEY_SUBSCRIPTION_TYPE_ID = "id";
+    public static final String KEY_SPECIALITY_IDS = "speciality_ids";
 
     public static final String PENDING = "pending";
     public static final String ACCEPTED = "accepted";
@@ -245,6 +245,17 @@ public class AppGlobals extends Application {
     public static String getStringFromSharedPreferences(String key) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getString(key, "");
+    }
+
+    public static void saveSpecialityToSharedPreferences(Set<String> value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putStringSet(KEY_DOC_SPECIALITY, value).apply();
+    }
+
+    public static Set<String> getSpecialityFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        Set<String> strings = new HashSet<>();
+        return sharedPreferences.getStringSet(KEY_DOC_SPECIALITY, strings);
     }
 
     public static int getIntegerFromSharedPreferences(String key) {

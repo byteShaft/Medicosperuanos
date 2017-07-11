@@ -398,8 +398,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     JSONObject doctorDetail = doctorList.getJSONObject(j);
                                     DoctorDetails doctorDetails = new DoctorDetails();
                                     doctorDetails.setDate(date);
-                                    JSONObject speciality = doctorDetail.getJSONObject("speciality");
-                                    doctorDetails.setSpeciality(speciality.getString("name"));
+                                    JSONArray speciality = doctorDetail.getJSONArray("speciality");
+                                    JSONObject specialityObject = speciality.getJSONObject(0);
+                                    doctorDetails.setSpeciality(specialityObject.getString("name"));
                                     doctorDetails.setFirstName(doctorDetail.getString("first_name"));
                                     doctorDetails.setLastName(doctorDetail.getString("last_name"));
                                     doctorDetails.setPhotoUrl(doctorDetail.getString("photo")
