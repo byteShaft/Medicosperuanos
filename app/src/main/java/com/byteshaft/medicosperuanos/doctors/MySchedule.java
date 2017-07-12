@@ -173,10 +173,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_button:
-                if (toBeDelete.size() == 0 && scheduleId == -1 ) {
+                Log.i("TAG", "tobe delete size " + toBeDelete.size() + "schedule " + scheduleId);
+                if (toBeDelete.size() == 0 && scheduleId == -1) {
                     sendSchedule();
                 } else if (toBeDelete.size() > 0 || scheduleId != -1 ) {
                     Integer key = -1;
+                    updateSchedule(scheduleId);
                     ArrayList<Integer> value = new ArrayList<>();
                     for (Map.Entry<Integer, ArrayList<Integer>> entry : toBeDelete.entrySet()) {
                         key = entry.getKey();
@@ -185,7 +187,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     if (key != -1) {
                         deleteSchedule(key, value);
                     }
-                    updateSchedule(scheduleId);
                 }
                 break;
         }
@@ -217,51 +218,54 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             }
             final ArrayList<JSONObject> data = scheduleList.get(currentDate);
             final JSONObject jsonObject = data.get(position);
+            viewHolder.state.setOnCheckedChangeListener(null);
             viewHolder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    int pos = (int) viewHolder.state.getTag();
-                    View checkBoxView = mListView.getChildAt(pos);
-                    if (checkBoxView != null) {
-                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
-                        if (b) {
-                            data.remove(position);
-                            try {
-                                jsonObject.put("state", true);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            data.add(position, jsonObject);
-                        } else {
-                            try {
-                                if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
-                                    Helpers.showSnackBar(MySchedule.this.getView(),
-                                            getResources().getString(R.string.already_taken));
-                                    notifyDataSetChanged();
-                                    return;
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if (jsonObject.has("ids")) {
-                                try {
-                                    Integer[] idsArray = (Integer[]) jsonObject.get("ids");
-                                    toBeDeleteSelectedIds.add(idsArray[0]);
-                                    toBeDelete.put(idsArray[1], toBeDeleteSelectedIds);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            data.remove(position);
-                            try {
-                                jsonObject.put("state", false);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            data.add(position, jsonObject);
+//                    int pos = (int) viewHolder.state.getTag();
+//                    View checkBoxView = mListView.getChildAt(pos);
+//                    if (checkBoxView != null) {
+//                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
+                    if (b) {
+                        data.remove(position);
+                        try {
+                            jsonObject.put("state", true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
+                        data.add(position, jsonObject);
+                        Log.i("TAG", "Added" + jsonObject.toString());
+                    } else {
+                        try {
+                            if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
+                                Helpers.showSnackBar(MySchedule.this.getView(),
+                                        getResources().getString(R.string.already_taken));
+                                notifyDataSetChanged();
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (jsonObject.has("ids")) {
+                            try {
+                                Integer[] idsArray = (Integer[]) jsonObject.get("ids");
+                                toBeDeleteSelectedIds.add(idsArray[0]);
+                                toBeDelete.put(idsArray[1], toBeDeleteSelectedIds);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        data.remove(position);
+                        try {
+                            jsonObject.put("state", false);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        data.add(position, jsonObject);
+                        Log.i("TAG", "Removed" + jsonObject.toString());
                     }
+//                    }
                 }
             });
             try {
@@ -405,8 +409,11 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             jsonObject.put("date", currentDate);
             JSONArray jsonArray = new JSONArray();
             ArrayList<JSONObject> jsonObjectJSONArray = scheduleList.get(currentDate);
+            Log.i("TAG", "jsonObjectJSONArray" + jsonObjectJSONArray.size());
             for (JSONObject singleJson : jsonObjectJSONArray) {
-                if (singleJson.getBoolean("state") && !alreadySelectedSchedule.contains(singleJson)) {
+                Log.i("TAG", "loop" +singleJson.getBoolean("state"));
+                if (singleJson.getBoolean("state")) {
+                    Log.i("TAG", "Tobe sent" + singleJson.toString());
 //                    singleJson.remove("state");
                     JSONObject time = new JSONObject();
                     time.put("start_time", singleJson.get("start_time").toString().trim());
@@ -414,6 +421,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     jsonArray.put(time);
                 }
             }
+            Log.i("TAG", "jsonArray" + jsonArray.length());
             if (jsonArray.length() > 0) {
                 jsonObject.put("time_slots", jsonArray);
                 Helpers.showProgressDialog(getActivity(),
@@ -432,6 +440,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "GEt schedule " + request.getResponseText());
                         scheduleId = -1;
                         map = new HashMap<>();
                         try {
@@ -468,7 +477,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Helpers.showSnackBar(getView(), R.string.success);
-                        scheduleAdapter.notifyDataSetChanged();
+                        getSchedule(currentDate);
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (Helpers.getAlertDialog() == null) {
