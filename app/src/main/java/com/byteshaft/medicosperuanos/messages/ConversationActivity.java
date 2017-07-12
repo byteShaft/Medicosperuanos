@@ -29,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -94,6 +95,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private static ConversationActivity sInstance;
     private String imageUrl;
     private String photoUrl;
+    private LinearLayoutManager linearLayoutManager;
+    private boolean loading = false;
+    private boolean loadingPrevious = false;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -141,7 +145,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         }
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         conversation.setLayoutManager(linearLayoutManager);
         conversation.canScrollVertically(1);
         conversation.setHasFixedSize(true);
@@ -162,6 +166,40 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         }
         chatAdapter = new ChatAdapter(messages);
         conversation.setAdapter(chatAdapter);
+        conversation.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (loading) {
+//                    Helpers.showSnackBar(findViewById(android.R.id.content),
+//                            getResources().getString(R.string.loading));
+                    return;
+                }
+                if (!recyclerView.canScrollVertically(-1)) {
+                    onScrolledToTop();
+                } else if (!recyclerView.canScrollVertically(1)) {
+                    onScrolledToBottom();
+                } else if (dy < 0) {
+                    onScrolledUp();
+                } else if (dy > 0) {
+                    onScrolledDown();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
+                    // Do something
+                } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    // Do something
+                } else {
+                    // Do something
+                }
+            }
+        });
         writeMessageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -171,6 +209,26 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
+    }
+
+    public void onScrolledUp() {
+        Log.i("TAG", "onScrolledUp");
+
+    }
+
+    public void onScrolledDown() {
+        Log.i("TAG", "onScrolledDown");
+    }
+
+    public void onScrolledToTop() {
+        Log.i("TAG", "onScrolledToTop");
+        getNextMessages(nextUrl);
+
+    }
+
+    public void onScrolledToBottom() {
+        Log.i("TAG", "onScrolledToBottom");
+
     }
 
     @Override
@@ -311,6 +369,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
 
     private void getMyMessages(int secondPersonId) {
+        loading = true;
         HttpRequest request = new HttpRequest(getApplicationContext());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -321,6 +380,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void getNextMessages(String url) {
+        loading = true;
+        loadingPrevious = true;
         HttpRequest request = new HttpRequest(getApplicationContext());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -336,21 +397,28 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             case HttpRequest.STATE_DONE:
                 Log.i("TAG", httpRequest.getResponseURL());
                 Helpers.dismissProgressDialog();
+                loading = false;
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", httpRequest.getResponseText());
+                        ArrayList<ChatModel> previousMessages = new ArrayList<>();
+                        if (loadingPrevious) {
+                            previousMessages = messages;
+                        }
                         try {
                             JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
                             if (!jsonObject.isNull("next")) {
                                 nextUrl = jsonObject.getString("next")
                                         .replace("http://localhost/api/", AppGlobals.BASE_URL);
-//                                getNextMessages(nextUrl);
                             }
-                            if (!jsonObject.isNull("previous")) {
-                                previousUrl = jsonObject.getString("previous");
-                            }
+//                            if (!jsonObject.isNull("previous")) {
+//                                previousUrl = jsonObject.getString("previous");
+//                            }
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
                             int length = jsonArray.length()-1;
+                            if (loadingPrevious) {
+                                messages.clear();
+                            }
                             for(int j = length; j >= 0; j--) {
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
@@ -364,19 +432,27 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 }
                                 chatModel.setTimeStamp(singleMessage.getString("created_at"));
                                 messages.add(chatModel);
+                                if (!loadingPrevious)
                                 chatAdapter.notifyDataSetChanged();
                                 conversation.scrollToPosition(messages.size() - 1);
+                            }
+                            if (loadingPrevious) {
+                                messages.addAll(previousMessages);
+                                chatAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                 }
+                loadingPrevious = false;
         }
 
     }
 
     @Override
     public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+        loading = false;
+        loadingPrevious = false;
         switch (i) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
                 Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_time_out));
