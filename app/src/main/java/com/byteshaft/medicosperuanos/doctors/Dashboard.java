@@ -1,6 +1,7 @@
 package com.byteshaft.medicosperuanos.doctors;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -144,6 +145,7 @@ public class Dashboard extends Fragment {
                                         BarDataSet income = new BarDataSet(incomeArrayList, "income");
                                         income.setColor(R.color.buttonColor);
                                         BarData data = new BarData(income);
+                                        income.setColor(Color.BLUE);
                                         mChart.setData(data);
                                     }
                                 } catch (JSONException e) {
