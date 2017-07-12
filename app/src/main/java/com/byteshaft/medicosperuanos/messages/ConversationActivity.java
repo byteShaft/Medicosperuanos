@@ -212,22 +212,23 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     }
 
     public void onScrolledUp() {
-        Log.i("TAG", "onScrolledUp");
+
 
     }
 
     public void onScrolledDown() {
-        Log.i("TAG", "onScrolledDown");
+
     }
 
     public void onScrolledToTop() {
         Log.i("TAG", "onScrolledToTop");
+        if (nextUrl != null)
         getNextMessages(nextUrl);
 
     }
 
     public void onScrolledToBottom() {
-        Log.i("TAG", "onScrolledToBottom");
+
 
     }
 
@@ -403,13 +404,18 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         Log.i("TAG", httpRequest.getResponseText());
                         ArrayList<ChatModel> previousMessages = new ArrayList<>();
                         if (loadingPrevious) {
-                            previousMessages = messages;
+                            for (ChatModel chatModel: messages) {
+                                previousMessages.add(chatModel);
+                            }
+                            Log.i("TAg", "previousMessages");
                         }
                         try {
                             JSONObject jsonObject = new JSONObject(httpRequest.getResponseText());
                             if (!jsonObject.isNull("next")) {
                                 nextUrl = jsonObject.getString("next")
                                         .replace("http://localhost/api/", AppGlobals.BASE_URL);
+                            } else {
+                                nextUrl = null;
                             }
 //                            if (!jsonObject.isNull("previous")) {
 //                                previousUrl = jsonObject.getString("previous");
@@ -417,9 +423,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
                             int length = jsonArray.length()-1;
                             if (loadingPrevious) {
-                                messages.clear();
+                                messages = new ArrayList<>();
                             }
                             for(int j = length; j >= 0; j--) {
+                                Log.i("TAG", "Looping");
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
                                 chatModel.setPatientId(singleMessage.getInt("patient"));
@@ -432,12 +439,18 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 }
                                 chatModel.setTimeStamp(singleMessage.getString("created_at"));
                                 messages.add(chatModel);
+                                chatAdapter.notifyDataSetChanged();
+                                Log.i("TAG", "added " + j);
                                 if (!loadingPrevious)
                                 chatAdapter.notifyDataSetChanged();
                                 conversation.scrollToPosition(messages.size() - 1);
                             }
                             if (loadingPrevious) {
-                                messages.addAll(previousMessages);
+                                Log.i("TAg", "added all");
+                                for (ChatModel chatModel: previousMessages) {
+                                    messages.add(chatModel);
+                                }
+//                                messages.addAll(previousMessages);
                                 chatAdapter.notifyDataSetChanged();
                             }
                         } catch (JSONException e) {
@@ -731,7 +744,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             public void setProfilePhoto(final String urlPhotoUser) {
                 if (profilePhoto == null) return;
-                Glide.with(profilePhoto.getContext()).load(imageUrl).centerCrop()
+                Glide.with(profilePhoto.getContext()).load(photoUrl).centerCrop()
                         .transform(new CircleTransform(profilePhoto.getContext())).override(60, 60)
                         .into(profilePhoto);
             }
