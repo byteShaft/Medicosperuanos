@@ -68,6 +68,7 @@ public class Appointments extends Fragment implements
     private float x1,x2;
     static final int MIN_DISTANCE = 150;
     private GestureDetector gestureDetector;
+    private boolean foreground = false;
 
     public static Appointments getInstance() {
         return sInstance;
@@ -84,6 +85,7 @@ public class Appointments extends Fragment implements
                 getAgendaList(agendaDate);
             }
         });
+        foreground = true;
         sInstance = this;
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.appointments));
@@ -94,7 +96,7 @@ public class Appointments extends Fragment implements
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
         calendarView.setCanGoBack(true);
-//        calendarView.updateCalendar(events);
+        calendarView.updateCalendar(events, null);
         TextView dateTextView = (TextView) calendarView.findViewById(R.id.calendar_date_display);
         dateTextView.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
@@ -305,7 +307,14 @@ public class Appointments extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
+        foreground = true;
         getDashBoardDetails();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        foreground = false;
     }
 
     private void getDashBoardDetails() {
@@ -388,8 +397,10 @@ public class Appointments extends Fragment implements
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         agendaArrayList = new ArrayList<>();
-                        arrayAdapter = new Adapter(getActivity(), agendaArrayList);
-                        mListView.setAdapter(arrayAdapter);
+                        if (foreground) {
+                            arrayAdapter = new Adapter(getActivity(), agendaArrayList);
+                            mListView.setAdapter(arrayAdapter);
+                        }
                         Log.i("agenda List ", request.getResponseText());
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
@@ -432,7 +443,9 @@ public class Appointments extends Fragment implements
                                 }
                                 agenda.setPatientServices(servicesArrayList);
                                 agendaArrayList.add(agenda);
-                                arrayAdapter.notifyDataSetChanged();
+                                if (foreground) {
+                                    arrayAdapter.notifyDataSetChanged();
+                                }
 
                             }
                         } catch (JSONException e) {

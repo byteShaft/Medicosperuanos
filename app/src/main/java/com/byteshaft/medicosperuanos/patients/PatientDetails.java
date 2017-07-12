@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.medicosperuanos.R;
@@ -66,6 +67,12 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
     private int patientId;
     public static HashMap<Integer, ArrayList<Services>> sDoctorServices;
     private boolean chatStatus;
+    private static PatientDetails instance;
+    private ImageView chatState;
+
+    public static PatientDetails getInstance() {
+        return instance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,14 +81,16 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         setContentView(R.layout.activity_patient_details);
         sDoctorServices = new HashMap<>();
+        instance = this;
         getDoctorServices();
         patientName = (TextView) findViewById(R.id.patient_name_);
         patientAge = (TextView) findViewById(R.id.patient_age_);
         docId = (EditText) findViewById(R.id.doc_id);
         birthDate = (EditText) findViewById(R.id.birth_date);
+        chatState = (ImageView) findViewById(R.id.status);
 
         patientAddress = (EditText) findViewById(R.id.patient_address);
-        circleImageView = (CircleImageView) findViewById(R.id.patient_image);
+        circleImageView = (CircleImageView) findViewById(R.id.profile_image_view_search);
         phonePrimary = (EditText) findViewById(R.id.Phone_primary);
         phoneSecondary = (EditText) findViewById(R.id.Phone_secondary);
 
@@ -138,6 +147,11 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
         patientAddress.setTypeface(AppGlobals.typefaceNormal);
         birthDate.setTypeface(AppGlobals.typefaceNormal);
         docId.setTypeface(AppGlobals.typefaceNormal);
+        if (!chatStatus) {
+            chatState.setImageResource(R.mipmap.ic_offline_indicator);
+        } else {
+            chatState.setImageResource(R.mipmap.ic_online_indicator);
+        }
 
         appointmentButton.setOnClickListener(this);
         callButton.setOnClickListener(this);
@@ -214,6 +228,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 appointmentIntent.putExtra("patientID", patientId);
                 appointmentIntent.putExtra("date", Helpers.getDate());
                 appointmentIntent.putExtra("from_doctor", true);
+                appointmentIntent.putExtra("available_to_chat", chatStatus);
                 startActivity(appointmentIntent);
                 break;
             case R.id.call_button_:

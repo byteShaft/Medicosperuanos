@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.doctors.Appointments;
 import com.byteshaft.medicosperuanos.doctors.DoctorDetailsActivity;
 import com.byteshaft.medicosperuanos.gettersetter.Services;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
@@ -389,11 +390,14 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                     if (DoctorDetailsActivity.getInstance() != null) {
                                         DoctorDetailsActivity.getInstance().finish();
                                     }
+                                    if (PatientDetails.getInstance() != null) {
+                                        PatientDetails.getInstance().finish();
+                                    }
                                     finish();
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
-                                            MainActivity.getInstance().loadFragment(new MyAppointments());
+                                            MainActivity.getInstance().loadFragment(new Appointments());
                                         }
                                     }, 600);
                                 } else {

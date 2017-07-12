@@ -19,12 +19,28 @@
             android:background="#3F3F3F"
             android:padding="15dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <RelativeLayout
                 android:id="@+id/patient_image"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_centerHorizontal="true"
-                android:src="@mipmap/image_placeholder" />
+                android:gravity="center">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profile_image_view_search"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@mipmap/image_placeholder" />
+
+                <ImageView
+                    android:id="@+id/status"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="5dp"
+                    android:src="@mipmap/ic_offline_indicator" />
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/patient_name_"

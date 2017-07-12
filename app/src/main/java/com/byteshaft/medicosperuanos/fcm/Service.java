@@ -75,7 +75,7 @@ public class Service extends FirebaseMessagingService {
             senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
             senderImageUrl = remoteMessage.getData().get("sender_image_url");
             photo = remoteMessage.getData().get("sender_photo");
-            if (remoteMessage.getData().get("gender").equals("M")) {
+            if (remoteMessage.getData().get("type").equals("appointment") && remoteMessage.getData().get("gender").equals("M")) {
                 isMale = true;
             } else {
                 isMale = false;

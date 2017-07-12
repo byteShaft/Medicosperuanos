@@ -314,10 +314,12 @@ public class MainActivity extends AppCompatActivity
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         ArrayList<Integer> ids = new ArrayList<>();
-        String[] specialityIds = AppGlobals.getDoctorSpecialities().replace("[", "").replace("]", "").split(",");
-        for (int j = 0; j < specialityIds.length; j++) {
-            Log.i("TAG", "loop "+ specialityIds[j]);
-            ids.add(Integer.valueOf(specialityIds[j].trim()));
+        if (AppGlobals.isDoctor()) {
+            String[] specialityIds = AppGlobals.getDoctorSpecialities().replace("[", "").replace("]", "").split(",");
+            for (int j = 0; j < specialityIds.length; j++) {
+                Log.i("TAG", "loop " + specialityIds[j]);
+                ids.add(Integer.valueOf(specialityIds[j].trim()));
+            }
         }
         request.send(dataWithChatStatus(status, address, city, dob, first_name, gender, identity_document,
                 insurance_carrier, last_name, location, phone_number_primary, state,
@@ -342,7 +344,9 @@ public class MainActivity extends AppCompatActivity
         formData.append(FormData.TYPE_CONTENT_TEXT, "phone_number_primary", phone_number_primary);
         formData.append(FormData.TYPE_CONTENT_TEXT, "state", state);
         formData.append(FormData.TYPE_CONTENT_TEXT, "consultation_time", consultation_time);
-        formData.append(FormData.TYPE_CONTENT_TEXT, "speciality[]", speciality.toString());
+        if (AppGlobals.isDoctor()) {
+            formData.append(FormData.TYPE_CONTENT_TEXT, "speciality", speciality.toString());
+        }
         formData.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", subscription_plan);
         formData.append(FormData.TYPE_CONTENT_TEXT, "college_id", collegeId);
 
