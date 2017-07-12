@@ -61,6 +61,11 @@ public class CalendarView extends LinearLayout {
     private Date selectedDate;
     private CalendarAdapter calendarAdapter;
     private Context mContext;
+    private boolean canGoBack = false;
+
+    public void setCanGoBack(boolean canGoBack) {
+        this.canGoBack = canGoBack;
+    }
 
     public CalendarView(Context context) {
         super(context);
@@ -138,7 +143,13 @@ public class CalendarView extends LinearLayout {
                     e.printStackTrace();
                 }
                 if (dateOne.compareTo(dateTwo) < 0) {
-                    Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
+                    if (!canGoBack)
+                        Helpers.showSnackBar(getRootView().findViewById(android.R.id.content), R.string.cannot_go_back_from_current_date);
+                    else
+                        currentDate.add(Calendar.DAY_OF_YEAR, -1);
+                        selectedDate = currentDate.getTime();
+                        eventHandler.onDayPress(selectedDate);
+                        updateCalendar();
 
                 } else {
                     currentDate.add(Calendar.DAY_OF_YEAR, -1);

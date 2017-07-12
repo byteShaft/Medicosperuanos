@@ -448,6 +448,14 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
                 break;
             case R.id.send_button:
+                String message = writeMessageEditText.getText().toString();
+                Log.i("TAG", "edittext " + String.valueOf(writeMessageEditText == null));
+                Log.i("TAG", "value " + String.valueOf(message == null));
+                if (message == null && imageUrl == null) {
+                    Helpers.showSnackBar(findViewById(android.R.id.content),
+                            getResources().getString(R.string.message_error));
+                    break;
+                }
                 if (!writeMessageEditText.getText().toString().trim().isEmpty() || !imageUrl.trim().isEmpty()) {
                     sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
                     writeMessageEditText.getText().clear();

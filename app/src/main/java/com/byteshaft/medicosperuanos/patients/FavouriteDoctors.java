@@ -364,7 +364,8 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
                                 myFavoriteDoctorsList.setFavorite(jsonObject.getBoolean("is_favorite"));
                                 myFavoriteDoctorsList.setLocation(jsonObject.getString("location"));
                                 myFavoriteDoctorsList.setAvailableToChat(jsonObject.getBoolean("available_to_chat"));
-                                JSONObject specialityJsonObject = jsonObject.getJSONObject("speciality");
+                                JSONArray specialityJsonArray = jsonObject.getJSONArray("speciality");
+                                JSONObject specialityJsonObject = specialityJsonArray.getJSONObject(0);
                                 myFavoriteDoctorsList.setSpeciality(specialityJsonObject.getString("name"));
                                 myFavoriteDoctorsList.setDoctorImage(jsonObject.getString("photo").replace("http://localhost", AppGlobals.SERVER_IP));
                                 myFavoriteDoctorsList.setStars(jsonObject.getInt("review_stars"));

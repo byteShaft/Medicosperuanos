@@ -6,12 +6,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.RemoteInput;
 import android.support.v4.content.ContextCompat;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
 import com.byteshaft.medicosperuanos.R;
@@ -23,6 +25,11 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+
+import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
 
 public class Service extends FirebaseMessagingService {
@@ -41,6 +48,9 @@ public class Service extends FirebaseMessagingService {
     private String senderImageUrl;
     private String attachment;
     private String createdAt;
+    private String photo;
+    private String patientName;
+    private boolean isMale = false;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -57,18 +67,40 @@ public class Service extends FirebaseMessagingService {
             }
         } else {
             doctorName = remoteMessage.getData().get("doctor_name");
+            patientName = remoteMessage.getData().get("patient_name");
             appointmentReason = remoteMessage.getData().get("appointment_reason");
             appointmentState = remoteMessage.getData().get("reason");
             senderName = remoteMessage.getData().get("sender_name");
             messageBody = remoteMessage.getData().get("text");
             senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
             senderImageUrl = remoteMessage.getData().get("sender_image_url");
+            photo = remoteMessage.getData().get("sender_photo");
+            if (remoteMessage.getData().get("type").equals("appointment") && remoteMessage.getData().get("gender").equals("M")) {
+                isMale = true;
+            } else {
+                isMale = false;
+            }
             if (remoteMessage.getData().containsKey("attachment")) {
                 attachment = remoteMessage.getData().get("attachment");
             }
 
             if (remoteMessage.getData().get("type").equals("appointment")) {
-                sendNotification();
+                if (remoteMessage.getData().get("reason").equals("request")) {
+                    final SpannableStringBuilder sb = new SpannableStringBuilder("Date");
+                    final StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD); //Span to make text italic
+                    sb.setSpan(bss, 0, 4, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    String message  = patientName+ " has requested appointment \n"+sb.toString()+": " +
+                            remoteMessage.getData().get("date") + " Start Time: " +
+                            remoteMessage.getData().get("start_time");
+                    sendNotification(message, patientName, appointmentReason);
+                } else {
+                    String doctor;
+                    if (isMale)
+                        doctor = "Dr "+ doctorName;
+                    else doctor = "Dra " + doctorName;
+                    String message  = "Appointment " + appointmentState + " by " +doctor ;
+                    sendNotification(message, doctor, appointmentReason);
+                }
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
@@ -136,20 +168,32 @@ public class Service extends FirebaseMessagingService {
                 newMessageNotification);
     }
 
-    private void sendNotification() {
+    private void sendNotification(String messageBody, String doctorName, String appointmentReason) {
         Intent intent = new Intent(this, MainMessages.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+        ImageLoadingListener animateFirstListener;
+        DisplayImageOptions options;
+        options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.mipmap.image_placeholder)
+                .showImageOnLoading(R.mipmap.image_placeholder)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                .cacheInMemory(false)
+                .cacheOnDisc(false).considerExifParams(true).build();
+         Bitmap bitmap = sImageLoader.loadImageSync(AppGlobals.SERVER_IP+photo, options);
+
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setLargeIcon(bm)
+                .setLargeIcon(bitmap)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setTicker(appointmentReason)
+                .setStyle(new NotificationCompat.BigTextStyle())
                 .setContentTitle(doctorName)
-                .setContentText("Has " + appointmentState + " your appointment")
+                .setContentText(messageBody)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
