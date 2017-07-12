@@ -20,6 +20,7 @@ import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -82,7 +83,12 @@ public class Dashboard extends Fragment {
         mChart.setDrawGridBackground(false);
         mChart.setDrawGridBackground(false);
         mChart.setAutoScaleMinMaxEnabled(true);
+        mChart.setDoubleTapToZoomEnabled(false);
         mChart.animateXY(2000, 2000);
+        Description description = new Description();
+        description.setText("");
+
+        mChart.setDescription(description);
         incomeArrayList = new ArrayList<>();
 
         doctorName.setTypeface(AppGlobals.typefaceNormal);
