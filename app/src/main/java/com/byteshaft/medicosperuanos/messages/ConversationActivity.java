@@ -98,6 +98,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private LinearLayoutManager linearLayoutManager;
     private boolean loading = false;
     private boolean loadingPrevious = false;
+    private int scrollPosition = 0;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -176,6 +177,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 //                            getResources().getString(R.string.loading));
                     return;
                 }
+                scrollPosition = linearLayoutManager.findFirstVisibleItemPosition();
                 if (!recyclerView.canScrollVertically(-1)) {
                     onScrolledToTop();
                 } else if (!recyclerView.canScrollVertically(1)) {
@@ -401,7 +403,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 loading = false;
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", httpRequest.getResponseText());
+//                        Log.i("TAG", httpRequest.getResponseText());
                         ArrayList<ChatModel> previousMessages = new ArrayList<>();
                         if (loadingPrevious) {
                             for (ChatModel chatModel: messages) {
@@ -445,14 +447,17 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 chatAdapter.notifyDataSetChanged();
                                 conversation.scrollToPosition(messages.size() - 1);
                             }
+                            Log.i("TAg", "Size " + messages.size());
                             if (loadingPrevious) {
                                 Log.i("TAg", "added all");
                                 for (ChatModel chatModel: previousMessages) {
                                     messages.add(chatModel);
                                 }
-//                                messages.addAll(previousMessages);
-                                chatAdapter.notifyDataSetChanged();
+                                ChatAdapter chatAdapter = new ChatAdapter(messages);
+                                conversation.setAdapter(chatAdapter);
+                                conversation.scrollToPosition(scrollPosition);
                             }
+                            Log.i("TAg", "Size " + messages.size());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
