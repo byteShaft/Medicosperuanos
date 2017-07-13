@@ -84,7 +84,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 }
 //                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
                 currentDate = dateFormat.format(formattedDate);
-                Log.i("TAG", "current date  " + currentDate);
                 getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
                         ))));
@@ -174,13 +173,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_button:
-                Log.i("TAG","size" +  toBeDelete.size());
-                Log.i("TAG","schedule " + scheduleId);
-                if (toBeDelete.size() == 0 && scheduleId == -1 ) {
-                    Log.i("TAG","SCHEDULE");
+                Log.i("TAG", "tobe delete size " + toBeDelete.size() + "schedule " + scheduleId);
+                if (toBeDelete.size() == 0 && scheduleId == -1) {
                     sendSchedule();
                 } else if (toBeDelete.size() > 0 || scheduleId != -1 ) {
                     Integer key = -1;
+                    updateSchedule(scheduleId);
                     ArrayList<Integer> value = new ArrayList<>();
                     for (Map.Entry<Integer, ArrayList<Integer>> entry : toBeDelete.entrySet()) {
                         key = entry.getKey();
@@ -189,7 +187,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     if (key != -1) {
                         deleteSchedule(key, value);
                     }
-                    updateSchedule(scheduleId);
                 }
                 break;
         }
@@ -221,62 +218,59 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             }
             final ArrayList<JSONObject> data = scheduleList.get(currentDate);
             final JSONObject jsonObject = data.get(position);
+            viewHolder.state.setOnCheckedChangeListener(null);
             viewHolder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    int pos = (int) viewHolder.state.getTag();
-                    View checkBoxView = mListView.getChildAt(pos);
-                    if (checkBoxView != null) {
-                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
-                        if (b) {
-                            data.remove(position);
-                            try {
-                                jsonObject.put("state", true);
-                                Log.i("TAG", "ADAPTER onCheckedChanged" + String.valueOf(jsonObject.getBoolean("state")));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            data.add(position, jsonObject);
-                            Log.i("TAG", "ADAPTER onCheckedChanged" +String.valueOf(data.get(position)));
-
-                        } else {
-                            try {
-                                if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
-                                    Helpers.showSnackBar(MySchedule.this.getView(),
-                                            getResources().getString(R.string.already_taken));
-                                    notifyDataSetChanged();
-                                    return;
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if (jsonObject.has("ids")) {
-                                try {
-                                    Integer[] idsArray = (Integer[]) jsonObject.get("ids");
-                                    toBeDeleteSelectedIds.add(idsArray[0]);
-                                    toBeDelete.put(idsArray[1], toBeDeleteSelectedIds);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            data.remove(position);
-                            try {
-                                jsonObject.put("state", false);
-                                Log.i("TAG", "ADAPTER onCheckedChanged" + String.valueOf(jsonObject.getBoolean("state")));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            data.add(position, jsonObject);
-                            Log.i("TAG","ADAPTER onCheckedChanged"+ String.valueOf(data.get(position)));
+//                    int pos = (int) viewHolder.state.getTag();
+//                    View checkBoxView = mListView.getChildAt(pos);
+//                    if (checkBoxView != null) {
+//                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
+                    if (b) {
+                        data.remove(position);
+                        try {
+                            jsonObject.put("state", true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
+
+                        data.add(position, jsonObject);
+                        Log.i("TAG", "Added" + jsonObject.toString());
+                    } else {
+                        try {
+                            if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
+                                Helpers.showSnackBar(MySchedule.this.getView(),
+                                        getResources().getString(R.string.already_taken));
+                                notifyDataSetChanged();
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (jsonObject.has("ids")) {
+                            try {
+                                Integer[] idsArray = (Integer[]) jsonObject.get("ids");
+                                toBeDeleteSelectedIds.add(idsArray[0]);
+                                toBeDelete.put(idsArray[1], toBeDeleteSelectedIds);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        data.remove(position);
+                        try {
+                            jsonObject.put("state", false);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        data.add(position, jsonObject);
+                        Log.i("TAG", "Removed" + jsonObject.toString());
                     }
+//                    }
                 }
             });
             try {
                 viewHolder.startTime.setText(jsonObject.getString("start_time"));
                 viewHolder.endTime.setText(jsonObject.getString("end_time"));
-                Log.i("TAG", "ADAPTER" + String.valueOf(jsonObject.getBoolean("state")));
                 if (map != null) {
                     if (!map.containsKey(jsonObject.getString("start_time").trim())) {
                         viewHolder.state.setChecked(false);
@@ -327,7 +321,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
-                        Log.i("TAG", request.getResponseURL());
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_NO_CONTENT:
                                 break;
@@ -355,7 +348,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.i("TAG", "DELETE" + jsonObject.toString());
         request.send(jsonObject.toString());
     }
 
@@ -372,7 +364,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             case HttpURLConnection.HTTP_OK:
                                 Helpers.showSnackBar(getView(), getResources().getString(R.string.schedule_updated));
                                 getSchedule(currentDate);
-                                Log.i("Update", httpRequest.getResponseText());
                         }
                 }
 
@@ -418,8 +409,11 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             jsonObject.put("date", currentDate);
             JSONArray jsonArray = new JSONArray();
             ArrayList<JSONObject> jsonObjectJSONArray = scheduleList.get(currentDate);
+            Log.i("TAG", "jsonObjectJSONArray" + jsonObjectJSONArray.size());
             for (JSONObject singleJson : jsonObjectJSONArray) {
-                if (singleJson.getBoolean("state") && !alreadySelectedSchedule.contains(singleJson)) {
+                Log.i("TAG", "loop" +singleJson.getBoolean("state"));
+                if (singleJson.getBoolean("state")) {
+                    Log.i("TAG", "Tobe sent" + singleJson.toString());
 //                    singleJson.remove("state");
                     JSONObject time = new JSONObject();
                     time.put("start_time", singleJson.get("start_time").toString().trim());
@@ -427,10 +421,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     jsonArray.put(time);
                 }
             }
-            Log.i("DATA", jsonObject.toString());
+            Log.i("TAG", "jsonArray" + jsonArray.length());
             if (jsonArray.length() > 0) {
                 jsonObject.put("time_slots", jsonArray);
-                Log.i("DATA", jsonObject.toString());
                 Helpers.showProgressDialog(getActivity(),
                         getResources().getString(R.string.setting_up_schedule));
                 request.send(jsonObject.toString());
@@ -447,26 +440,23 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
+                        Log.i("TAG", "GEt schedule " + request.getResponseText());
                         scheduleId = -1;
-                        Log.i("TAG", "response  " + request.getResponseText());
                         map = new HashMap<>();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             jsonArray = jsonObject.getJSONArray("results");
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject object = jsonArray.getJSONObject(i);
-//                                Log.i("TAG", "Object " + object);
                                 scheduleId = object.getInt("id");
                                 JSONArray timeSlots = object.getJSONArray("time_slots");
                                 for (int r = 0; r < timeSlots.length(); r++) {
                                     JSONObject timeSlot = timeSlots.getJSONObject(r);
-//                                    Log.i("TAG", "time slot" + timeSlot);
                                     String startTime = timeSlot.getString("start_time");
                                     map.put(startTime.trim(), new Integer[]{
                                             timeSlot.getInt("id"), object.getInt("id")});
                                 }
                             }
-//                            Log.i("Map", map.toString());
                             ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
                             if (jsonObjects.size() > 0) {
                                 for (int j = 0; j < jsonObjects.size(); j++) {
@@ -487,7 +477,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         break;
                     case HttpURLConnection.HTTP_CREATED:
                         Helpers.showSnackBar(getView(), R.string.success);
-                        scheduleAdapter.notifyDataSetChanged();
+                        getSchedule(currentDate);
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (Helpers.getAlertDialog() == null) {
@@ -496,7 +486,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
-                        Log.i("TAG", "request " + request.getResponseText());
                         break;
                 }
         }
