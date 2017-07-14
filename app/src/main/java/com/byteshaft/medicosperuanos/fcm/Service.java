@@ -22,12 +22,12 @@ import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.messages.MainMessages;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.medicosperuanos.utils.NotificationDeleteIntent;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
@@ -36,7 +36,6 @@ public class Service extends FirebaseMessagingService {
 //    private String message;
 
     private static int APPOINTMENT_NOTIFICATION_ID = 101;
-    private static int REPLY_NOTIFICATION_ID = 202;
     private static String KEY_TEXT_REPLY = "key_text_reply";
 
     private String doctorName;
@@ -123,6 +122,16 @@ public class Service extends FirebaseMessagingService {
         }
     }
 
+    private PendingIntent createOnDismissedIntent(Context context, int notificationId, int senderId) {
+        Intent intent = new Intent(context, NotificationDeleteIntent.class);
+        intent.putExtra("com.byteshaft.medicosperuanos.notificationId", notificationId);
+        intent.putExtra("senderId", senderId);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(context.getApplicationContext(),
+                        notificationId, intent, 0);
+        return pendingIntent;
+    }
+
     public void replyNotification() {
         String replyLabel = "Enter your reply here";
         RemoteInput remoteInput =
@@ -158,13 +167,14 @@ public class Service extends FirebaseMessagingService {
                                 R.drawable.msg)
                         .setContentTitle(senderName)
                         .setContentText(messageBody)
+                        .setDeleteIntent(createOnDismissedIntent(this, AppGlobals.REPLY_NOTIFICATION_ID, senderId))
                         .addAction(replyAction).build();
 
         NotificationManager notificationManager =
                 (NotificationManager)
                         getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(REPLY_NOTIFICATION_ID,
+        notificationManager.notify(AppGlobals.REPLY_NOTIFICATION_ID,
                 newMessageNotification);
     }
 
@@ -175,8 +185,6 @@ public class Service extends FirebaseMessagingService {
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        ImageLoadingListener animateFirstListener;
         DisplayImageOptions options;
         options = new DisplayImageOptions.Builder()
                 .showImageOnFail(R.mipmap.image_placeholder)

@@ -3,6 +3,7 @@ package com.byteshaft.medicosperuanos;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -17,7 +18,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -116,6 +121,18 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_doctor, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.doctor_menus);
+
+            // get menu from navigationView
+            Menu menu = navigationView.getMenu();
+            // find MenuItem you want to change
+            MenuItem navMessages = menu.findItem(R.id.nav_messages);
+            if (AppGlobals.getUnReadMessages().size() > 0) {
+                SpannableString s = new SpannableString("Messages         "+
+                        String.valueOf(AppGlobals.getUnReadMessages().size()));
+                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                navMessages.setTitle(s);
+            }
             /// Doctor's Navigation items
 
             TextView docName = (TextView) headerView.findViewById(R.id.doc_nav_name);
@@ -211,6 +228,17 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_patient, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.patient_menu);
+            // get menu from navigationView
+            Menu menu = navigationView.getMenu();
+            // find MenuItem you want to change
+            MenuItem navMessages = menu.findItem(R.id.nav_messages);
+            if (AppGlobals.getUnReadMessages().size() > 0) {
+                SpannableString s = new SpannableString("Messages         "+
+                        String.valueOf(AppGlobals.getUnReadMessages().size()));
+                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                navMessages.setTitle(s);
+            }
             TextView patientName = (TextView) headerView.findViewById(R.id.patient_nav_name);
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);

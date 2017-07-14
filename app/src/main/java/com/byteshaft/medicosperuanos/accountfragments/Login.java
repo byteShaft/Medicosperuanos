@@ -255,8 +255,8 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         String subscriptionType = subscriptionPlanObject.getString("plan_type");
 
                                         JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
-                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
-                                                affiliateClinicObject.getInt("id"));
+//                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTE,
+//                                                affiliateClinicObject.getInt("id"));
                                         String affiliateClinic = affiliateClinicObject.getString("name");
                                         String collageId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
                                         String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);

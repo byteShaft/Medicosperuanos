@@ -62,6 +62,7 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
                 getMessages();
             }
         });
+        AppGlobals.removeUnreadMessages();
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.messages));
         getMessages();
