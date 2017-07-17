@@ -45,9 +45,13 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -89,6 +93,8 @@ public class MainActivity extends AppCompatActivity
     private NavigationView patientNavigationView;
     private boolean foreground = false;
 
+    private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,8 +109,9 @@ public class MainActivity extends AppCompatActivity
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.i("TAG", "token  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.i("TAG", "id  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
@@ -183,11 +190,6 @@ public class MainActivity extends AppCompatActivity
                             if (isError) {
                                 isError = false;
                             } else {
-                                if (b) {
-                                    doctorOnlineSwitch.setText(R.string.online);
-                                } else {
-                                    doctorOnlineSwitch.setText(R.string.offline);
-                                }
                                     changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
                                             String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
                                             consultationTime, String.valueOf(subscriptionPlan), collegeId);
@@ -507,12 +509,28 @@ public class MainActivity extends AppCompatActivity
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        if (!AppGlobals.isDoctor()) {
-                            patientOnlineSwitch.setEnabled(true);
-                            AppGlobals.saveChatStatus(patientOnlineSwitch.isChecked());
-                        } else {
-                            doctorOnlineSwitch.setEnabled(true);
-                            AppGlobals.saveChatStatus(doctorOnlineSwitch.isChecked());
+                        LOGGER.info(request.getResponseText());
+                        try {
+                            JSONObject jsonObject1  = new JSONObject(request.getResponseText());
+                            if (!AppGlobals.isDoctor()) {
+                                if (jsonObject1.getBoolean("available_to_chat")) {
+                                    patientOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    patientOnlineSwitch.setText(R.string.offline);
+                                }
+                                patientOnlineSwitch.setEnabled(true);
+                                AppGlobals.saveChatStatus(jsonObject1.getBoolean("available_to_chat"));
+                            } else {
+                                if (jsonObject1.getBoolean("available_to_chat")) {
+                                    doctorOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    doctorOnlineSwitch.setText(R.string.offline);
+                                }
+                                doctorOnlineSwitch.setEnabled(true);
+                                AppGlobals.saveChatStatus(jsonObject1.getBoolean("available_to_chat"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:

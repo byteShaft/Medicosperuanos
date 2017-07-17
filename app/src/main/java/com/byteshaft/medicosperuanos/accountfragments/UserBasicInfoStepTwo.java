@@ -516,11 +516,11 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             System.out.println(jsonObject + "working ");
 
-                            String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
+                            String userId = jsonObject.getString("user");
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                             String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
-                            String profileId = jsonObject.getString("user");
+                            String profileId = jsonObject.getString("id");
 
                             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
                             String dateOfBirth = jsonObject.getString(AppGlobals.KEY_DATE_OF_BIRTH);
@@ -583,13 +583,11 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             System.out.println(jsonObject + "working ");
 
-                            String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
+                            String userId = jsonObject.getString("user");
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                             String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
-                            String profileId = jsonObject.getString("user");
-
-
+                            String profileId = jsonObject.getString("id");
                             Log.i("TAG", "server url " + imageUrl);
 
                             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
@@ -620,7 +618,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, dateOfBirth);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_PRIMARY, phoneNumberPrimary);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneNumberSecondary);
-
 //                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC_ID, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_INSURANCE_CARRIER, insuranceCarrier);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);

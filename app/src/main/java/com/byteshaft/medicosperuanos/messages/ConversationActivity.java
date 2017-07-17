@@ -555,6 +555,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
                 if (!writeMessageEditText.getText().toString().trim().isEmpty() || !imageUrl.trim().isEmpty()) {
                     sendMessage(id, writeMessageEditText.getText().toString(), imageUrl);
+                    Log.i("TAG", "Sent ");
                     writeMessageEditText.getText().clear();
                 } else {
                     Helpers.showSnackBar(findViewById(android.R.id.content),

@@ -391,20 +391,25 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                                         PatientDetails.getInstance().finish();
                                     }
                                     finish();
+                                } else {
+                                    finish();
+                                }
+                                if (AppGlobals.isDoctor()) {
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             MainActivity.getInstance().loadFragment(new Appointments());
                                         }
                                     }, 600);
+
                                 } else {
-                                    finish();
                                     new android.os.Handler().postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             MainActivity.getInstance().loadFragment(new MyAppointments());
                                         }
-                                    }, 600);                                }
+                                    }, 600);
+                                }
                             }
                         }, 500);
                         break;
