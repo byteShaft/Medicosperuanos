@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -57,7 +58,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -214,6 +217,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
+        Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
+        Set<String> ids = new HashSet<>();
+        Log.i("TAg", String.valueOf(alreadyExisting.contains(String.valueOf(id))));
+        if (alreadyExisting.contains(String.valueOf(id))) {
+            alreadyExisting.remove(String.valueOf(id));
+        }
+        ids.addAll(alreadyExisting);
+        AppGlobals.setUnreadMessages(ids);
+        MainActivity.getInstance().updateMessages();
+        Log.i("TAg", alreadyExisting.toString());
     }
 
     public void onScrolledUp() {

@@ -22,6 +22,7 @@ import android.text.SpannableString;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -116,6 +117,29 @@ public class MainActivity extends AppCompatActivity
         if (AppGlobals.isDoctor()) {
             View headerView;
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+                @Override
+                public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                }
+
+                @Override
+                public void onDrawerOpened(View drawerView) {
+                    Log.i("TAG", "test");
+                    updateMessages();
+
+                }
+
+                @Override
+                public void onDrawerClosed(View drawerView) {
+
+                }
+
+                @Override
+                public void onDrawerStateChanged(int newState) {
+
+                }
+            });
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
@@ -204,6 +228,13 @@ public class MainActivity extends AppCompatActivity
         } else {
             View headerView;
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.setOnDragListener(new View.OnDragListener() {
+                @Override
+                public boolean onDrag(View view, DragEvent dragEvent) {
+                    updateMessages();
+                    return true;
+                }
+            });
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
             drawer.setDrawerListener(toggle);
@@ -379,7 +410,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void updateMessages() {
-        if (foreground) {
+//        if (foreground) {
             NavigationView navigationView;
             if (AppGlobals.isDoctor())
                 navigationView = doctorNavigationView;
@@ -394,8 +425,11 @@ public class MainActivity extends AppCompatActivity
                 s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
                 s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
                 navMessages.setTitle(s);
+            } else {
+                navMessages.setTitle("Messages");
             }
-        }
+            invalidateOptionsMenu();
+//        }
     }
 
     @Override

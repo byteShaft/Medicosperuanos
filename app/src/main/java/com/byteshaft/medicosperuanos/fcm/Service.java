@@ -170,6 +170,8 @@ public class Service extends FirebaseMessagingService {
                         .addRemoteInput(remoteInput)
                         .build();
 
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         Notification newMessageNotification =
                 new NotificationCompat.Builder(this)
                         .setColor(ContextCompat.getColor(this,
@@ -178,6 +180,7 @@ public class Service extends FirebaseMessagingService {
                                 R.drawable.msg)
                         .setContentTitle(senderName)
                         .setContentText(messageBody)
+                        .setSound(defaultSoundUri)
                         .setDeleteIntent(createOnDismissedIntent(this, AppGlobals.REPLY_NOTIFICATION_ID, senderId))
                         .addAction(replyAction).build();
 
@@ -191,7 +194,6 @@ public class Service extends FirebaseMessagingService {
 
     private void sendNotification(String messageBody, String doctorName, String appointmentReason) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
