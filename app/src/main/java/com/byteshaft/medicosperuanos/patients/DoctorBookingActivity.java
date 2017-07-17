@@ -232,7 +232,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
         if (fromDoctor) {
-            userId = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+            userId = Integer.parseInt(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID));
         }
         String url = String.format("%sdoctors/%s/schedule?date=%s",
                 AppGlobals.BASE_URL, userId, targetDate);

@@ -612,6 +612,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", "res" + request.getResponseText());
                 if (alertDialog != null) {
                     alertDialog.dismiss();
                 } else {
@@ -662,18 +663,16 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                             }
                         }, 800);
                         break;
-
                 }
         }
-
     }
 
     private void parseServerResponse(HttpRequest request) {
         try {
             JSONObject jsonObject = new JSONObject(request.getResponseText());
 
-            String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
-            String profileId = jsonObject.getString("user");
+            String userId = jsonObject.getString("user");
+            String profileId = jsonObject.getString("id");
             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
 

@@ -101,4 +101,9 @@
         <item name="colorButtonNormal">@color/buttonColor</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="message">
+        <item name="android:textColor">#FF0000</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMapForImage;
+import static com.byteshaft.medicosperuanos.utils.Helpers.getBitMapForSelectedImage;
 
 public class SelectedImages extends AppCompatActivity {
 
@@ -43,6 +43,7 @@ public class SelectedImages extends AppCompatActivity {
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
             System.out.println(pair.getKey() + " = " + pair.getValue());
+            if (pair.getValue() != null)
             arrayList.add(String.valueOf(pair.getKey()));
         }
     }
@@ -101,11 +102,12 @@ public class SelectedImages extends AppCompatActivity {
                     if (DoctorsAppointment.photosHashMap.containsKey(imagesList.get(position))) {
                         DoctorsAppointment.photosHashMap.remove(imagesList.get(position));
                         DoctorsAppointment.removedImages.add(imagesList.get(position));
-                        notifyDataSetChanged();
+                        androidGridView = (GridView) findViewById(R.id.selected_images);
+                        adapter = new ImagesAdapter(arrayList);
                     }
                 }
             });
-            getBitMapForImage(DoctorsAppointment.photosHashMap.get(imagesList.get(position)), viewHolder.imageView);
+            getBitMapForSelectedImage(DoctorsAppointment.photosHashMap.get(imagesList.get(position)), viewHolder.imageView);
             return convertView;
         }
 

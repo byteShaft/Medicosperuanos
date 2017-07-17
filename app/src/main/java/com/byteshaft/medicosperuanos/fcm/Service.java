@@ -16,18 +16,18 @@ import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.Log;
 
+import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
-import com.byteshaft.medicosperuanos.messages.MainMessages;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
+import com.byteshaft.medicosperuanos.utils.NotificationDeleteIntent;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
@@ -36,7 +36,6 @@ public class Service extends FirebaseMessagingService {
 //    private String message;
 
     private static int APPOINTMENT_NOTIFICATION_ID = 101;
-    private static int REPLY_NOTIFICATION_ID = 202;
     private static String KEY_TEXT_REPLY = "key_text_reply";
 
     private String doctorName;
@@ -51,6 +50,7 @@ public class Service extends FirebaseMessagingService {
     private String photo;
     private String patientName;
     private boolean isMale = false;
+    private boolean chatStatus = false;
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -75,6 +75,8 @@ public class Service extends FirebaseMessagingService {
             senderId = Integer.parseInt(remoteMessage.getData().get("sender_id"));
             senderImageUrl = remoteMessage.getData().get("sender_image_url");
             photo = remoteMessage.getData().get("sender_photo");
+            chatStatus = Boolean.parseBoolean(remoteMessage.getData().get("available_to_chat"));
+
             if (remoteMessage.getData().get("type").equals("appointment") && remoteMessage.getData().get("gender").equals("M")) {
                 isMale = true;
             } else {
@@ -98,9 +100,14 @@ public class Service extends FirebaseMessagingService {
                     if (isMale)
                         doctor = "Dr "+ doctorName;
                     else doctor = "Dra " + doctorName;
-                    String message  = "Appointment " + appointmentState + " by " +doctor ;
+                    String message  = "Appointment " + appointmentState + " by " +doctor +"\n"
+                            + "Appointment Reason: " + appointmentReason;
                     sendNotification(message, doctor, appointmentReason);
                 }
+            } else if (remoteMessage.getData().get("type").equals("subscription_expired")) {
+                sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
+                        "to renew your subscription ", "Subscription Expired", "Subscription Expired");
+
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
@@ -123,6 +130,16 @@ public class Service extends FirebaseMessagingService {
         }
     }
 
+    private PendingIntent createOnDismissedIntent(Context context, int notificationId, int senderId) {
+        Intent intent = new Intent(context, NotificationDeleteIntent.class);
+        intent.putExtra("com.byteshaft.medicosperuanos.notificationId", notificationId);
+        intent.putExtra("senderId", senderId);
+        PendingIntent pendingIntent =
+                PendingIntent.getBroadcast(context.getApplicationContext(),
+                        notificationId, intent, 0);
+        return pendingIntent;
+    }
+
     public void replyNotification() {
         String replyLabel = "Enter your reply here";
         RemoteInput remoteInput =
@@ -134,6 +151,9 @@ public class Service extends FirebaseMessagingService {
                 new Intent(this, ConversationActivity.class);
         resultIntent.putExtra("notification", true);
         resultIntent.putExtra("sender_id", senderId);
+        resultIntent.putExtra("status", chatStatus);
+        resultIntent.putExtra("name", senderName);
+        resultIntent.putExtra("image_url", AppGlobals.SERVER_IP + senderImageUrl);
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -158,25 +178,24 @@ public class Service extends FirebaseMessagingService {
                                 R.drawable.msg)
                         .setContentTitle(senderName)
                         .setContentText(messageBody)
+                        .setDeleteIntent(createOnDismissedIntent(this, AppGlobals.REPLY_NOTIFICATION_ID, senderId))
                         .addAction(replyAction).build();
 
         NotificationManager notificationManager =
                 (NotificationManager)
                         getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(REPLY_NOTIFICATION_ID,
+        notificationManager.notify(AppGlobals.REPLY_NOTIFICATION_ID,
                 newMessageNotification);
     }
 
     private void sendNotification(String messageBody, String doctorName, String appointmentReason) {
-        Intent intent = new Intent(this, MainMessages.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        ImageLoadingListener animateFirstListener;
         DisplayImageOptions options;
         options = new DisplayImageOptions.Builder()
                 .showImageOnFail(R.mipmap.image_placeholder)

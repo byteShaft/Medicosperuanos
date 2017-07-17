@@ -3,6 +3,7 @@ package com.byteshaft.medicosperuanos;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -17,7 +18,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -40,9 +45,13 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -80,12 +89,18 @@ public class MainActivity extends AppCompatActivity
     private String[] speciality;
     private int subscriptionPlan;
     private String collegeId;
+    private NavigationView doctorNavigationView;
+    private NavigationView patientNavigationView;
+    private boolean foreground = false;
+
+    private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sInstance = this;
         setContentView(R.layout.activity_main);
+        foreground = true;
         if (AccountManagerActivity.getInstance() != null) {
             AccountManagerActivity.getInstance().finish();
         }
@@ -94,8 +109,9 @@ public class MainActivity extends AppCompatActivity
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Log.i("TAG", "token  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.i("TAG", "id  " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID));
+        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
 
         if (AppGlobals.isDoctor()) {
             View headerView;
@@ -116,8 +132,7 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_doctor, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.doctor_menus);
-            /// Doctor's Navigation items
-
+            doctorNavigationView = navigationView;
             TextView docName = (TextView) headerView.findViewById(R.id.doc_nav_name);
             TextView docEmail = (TextView) headerView.findViewById(R.id.doc_nav_email);
             TextView docSpeciality = (TextView) headerView.findViewById(R.id.doc_nav_speciality);
@@ -175,11 +190,6 @@ public class MainActivity extends AppCompatActivity
                             if (isError) {
                                 isError = false;
                             } else {
-                                if (b) {
-                                    doctorOnlineSwitch.setText(R.string.online);
-                                } else {
-                                    doctorOnlineSwitch.setText(R.string.offline);
-                                }
                                     changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
                                             String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
                                             consultationTime, String.valueOf(subscriptionPlan), collegeId);
@@ -211,6 +221,8 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_patient, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.patient_menu);
+            patientNavigationView = navigationView;
+
             TextView patientName = (TextView) headerView.findViewById(R.id.patient_nav_name);
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);
@@ -349,32 +361,41 @@ public class MainActivity extends AppCompatActivity
         }
         formData.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", subscription_plan);
         formData.append(FormData.TYPE_CONTENT_TEXT, "college_id", collegeId);
-
-
-//
-//
-//        try {
-//            jsonObject.put("available_to_chat", status);
-//            jsonObject.put("address", address);
-//            jsonObject.put("city", city);
-//            jsonObject.put("dob", dob);
-//            jsonObject.put("first_name", first_name);
-//            jsonObject.put("gender", gender);
-//            jsonObject.put("identity_document", identity_document);
-//            jsonObject.put("insurance_carrier", insurance_carrier);
-//            jsonObject.put("last_name", last_name);
-//            jsonObject.put("location", location);
-//            jsonObject.put("phone_number_primary", phone_number_primary);
-//            jsonObject.put("state", state);
-//            jsonObject.put("consultation_time", consultation_time);
-//            jsonObject.put("speciality", speciality);
-//            jsonObject.put("subscription_plan", subscription_plan);
-//            jsonObject.put("college_id", collegeId);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
         return formData;
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foreground = true;
+        updateMessages();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        foreground = false;
+    }
+
+    public void updateMessages() {
+        if (foreground) {
+            NavigationView navigationView;
+            if (AppGlobals.isDoctor())
+                navigationView = doctorNavigationView;
+            else
+                navigationView = patientNavigationView;
+            Menu menu = navigationView.getMenu();
+            // find MenuItem you want to change
+            MenuItem navMessages = menu.findItem(R.id.nav_messages);
+            if (AppGlobals.getUnReadMessages().size() > 0) {
+                SpannableString s = new SpannableString("Messages         " +
+                        String.valueOf(AppGlobals.getUnReadMessages().size()));
+                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                navMessages.setTitle(s);
+            }
+        }
     }
 
     @Override
@@ -488,12 +509,28 @@ public class MainActivity extends AppCompatActivity
             case HttpRequest.STATE_DONE:
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        if (!AppGlobals.isDoctor()) {
-                            patientOnlineSwitch.setEnabled(true);
-                            AppGlobals.saveChatStatus(patientOnlineSwitch.isChecked());
-                        } else {
-                            doctorOnlineSwitch.setEnabled(true);
-                            AppGlobals.saveChatStatus(doctorOnlineSwitch.isChecked());
+                        LOGGER.info(request.getResponseText());
+                        try {
+                            JSONObject jsonObject1  = new JSONObject(request.getResponseText());
+                            if (!AppGlobals.isDoctor()) {
+                                if (jsonObject1.getBoolean("available_to_chat")) {
+                                    patientOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    patientOnlineSwitch.setText(R.string.offline);
+                                }
+                                patientOnlineSwitch.setEnabled(true);
+                                AppGlobals.saveChatStatus(jsonObject1.getBoolean("available_to_chat"));
+                            } else {
+                                if (jsonObject1.getBoolean("available_to_chat")) {
+                                    doctorOnlineSwitch.setText(R.string.online);
+                                } else {
+                                    doctorOnlineSwitch.setText(R.string.offline);
+                                }
+                                doctorOnlineSwitch.setEnabled(true);
+                                AppGlobals.saveChatStatus(jsonObject1.getBoolean("available_to_chat"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:

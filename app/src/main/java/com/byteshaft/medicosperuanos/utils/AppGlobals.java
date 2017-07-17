@@ -117,6 +117,8 @@ public class AppGlobals extends Application {
     public static final String MESSAGES = "Message";
     public static final String APPOINTMENT_FOR_CONFIRMATION = "Appointment for confirmation";
     public static final String APPOINTMENT_CANCELLED = "Appointment Canceled";
+    public static int REPLY_NOTIFICATION_ID = 202;
+    private static final String UNREAD_MESSAGES = "unread_messages";
 
     @Override
     public void onCreate() {
@@ -185,6 +187,21 @@ public class AppGlobals extends Application {
     public static boolean isLogin() {
         SharedPreferences sharedPreferences = getPreferenceManager();
         return sharedPreferences.getBoolean(KEY_LOGIN, false);
+    }
+
+    public static void setUnreadMessages(Set<String> count) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putStringSet(UNREAD_MESSAGES, count).apply();
+    }
+
+    public static Set<String> getUnReadMessages() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getStringSet(UNREAD_MESSAGES, new HashSet<String>());
+    }
+
+    public static void removeUnreadMessages() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().remove(UNREAD_MESSAGES).apply();
     }
 
     public static void userType(boolean type) {

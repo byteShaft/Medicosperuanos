@@ -186,8 +186,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         arrayList = (ArrayList<Services>) getIntent().getSerializableExtra("services");
 
         getAppointmentDetails();
-//        getDiagnostic();
-//        getMedications();
 
         providedServicesIds = new ArrayList<>();
         removedImages = new ArrayList<>();
@@ -610,13 +608,14 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         String exploration = jsonObject.getString("exploration");
                                         String dateOfReturn = jsonObject.getString("date_of_return");
                                         String conclusion = jsonObject.getString("conclusion");
+                                        Log.i("TAG", jsonObject.toString());
                                         if (!jsonObject.isNull("photo1")) {
                                             photo1 = jsonObject.getString("photo1");
                                         }
                                         if (!jsonObject.isNull("photo2")) {
                                             photo2 = jsonObject.getString("photo2");
                                         }
-                                        if (!jsonObject.isNull("photo2")) {
+                                        if (!jsonObject.isNull("photo3")) {
                                             photo3 = jsonObject.getString("photo3");
                                         }
                                         if (!jsonObject.isNull("photo4")) {
@@ -794,6 +793,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
+        alertDialog.dismiss();
         switch (readyState) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
                 Helpers.showSnackBar(findViewById(android.R.id.content), "connection time out");
@@ -802,6 +802,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 Helpers.showSnackBar(findViewById(android.R.id.content),
                         getResources().getString(R.string.network_unreachable));
                 break;
+            default:  Helpers.showSnackBar(findViewById(android.R.id.content),
+                    getResources().getString(R.string.an_error_occurred));
+                break;
+
         }
 
     }

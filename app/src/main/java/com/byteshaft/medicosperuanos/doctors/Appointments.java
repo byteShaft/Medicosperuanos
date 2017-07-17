@@ -44,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.logging.Logger;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -277,6 +278,7 @@ public class Appointments extends Fragment implements
             @Override
             public void onReadyStateChange(HttpRequest request, int readyState) {
                 Log.i("TAG", request.getResponseURL());
+                Log.i("TAG","response "  +request.getResponseText());
                 switch (readyState) {
                     case HttpRequest.STATE_DONE:
                         Helpers.dismissProgressDialog();
@@ -285,9 +287,11 @@ public class Appointments extends Fragment implements
                                 Agenda agenda = agendaArrayList.get(position);
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
+                                Logger.getLogger("TAG").info(request.getResponseText());
                                 break;
                             case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
                                 Helpers.alertDialog(getActivity(), "Warning", "check your internet connection", null);
+                                break;
                         }
                 }
             }

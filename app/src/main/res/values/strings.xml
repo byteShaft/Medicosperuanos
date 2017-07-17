@@ -172,6 +172,7 @@
     <string name="rejected_appointment_cannot_be_opened">cannot open rejected appointment</string>
     <string name="no_speciality_selected">please select atleast one speciality</string>
     <string name="loading">loading</string>
+    <string name="an_error_occurred">An error occurred, please try again</string>
 
 </resources>
 

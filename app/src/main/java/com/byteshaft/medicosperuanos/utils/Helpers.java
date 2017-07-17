@@ -250,6 +250,19 @@ public class Helpers {
         sImageLoader.displayImage(url, imageView, options, animateFirstListener);
     }
 
+    public static void getBitMapForSelectedImage(String url, ImageView imageView) {
+        ImageLoadingListener animateFirstListener;
+        DisplayImageOptions options;
+        options = new DisplayImageOptions.Builder()
+                .showImageOnFail(R.mipmap.image_place_holder)
+                .showImageOnLoading(R.mipmap.image_place_holder)
+                .imageScaleType(ImageScaleType.IN_SAMPLE_INT)
+                .cacheInMemory(true)
+                .cacheOnDisc(true).considerExifParams(true).build();
+        animateFirstListener = new AnimateFirstDisplayListener();
+        sImageLoader.displayImage(url, imageView, options, animateFirstListener);
+    }
+
     private static class AnimateFirstDisplayListener extends
             SimpleImageLoadingListener {
 
