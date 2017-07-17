@@ -87,6 +87,7 @@ public class Appointments extends Fragment implements
         });
         foreground = true;
         sInstance = this;
+        swipeRefreshLayout.setNestedScrollingEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.appointments));
         mListView = (SwipeMenuListView) mBaseView.findViewById(R.id.listView);
@@ -249,6 +250,8 @@ public class Appointments extends Fragment implements
 //        });
         return mBaseView;
     }
+
+
 
     private void getAgendaList(String date) {
         if (!swipeRefresh && agendaArrayList.size() < 1) {
