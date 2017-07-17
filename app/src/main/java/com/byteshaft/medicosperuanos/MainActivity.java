@@ -85,12 +85,16 @@ public class MainActivity extends AppCompatActivity
     private String[] speciality;
     private int subscriptionPlan;
     private String collegeId;
+    private NavigationView doctorNavigationView;
+    private NavigationView patientNavigationView;
+    private boolean foreground = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sInstance = this;
         setContentView(R.layout.activity_main);
+        foreground = true;
         if (AccountManagerActivity.getInstance() != null) {
             AccountManagerActivity.getInstance().finish();
         }
@@ -121,20 +125,7 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_doctor, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.doctor_menus);
-
-            // get menu from navigationView
-            Menu menu = navigationView.getMenu();
-            // find MenuItem you want to change
-            MenuItem navMessages = menu.findItem(R.id.nav_messages);
-            if (AppGlobals.getUnReadMessages().size() > 0) {
-                SpannableString s = new SpannableString("Messages         "+
-                        String.valueOf(AppGlobals.getUnReadMessages().size()));
-                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-                navMessages.setTitle(s);
-            }
-            /// Doctor's Navigation items
-
+            doctorNavigationView = navigationView;
             TextView docName = (TextView) headerView.findViewById(R.id.doc_nav_name);
             TextView docEmail = (TextView) headerView.findViewById(R.id.doc_nav_email);
             TextView docSpeciality = (TextView) headerView.findViewById(R.id.doc_nav_speciality);
@@ -228,17 +219,8 @@ public class MainActivity extends AppCompatActivity
             headerView = getLayoutInflater().inflate(R.layout.nav_header_patient, navigationView, false);
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.patient_menu);
-            // get menu from navigationView
-            Menu menu = navigationView.getMenu();
-            // find MenuItem you want to change
-            MenuItem navMessages = menu.findItem(R.id.nav_messages);
-            if (AppGlobals.getUnReadMessages().size() > 0) {
-                SpannableString s = new SpannableString("Messages         "+
-                        String.valueOf(AppGlobals.getUnReadMessages().size()));
-                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-                navMessages.setTitle(s);
-            }
+            patientNavigationView = navigationView;
+
             TextView patientName = (TextView) headerView.findViewById(R.id.patient_nav_name);
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);
@@ -377,32 +359,41 @@ public class MainActivity extends AppCompatActivity
         }
         formData.append(FormData.TYPE_CONTENT_TEXT, "subscription_plan", subscription_plan);
         formData.append(FormData.TYPE_CONTENT_TEXT, "college_id", collegeId);
-
-
-//
-//
-//        try {
-//            jsonObject.put("available_to_chat", status);
-//            jsonObject.put("address", address);
-//            jsonObject.put("city", city);
-//            jsonObject.put("dob", dob);
-//            jsonObject.put("first_name", first_name);
-//            jsonObject.put("gender", gender);
-//            jsonObject.put("identity_document", identity_document);
-//            jsonObject.put("insurance_carrier", insurance_carrier);
-//            jsonObject.put("last_name", last_name);
-//            jsonObject.put("location", location);
-//            jsonObject.put("phone_number_primary", phone_number_primary);
-//            jsonObject.put("state", state);
-//            jsonObject.put("consultation_time", consultation_time);
-//            jsonObject.put("speciality", speciality);
-//            jsonObject.put("subscription_plan", subscription_plan);
-//            jsonObject.put("college_id", collegeId);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
         return formData;
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        foreground = true;
+        updateMessages();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        foreground = false;
+    }
+
+    public void updateMessages() {
+        if (foreground) {
+            NavigationView navigationView;
+            if (AppGlobals.isDoctor())
+                navigationView = doctorNavigationView;
+            else
+                navigationView = patientNavigationView;
+            Menu menu = navigationView.getMenu();
+            // find MenuItem you want to change
+            MenuItem navMessages = menu.findItem(R.id.nav_messages);
+            if (AppGlobals.getUnReadMessages().size() > 0) {
+                SpannableString s = new SpannableString("Messages         " +
+                        String.valueOf(AppGlobals.getUnReadMessages().size()));
+                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                navMessages.setTitle(s);
+            }
+        }
     }
 
     @Override

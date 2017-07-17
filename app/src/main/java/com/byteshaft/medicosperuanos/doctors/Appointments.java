@@ -288,6 +288,7 @@ public class Appointments extends Fragment implements
                                 break;
                             case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
                                 Helpers.alertDialog(getActivity(), "Warning", "check your internet connection", null);
+                                break;
                         }
                 }
             }

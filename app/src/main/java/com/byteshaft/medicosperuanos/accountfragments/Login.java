@@ -157,7 +157,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                         break;
 
                     case HttpURLConnection.HTTP_OK:
-                        System.out.println(request.getResponseText() + "working ");
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             String token = jsonObject.getString(AppGlobals.KEY_TOKEN);
@@ -167,6 +166,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                 AppGlobals.userType(true);
                             }
                             gettingUserData();
+                            Log.e("TAG", "BAMMMM " + jsonObject.getInt("id"));
                             String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
                             String email = jsonObject.getString(AppGlobals.KEY_EMAIL);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMAIL, email);
@@ -211,7 +211,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                                     String phoneOne = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_PRIMARY);
                                     String phoneTwo = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
-                                    String profileId = jsonObject.getString("user");
+                                    String profileId = jsonObject.getString("id");
                                     String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
                                     boolean notificationState = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NOTIFICATION);
                                     boolean showNewsState = jsonObject.getBoolean(AppGlobals.KEY_SHOW_NEWS);

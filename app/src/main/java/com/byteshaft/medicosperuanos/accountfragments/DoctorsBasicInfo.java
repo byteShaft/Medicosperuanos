@@ -612,6 +612,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Log.i("TAG", "res" + request.getResponseText());
                 if (alertDialog != null) {
                     alertDialog.dismiss();
                 } else {

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.byteshaft.medicosperuanos.MainActivity;
+
 import java.util.Set;
 
 /**
@@ -25,6 +27,7 @@ public class NotificationDeleteIntent extends BroadcastReceiver {
                 Log.i("TAG", "unread messages doesnot exist");
                 alreadyExisting.add(String.valueOf(senderId));
                 AppGlobals.setUnreadMessages(alreadyExisting);
+                MainActivity.getInstance().updateMessages();
             }
         }
     }

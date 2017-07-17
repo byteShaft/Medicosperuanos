@@ -131,6 +131,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             if (getIntent().getExtras().getBoolean("notification")) {
                 getMessageText(getIntent(), getIntent().getIntExtra("sender_id", -1));
                 id = getIntent().getIntExtra("sender_id", -1);
+                status = getIntent().getBooleanExtra("status", false);
+                photoUrl = getIntent().getStringExtra("image_url");
+                this.name = getIntent().getStringExtra("name");
             }
         }
         status = getIntent().getBooleanExtra("status", false);
@@ -649,9 +652,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 } else if (items[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
-//                else if (items[item].equals("Remove photo")) {
-//                    mProfilePicture.setImageDrawable(null);
-//                }
 
             }
         });
@@ -713,13 +713,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             ChatModel model = modelArrayList.get(position);
             if (model.getImageUrl() != null) {
                 if (model.getImageUrl() != null && model.getId() != Integer.valueOf(
-                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
+                        AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                     return LEFT_MSG_IMG;
                 } else {
                     return RIGHT_MSG_IMG;
                 }
             } else if (model.getId() == Integer.valueOf(
-                    AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID))) {
+                    AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID))) {
                 return RIGHT_MSG;
             } else {
                 return LEFT_MSG;

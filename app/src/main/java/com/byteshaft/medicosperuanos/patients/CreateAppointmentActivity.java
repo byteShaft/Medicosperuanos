@@ -83,14 +83,11 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
     private EditText priceTotalEditText;
     private String slotTime;
     private String appointmentDate;
-    private int selectedServiceId;
-    private String reason;
     private ArrayList<Services> arrayList;
     private HashMap<Integer, Integer> selectedServicesArrayList;
     private ListView listView;
     private int amount = 0;
     private static CreateAppointmentActivity sInstance;
-    private String date;
 
 
     public static CreateAppointmentActivity getInstance() {

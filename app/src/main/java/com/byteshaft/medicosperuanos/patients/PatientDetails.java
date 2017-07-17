@@ -225,7 +225,6 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 appointmentIntent.putExtra("name", patientNameString);
                 appointmentIntent.putExtra("dob", patientAgeString);
                 appointmentIntent.putExtra("photo", circleImageViewString);
-                appointmentIntent.putExtra("patientID", patientId);
                 appointmentIntent.putExtra("date", Helpers.getDate());
                 appointmentIntent.putExtra("from_doctor", true);
                 appointmentIntent.putExtra("available_to_chat", chatStatus);
