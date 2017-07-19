@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +54,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     private HashMap<String, Integer[]> map;
     private ArrayList<JSONObject> alreadySelectedSchedule;
     private int scheduleId = -1;
-    private boolean sendUpdate = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +67,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 mBaseView.findViewById(R.id.calendar_view));
         cv.setCanGoBack(true);
         currentDate = Helpers.getDate();
+        cv.update(new Date(), Calendar.getInstance());
         // assign event handler
         cv.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {
             @Override
@@ -163,7 +164,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
             mListView.setAdapter(scheduleAdapter);
         } else {
-            sendUpdate = false;
             scheduleAdapter.notifyDataSetChanged();
         }
     }

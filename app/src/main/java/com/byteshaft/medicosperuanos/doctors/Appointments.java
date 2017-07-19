@@ -41,6 +41,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.logging.Logger;
@@ -97,7 +98,7 @@ public class Appointments extends Fragment implements
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
         calendarView.setCanGoBack(true);
-        calendarView.updateCalendar(events, null);
+        calendarView.update(new Date(), Calendar.getInstance());
         TextView dateTextView = (TextView) calendarView.findViewById(R.id.calendar_date_display);
         dateTextView.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();

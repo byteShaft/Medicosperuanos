@@ -190,6 +190,12 @@ public class CalendarView extends LinearLayout {
         updateCalendar(null, null);
     }
 
+    public void update(Date date, Calendar calendar) {
+        selectedDate  = date;
+        currentDate = calendar;
+        updateCalendar(null, null);
+    }
+
     /**
      * Display dates correctly in hori
      */
