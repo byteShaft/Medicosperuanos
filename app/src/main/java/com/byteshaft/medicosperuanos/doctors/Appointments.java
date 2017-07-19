@@ -84,6 +84,7 @@ public class Appointments extends Fragment implements
             public void onRefresh() {
                 swipeRefresh = true;
                 getAgendaList(agendaDate);
+                getDashBoardDetails();
             }
         });
         foreground = true;
@@ -128,6 +129,7 @@ public class Appointments extends Fragment implements
                 mListView.setAdapter(arrayAdapter);
                 agendaDate = dateFormat.format(formattedDate);
                 getAgendaList(agendaDate);
+                getDashBoardDetails();
             }
         });
 
@@ -275,6 +277,7 @@ public class Appointments extends Fragment implements
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                Log.i("TAG", "Get details");
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
                                     confirmedAppointments.setText(String.valueOf(dashBoardValues
@@ -319,6 +322,7 @@ public class Appointments extends Fragment implements
                     case 1:
                         if (agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
                             Helpers.showSnackBar(getView(), getResources().getString(R.string.cannot_reject_attended_appointment));
+                            getDashBoardDetails();
                             return false;
                         }
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);

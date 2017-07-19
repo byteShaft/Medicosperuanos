@@ -222,10 +222,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             viewHolder.state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                    int pos = (int) viewHolder.state.getTag();
-//                    View checkBoxView = mListView.getChildAt(pos);
-//                    if (checkBoxView != null) {
-//                        CheckBox cbx = (CheckBox) checkBoxView.findViewById(R.id.check_box_appointment);
                     if (b) {
                         data.remove(position);
                         try {
@@ -235,7 +231,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         }
 
                         data.add(position, jsonObject);
-                        Log.i("TAG", "Added" + jsonObject.toString());
                     } else {
                         try {
                             if (jsonObject.has("taken") && jsonObject.getInt("taken") == 1) {
@@ -263,9 +258,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                             e.printStackTrace();
                         }
                         data.add(position, jsonObject);
-                        Log.i("TAG", "Removed" + jsonObject.toString());
                     }
-//                    }
                 }
             });
             try {
@@ -486,6 +479,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
+                        Log.i("TAG", "schedule " + request.getResponseText());
                         break;
                 }
         }

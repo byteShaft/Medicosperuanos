@@ -736,7 +736,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         targets.setName(jsonObject.getString("name"));
                                         targetsArrayList.add(targets);
                                     }
-                                    System.out.println(targetsArray.length() + "length");
+                                    Log.i("TAG", targetsObject.toString());
+                                    Log.i("TAG", "target id" + selectedTargetId);
                                     targetsAdapter = new TargetsAdapter(targetsArrayList);
                                     mDestinationSpinner.setAdapter(targetsAdapter);
                                     for (int i = 0; i < targetsArrayList.size(); i++) {
