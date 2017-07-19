@@ -277,7 +277,8 @@ public class Appointments extends Fragment implements
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                Log.i("TAG", "Get details");
+                                Log.i("TAG", " getDashBoardDetails Get details");
+                                Log.i("TAG", " Get details " + request.getResponseText());
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
                                     confirmedAppointments.setText(String.valueOf(dashBoardValues
