@@ -455,11 +455,11 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                         locationsArrayList.add(doctorLocations);
                                     }
                                 }
-                                if (doctors.size() < 1) {
-                                    mListView.setVisibility(GONE);
-                                    noDoctor.setVisibility(View.VISIBLE);
-                                    Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);
-                                }
+                            }
+                            if (doctors.size() < 1) {
+                                mListView.setVisibility(GONE);
+                                noDoctor.setVisibility(View.VISIBLE);
+                                Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

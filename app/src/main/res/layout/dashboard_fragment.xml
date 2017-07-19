@@ -34,7 +34,6 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-
         <TextView
             android:id="@+id/doctor_email"
             android:layout_width="match_parent"
@@ -75,6 +74,7 @@
         android:id="@+id/dashboard_list_main_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="none"
         android:layout_margin="4dp"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 

@@ -94,6 +94,7 @@ public class Service extends FirebaseMessagingService {
                     String message  = patientName+ " has requested appointment \n"+sb.toString()+": " +
                             remoteMessage.getData().get("date") + " Start Time: " +
                             remoteMessage.getData().get("start_time");
+                    if (AppGlobals.isShowNotification())
                     sendNotification(message, patientName, appointmentReason);
                 } else {
                     String doctor;
@@ -102,6 +103,7 @@ public class Service extends FirebaseMessagingService {
                     else doctor = "Dra " + doctorName;
                     String message  = "Appointment " + appointmentState + " by " +doctor +"\n"
                             + "Appointment Reason: " + appointmentReason;
+                    if (AppGlobals.isShowNotification())
                     sendNotification(message, doctor, appointmentReason);
                 }
             } else if (remoteMessage.getData().get("type").equals("subscription_expired")) {

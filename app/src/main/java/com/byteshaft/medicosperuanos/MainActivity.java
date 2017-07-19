@@ -366,7 +366,6 @@ public class MainActivity extends AppCompatActivity
         }
         request.send(dataWithChatStatus(status, address, city, dob, first_name, gender, identity_document,
                 insurance_carrier, last_name, location, phone_number_primary, state,
-
                 consultation_time, ids, subscription_plan, collegeId));
     }
 
