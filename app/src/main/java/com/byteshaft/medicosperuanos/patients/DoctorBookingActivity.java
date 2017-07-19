@@ -128,6 +128,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         cv.updateCalendar(convertedDate);
         CalendarView.currentDate.set(Calendar.DATE, convertedDate.getDate());
         cv.updateCalendar(convertedDate);
+        cv.update(new Date(), Calendar.getInstance());
         Log.i("TAG", "current date"+ convertedDate);
 
         // assign event handler

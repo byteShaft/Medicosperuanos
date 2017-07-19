@@ -8,8 +8,7 @@
     <View
         android:id="@+id/state"
         android:layout_width="8dp"
-        android:layout_height="60dp"
-
+        android:layout_height="70dp"
         android:layout_marginLeft="4dp"
         android:background="@color/to_be_confirmed_background" />
 
@@ -31,6 +30,8 @@
         android:layout_centerVertical="true"
         android:layout_gravity="center"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:layout_toLeftOf="@+id/image_layout"
         android:layout_toRightOf="@+id/appointment_time"
         android:orientation="vertical">

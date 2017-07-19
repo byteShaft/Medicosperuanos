@@ -306,9 +306,6 @@ public class Helpers {
 
     public static String calculateAge(String dateOfBirth) {
         String[] dob = dateOfBirth.split("/");
-        Log.i("AGE", dob[0] + dob[1] + dob[2]);
-        System.out.println("age is : " + dateOfBirth);
-
         int date = Integer.parseInt(dob[0]);
         int month = Integer.parseInt(dob[1]);
         int year = Integer.parseInt(dob[2]);

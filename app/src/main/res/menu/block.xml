@@ -3,5 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/block_unblock"
+        android:visible="false"
         android:title="Block" />
 </menu>

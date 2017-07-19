@@ -13,7 +13,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -42,6 +41,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.logging.Logger;
@@ -84,10 +84,12 @@ public class Appointments extends Fragment implements
             public void onRefresh() {
                 swipeRefresh = true;
                 getAgendaList(agendaDate);
+                getDashBoardDetails(agendaDate);
             }
         });
         foreground = true;
         sInstance = this;
+        swipeRefreshLayout.setNestedScrollingEnabled(true);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
                 .setTitle(getResources().getString(R.string.appointments));
         mListView = (SwipeMenuListView) mBaseView.findViewById(R.id.listView);
@@ -97,7 +99,7 @@ public class Appointments extends Fragment implements
                 (com.byteshaft.medicosperuanos.uihelpers.CalendarView)
                         mBaseView.findViewById(R.id.calendar_view));
         calendarView.setCanGoBack(true);
-        calendarView.updateCalendar(events, null);
+        calendarView.update(new Date(), Calendar.getInstance());
         TextView dateTextView = (TextView) calendarView.findViewById(R.id.calendar_date_display);
         dateTextView.setTextColor(getResources().getColor(R.color.header_background));
         agendaArrayList = new ArrayList<>();
@@ -127,6 +129,7 @@ public class Appointments extends Fragment implements
                 mListView.setAdapter(arrayAdapter);
                 agendaDate = dateFormat.format(formattedDate);
                 getAgendaList(agendaDate);
+                getDashBoardDetails(agendaDate);
             }
         });
 
@@ -165,26 +168,7 @@ public class Appointments extends Fragment implements
         // set creator
         mListView.setMenuCreator(creator);
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-        mListView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.i("TAG", String.valueOf(motionEvent.getAction()));
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        swipeRefreshLayout.setEnabled(false);
-                        return false;
-                    case MotionEvent.ACTION_UP:
-                        x2 = motionEvent.getX();
-                        float deltaX = x2 - x1;
-                        if (Math.abs(deltaX) > MIN_DISTANCE) {
-                        } else {
-                            // consider as something else - a screen tap for example
-                        }
-                        return false;
-                    default: gestureDetector.onTouchEvent(motionEvent); return false;
-                }
-            }
-        });
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -209,47 +193,10 @@ public class Appointments extends Fragment implements
                 startActivity(intent);
             }
         });
-        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
-            @Override
-            public boolean onDown(MotionEvent motionEvent) {
-                return false;
-            }
-
-            @Override
-            public void onShowPress(MotionEvent motionEvent) {
-
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent motionEvent) {
-                return false;
-            }
-
-            @Override
-            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-                if (v1 > 0){
-                    // you are going up
-                    Log.i("TAG", "scroll up");
-                } else {
-                    // you are going down
-                    Log.i("TAG", "scroll down");
-                    swipeRefreshLayout.setEnabled(true);
-                }
-                return true;
-            }
-
-            @Override
-            public void onLongPress(MotionEvent motionEvent) {
-
-            }
-
-            @Override
-            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-                return false;
-            }
-        });
         return mBaseView;
     }
+
+
 
     private void getAgendaList(String date) {
         if (!swipeRefresh && agendaArrayList.size() < 1) {
@@ -288,6 +235,7 @@ public class Appointments extends Fragment implements
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
                                 Logger.getLogger("TAG").info(request.getResponseText());
+                                getDashBoardDetails(agendaDate);
                                 break;
                             case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
                                 Helpers.alertDialog(getActivity(), "Warning", "check your internet connection", null);
@@ -312,7 +260,7 @@ public class Appointments extends Fragment implements
     public void onResume() {
         super.onResume();
         foreground = true;
-        getDashBoardDetails();
+        getDashBoardDetails(agendaDate);
     }
 
     @Override
@@ -321,7 +269,7 @@ public class Appointments extends Fragment implements
         foreground = false;
     }
 
-    private void getDashBoardDetails() {
+    private void getDashBoardDetails(String date) {
         HttpRequest dashBoardRequest = new HttpRequest(getActivity().getApplicationContext());
         dashBoardRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -330,16 +278,18 @@ public class Appointments extends Fragment implements
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                Log.i("TAG", " getDashBoardDetails Get details");
+                                Log.i("TAG", " Get details " + request.getResponseText());
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
                                     confirmedAppointments.setText(String.valueOf(dashBoardValues
-                                            .getString("appointments_confirmed")));
+                                            .getString("confirmed")));
                                     pendingAppointments.setText(String.valueOf(dashBoardValues
-                                            .getInt("appointments_to_be_confirmed")));
+                                            .getInt("pending")));
                                     totalAppointments.setText(String.valueOf(String.valueOf(dashBoardValues
-                                            .getInt("appointments_count"))));
+                                            .getInt("total"))));
                                     attendedAppointments.setText(String.valueOf(String.valueOf(String.valueOf(dashBoardValues
-                                            .getInt("appointments_attended")))));
+                                            .getInt("attended")))));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -347,7 +297,7 @@ public class Appointments extends Fragment implements
                 }
             }
         });
-        dashBoardRequest.open("GET", String.format("%sdoctor/statistics", AppGlobals.BASE_URL));
+        dashBoardRequest.open("GET", String.format("%sdoctor/single-day-stats/?date=%s", AppGlobals.BASE_URL, date));
         dashBoardRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         dashBoardRequest.send();
@@ -368,7 +318,6 @@ public class Appointments extends Fragment implements
                             return false;
                         }
                         updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
-                        getDashBoardDetails();
                         return true;
                     // tick
                     case 1:
@@ -377,7 +326,6 @@ public class Appointments extends Fragment implements
                             return false;
                         }
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
-                        getDashBoardDetails();
                         return true;
                     default:
                         return false;

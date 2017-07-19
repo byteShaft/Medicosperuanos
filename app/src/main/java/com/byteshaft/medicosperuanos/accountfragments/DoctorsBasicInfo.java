@@ -170,7 +170,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
         mStateSpinner.setOnItemSelectedListener(this);
         mCitySpinner.setOnItemSelectedListener(this);
-//        mSpecialitySpinner.setOnItemSelectedListener(this);
         mAffiliatedClinicsSpinner.setOnItemSelectedListener(this);
         mSubscriptionSpinner.setOnItemSelectedListener(this);
 
@@ -214,13 +213,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CITY_SELECTED,
                             city.getCityId());
                 }
-                break;
-            case R.id.speciality_spinner:
-//                Specialities specialities = specialitiesList.get(i);
-//                mSpecialitySpinnerArray = String.valueOf(specialities.getSpecialitiesId());
-//                System.out.println(specialities.getSpecialitiesId());
-//                AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED,
-//                        specialities.getSpecialitiesId());
                 break;
             case R.id.clinics_spinner:
                 AffiliateClinic affiliateClinic = affiliateClinicsList.get(i);
@@ -311,7 +303,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             Helpers.showSnackBar(getView(), getResources().getString(R.string.no_speciality_selected));
             valid = false;
         }
-
         return valid;
     }
 
@@ -403,7 +394,6 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
             }
         });
-
         affiliateClinicRequest.open("GET", String.format("%sclinics/", AppGlobals.BASE_URL));
         affiliateClinicRequest.send();
     }
@@ -427,6 +417,13 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                     for (String string: specialitiesSaved) {
                                         savedSpecialities.add(string);
                                         Log.i("TAG", "speciality "+ string);
+                                    }
+                                    if (AppGlobals.isDoctor() && AppGlobals.isInfoAvailable()) {
+                                        String[] specialityIds = AppGlobals.getDoctorSpecialities().replace("[", "").replace("]", "").split(",");
+                                        for (int j = 0; j < specialityIds.length; j++) {
+                                            Log.i("TAG", "loop " + specialityIds[j]);
+                                            mSpecialitySpinnerArray.add(Integer.valueOf(specialityIds[j].trim()));
+                                        }
                                     }
                                     for (int i = 0; i < spArray.length(); i++) {
                                         JSONObject jsonObject = spArray.getJSONObject(i);
@@ -620,17 +617,20 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                 }
                 switch (request.getStatus()) {
                     case HttpRequest.ERROR_NETWORK_UNREACHABLE:
-                        AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "please check your internet connection");
+                        AppGlobals.alertDialog(getActivity(), getResources().getString(R.string.profile_update_failed),
+                                getResources().getString(R.string.check_internet));
                         break;
                     case HttpURLConnection.HTTP_NOT_FOUND:
-                        AppGlobals.alertDialog(getActivity(), "Profile update Failed!", "provide a valid EmailAddress");
+                        AppGlobals.alertDialog(getActivity(), getResources().getString(R.string.profile_update_failed),
+                                getResources().getString(R.string.provide_valid_email));
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable()) {
-                            AppGlobals.alertDialog(getActivity(), "Inactive Account", "Your account is inactive, " +
-                                    "please wait gor admin's approval. You will receive a activation Email");
+                            AppGlobals.alertDialog(getActivity(), getResources().getString(R.string.account_inactive),
+                                    getResources().getString(R.string.inactive_message));
                         } else
-                            AppGlobals.alertDialog(getActivity(), "Profile update Failed", "Please enter correct password");
+                            AppGlobals.alertDialog(getActivity(), getResources().getString(R.string.profile_update_failed),
+                                    getResources().getString(R.string.check_password));
                         break;
 
                     case HttpURLConnection.HTTP_BAD_REQUEST:
@@ -674,6 +674,9 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             String userId = jsonObject.getString("user");
             String profileId = jsonObject.getString("id");
             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
+            if (jsonObject.isNull("subscription_expiry_date")) {
+                AppGlobals.saveSubscriptionState("Subscription Exp: Doctor inactive");
+            }
             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
 
             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);

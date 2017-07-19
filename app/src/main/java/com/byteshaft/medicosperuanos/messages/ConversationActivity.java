@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -57,7 +58,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -113,7 +116,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         LayoutInflater inflater = LayoutInflater.from(this);
         sInstance = this;
         View v = inflater.inflate(R.layout.action_bar_for_messages, null);
-        TextView userName = (TextView)v.findViewById(R.id.action_bar_title);
+        TextView userName = (TextView) v.findViewById(R.id.action_bar_title);
         userName.setTypeface(AppGlobals.typefaceNormal);
         ImageView backPress = (ImageView) v.findViewById(R.id.back_press);
         backPress.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +159,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         getMyMessages(id);
         view = (View) findViewById(R.id.include);
         deleteButton = (ImageButton) findViewById(R.id.dustbin_messages);
+        if (AppGlobals.isDoctor()) {
+            deleteButton.setVisibility(View.VISIBLE);
+        }
         sendButton = (ImageView) view.findViewById(R.id.send_button);
         cameraButton = (CircleImageView) view.findViewById(R.id.camera_button);
         writeMessageEditText = (EditText) view.findViewById(R.id.write_message_edit_text);
@@ -214,6 +220,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
+        Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
+        Set<String> ids = new HashSet<>();
+        Log.i("TAg", String.valueOf(alreadyExisting.contains(String.valueOf(id))));
+        if (alreadyExisting.contains(String.valueOf(id))) {
+            alreadyExisting.remove(String.valueOf(id));
+        }
+        ids.addAll(alreadyExisting);
+        AppGlobals.setUnreadMessages(ids);
+        MainActivity.getInstance().updateMessages();
+        Log.i("TAg", alreadyExisting.toString());
     }
 
     public void onScrolledUp() {
@@ -228,7 +244,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     public void onScrolledToTop() {
         Log.i("TAG", "onScrolledToTop");
         if (nextUrl != null)
-        getNextMessages(nextUrl);
+            getNextMessages(nextUrl);
 
     }
 
@@ -356,12 +372,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.send(formData);
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             ChatModel chatModel = new ChatModel();
-//            if (AppGlobals.isDoctor()) {
-//                chatModel.setId(4);
-//            } else {
-                chatModel.setId(Integer.parseInt(AppGlobals.
-                        getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
-//            }
+            chatModel.setId(Integer.parseInt(AppGlobals.
+                    getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
             chatModel.setMessage(message);
             chatModel.setImageUrl(imageUrl);
             SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
@@ -409,7 +421,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 //                        Log.i("TAG", httpRequest.getResponseText());
                         ArrayList<ChatModel> previousMessages = new ArrayList<>();
                         if (loadingPrevious) {
-                            for (ChatModel chatModel: messages) {
+                            for (ChatModel chatModel : messages) {
                                 previousMessages.add(chatModel);
                             }
                             Log.i("TAg", "previousMessages");
@@ -422,15 +434,12 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             } else {
                                 nextUrl = null;
                             }
-//                            if (!jsonObject.isNull("previous")) {
-//                                previousUrl = jsonObject.getString("previous");
-//                            }
                             JSONArray jsonArray = jsonObject.getJSONArray("results");
-                            int length = jsonArray.length()-1;
+                            int length = jsonArray.length() - 1;
                             if (loadingPrevious) {
                                 messages = new ArrayList<>();
                             }
-                            for(int j = length; j >= 0; j--) {
+                            for (int j = length; j >= 0; j--) {
                                 Log.i("TAG", "Looping");
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
@@ -447,13 +456,13 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 chatAdapter.notifyDataSetChanged();
                                 Log.i("TAG", "added " + j);
                                 if (!loadingPrevious)
-                                chatAdapter.notifyDataSetChanged();
+                                    chatAdapter.notifyDataSetChanged();
                                 conversation.scrollToPosition(messages.size() - 1);
                             }
                             Log.i("TAg", "Size " + messages.size());
                             if (loadingPrevious) {
                                 Log.i("TAg", "added all");
-                                for (ChatModel chatModel: previousMessages) {
+                                for (ChatModel chatModel : previousMessages) {
                                     messages.add(chatModel);
                                 }
                                 ChatAdapter chatAdapter = new ChatAdapter(messages);
@@ -489,6 +498,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.block, menu);
+        if (AppGlobals.isDoctor()) {
+            menu.findItem(R.id.block_unblock).setVisible(true);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -517,10 +529,11 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             case R.id.dustbin_messages:
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                 alertDialogBuilder.setTitle("Confirmation");
-                alertDialogBuilder.setMessage("Do you really want to delete?")
+                alertDialogBuilder.setMessage("Do you really want to delete this conversation?")
                         .setCancelable(false).setPositiveButton("Delete",
                         new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                            public void onClick(DialogInterface dialog, int intId) {
+                                deleteConversation(id);
                                 dialog.dismiss();
                             }
                         });
@@ -797,5 +810,52 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         private CharSequence converteTimestamp(String mileSegundos) {
             return DateUtils.getRelativeTimeSpanString(Long.parseLong(mileSegundos), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
         }
+    }
+
+    private void deleteConversation(int id) {
+        HttpRequest request = new HttpRequest(getApplicationContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest httpRequest, int i) {
+                switch (i) {
+                    case HttpRequest.STATE_DONE:
+                        switch (httpRequest.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                finish();
+                                MainMessages.getInstance().getMessages();
+                                break;
+                        }
+                }
+
+            }
+        });
+        request.setOnErrorListener(new HttpRequest.OnErrorListener() {
+            @Override
+            public void onError(HttpRequest httpRequest, int i, short i1, Exception e) {
+                Log.i("TAG", "res " + httpRequest.getResponseText());
+                switch (i) {
+                    case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_time_out));
+                        break;
+                    case HttpRequest.ERROR_NETWORK_UNREACHABLE:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), e.getLocalizedMessage());
+                        break;
+                    case HttpRequest.ERROR_LOST_CONNECTION:
+                        Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_lost));
+                        break;
+                }
+            }
+        });
+        request.open("POST", String.format("%smessages/archive", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("patient", id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        request.send(jsonObject.toString());
     }
 }

@@ -562,6 +562,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         updateId = jsonObject.getInt("id");
                                         JSONObject destinationObject = jsonObject.getJSONObject("destination");
                                         selectedTargetId = destinationObject.getInt("id");
+                                        getTargets();
                                         JSONArray jsonArray = jsonObject.getJSONArray("diagnostics");
                                         Log.i("TAG", "diagnostics" +jsonArray.toString());
                                         JSONArray providedServicesArray = jsonObject.getJSONArray("services_provided");
@@ -725,6 +726,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                targetsArrayList = new ArrayList<Targets>();
                                 try {
                                     JSONObject targetsObject = new JSONObject(request.getResponseText());
                                     JSONArray targetsArray = targetsObject.getJSONArray("results");
@@ -736,7 +738,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         targets.setName(jsonObject.getString("name"));
                                         targetsArrayList.add(targets);
                                     }
-                                    System.out.println(targetsArray.length() + "length");
                                     targetsAdapter = new TargetsAdapter(targetsArrayList);
                                     mDestinationSpinner.setAdapter(targetsAdapter);
                                     for (int i = 0; i < targetsArrayList.size(); i++) {

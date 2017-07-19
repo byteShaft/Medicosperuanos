@@ -173,6 +173,10 @@
     <string name="no_speciality_selected">please select atleast one speciality</string>
     <string name="loading">loading</string>
     <string name="an_error_occurred">An error occurred, please try again</string>
+    <string name="profile_update_failed">Profile update Failed!</string>
+    <string name="provide_valid_email">Provide a valid EmailAddress</string>
+    <string name="account_inactive">Inactive Account</string>
+    <string name="inactive_message">Your account is inactive, please wait for admin\'s approval. You will receive a activation Email</string>
 
 </resources>
 

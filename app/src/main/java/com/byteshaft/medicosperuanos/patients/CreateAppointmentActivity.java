@@ -342,7 +342,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send(getAppointmentData(appointmentReason));
-        Log.i("TAG", getAppointmentData(appointmentReason));
     }
 
     private String getAppointmentData(String appointmentReason) {

@@ -47,10 +47,18 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
     private Adapter adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean swipeRefresh = false;
+    private static MainMessages instance;
+    public static boolean foreground = false;
+
+    public static MainMessages getInstance() {
+        return instance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.activity_main_messages, container, false);
+        foreground = true;
+        instance = this;
         swipeRefreshLayout = (SwipeRefreshLayout) mBaseView.findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -86,7 +94,7 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
         return mBaseView;
     }
 
-    private void getMessages() {
+    public void getMessages() {
         HttpRequest request = new HttpRequest(getActivity().getApplicationContext());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
@@ -94,6 +102,18 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        foreground = true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        foreground = false;
     }
 
     @Override

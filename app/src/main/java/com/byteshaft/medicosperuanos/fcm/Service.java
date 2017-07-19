@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.accountfragments.Login;
 import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -28,6 +29,9 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
@@ -62,7 +66,9 @@ public class Service extends FirebaseMessagingService {
                 Helpers.sendKey(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(String.format("doctor-activate-%s",
                         AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
-                Log.i("DATA" + " good ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
+                Log.i("DATA" + " Reg key ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
+                Login.gettingUserData(false);
+
 
             }
         } else {
@@ -94,6 +100,7 @@ public class Service extends FirebaseMessagingService {
                     String message  = patientName+ " has requested appointment \n"+sb.toString()+": " +
                             remoteMessage.getData().get("date") + " Start Time: " +
                             remoteMessage.getData().get("start_time");
+                    if (AppGlobals.isShowNotification())
                     sendNotification(message, patientName, appointmentReason);
                 } else {
                     String doctor;
@@ -102,15 +109,28 @@ public class Service extends FirebaseMessagingService {
                     else doctor = "Dra " + doctorName;
                     String message  = "Appointment " + appointmentState + " by " +doctor +"\n"
                             + "Appointment Reason: " + appointmentReason;
+                    if (AppGlobals.isShowNotification())
                     sendNotification(message, doctor, appointmentReason);
                 }
             } else if (remoteMessage.getData().get("type").equals("subscription_expired")) {
                 sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
                         "to renew your subscription ", "Subscription Expired", "Subscription Expired");
+                AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
 
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
+                    Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
+                    Set<String> set = new HashSet<String>();
+                    set.addAll(alreadyExisting);
+                    if (alreadyExisting.contains(String.valueOf(senderId))) {
+                        Log.i("TAG", "unread messages already exist");
+                    } else {
+                        Log.i("TAG", "unread messages doesnot exist");
+                        set.add(String.valueOf(senderId));
+                        AppGlobals.setUnreadMessages(set);
+                        MainActivity.getInstance().updateMessages();
+                    }
                 } else {
                     createdAt = remoteMessage.getData().get("created_at");
                     ChatModel chatModel = new ChatModel();
@@ -170,6 +190,8 @@ public class Service extends FirebaseMessagingService {
                         .addRemoteInput(remoteInput)
                         .build();
 
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         Notification newMessageNotification =
                 new NotificationCompat.Builder(this)
                         .setColor(ContextCompat.getColor(this,
@@ -178,6 +200,7 @@ public class Service extends FirebaseMessagingService {
                                 R.drawable.msg)
                         .setContentTitle(senderName)
                         .setContentText(messageBody)
+                        .setSound(defaultSoundUri)
                         .setDeleteIntent(createOnDismissedIntent(this, AppGlobals.REPLY_NOTIFICATION_ID, senderId))
                         .addAction(replyAction).build();
 
@@ -191,7 +214,6 @@ public class Service extends FirebaseMessagingService {
 
     private void sendNotification(String messageBody, String doctorName, String appointmentReason) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, APPOINTMENT_NOTIFICATION_ID, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 
