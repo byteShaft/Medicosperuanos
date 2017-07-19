@@ -119,6 +119,7 @@ public class AppGlobals extends Application {
     public static final String APPOINTMENT_CANCELLED = "Appointment Canceled";
     public static int REPLY_NOTIFICATION_ID = 202;
     private static final String UNREAD_MESSAGES = "unread_messages";
+    private static final String SUBSRIPTION_STATUS = "subscription_state";
 
     @Override
     public void onCreate() {
@@ -386,6 +387,15 @@ public class AppGlobals extends Application {
             FirebaseInstanceId.getInstance().getToken();
 
         }
+    }
+    public static void saveSubscriptionState(String value) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putString(SUBSRIPTION_STATUS, value).apply();
+    }
+
+    public static String getSubscription() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getString(SUBSRIPTION_STATUS, "");
     }
 }
 

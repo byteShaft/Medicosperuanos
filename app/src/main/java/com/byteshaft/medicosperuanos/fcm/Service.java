@@ -18,6 +18,7 @@ import android.util.Log;
 
 import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
+import com.byteshaft.medicosperuanos.accountfragments.Login;
 import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
@@ -62,7 +63,9 @@ public class Service extends FirebaseMessagingService {
                 Helpers.sendKey(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(String.format("doctor-activate-%s",
                         AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
-                Log.i("DATA" + " good ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
+                Log.i("DATA" + " Reg key ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
+                Login.gettingUserData(false);
+
 
             }
         } else {
@@ -109,6 +112,7 @@ public class Service extends FirebaseMessagingService {
             } else if (remoteMessage.getData().get("type").equals("subscription_expired")) {
                 sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
                         "to renew your subscription ", "Subscription Expired", "Subscription Expired");
+                AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
 
             } else {
                 if (!ConversationActivity.foreground) {

@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                     AppGlobals.KEY_FIRST_NAME) + " " +
                     AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
             docEmail.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMAIL));
-            docExpDate.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_SUBSCRIPTION_TYPE));
+            docExpDate.setText(AppGlobals.getSubscription());
 
             address = AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS);
             city = AppGlobals.getIntegerFromSharedPreferences(AppGlobals.KEY_CITY_SELECTED);
@@ -568,6 +568,8 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isDoctor()) {
+                            doctorOnlineSwitch.setEnabled(true);
+                            doctorOnlineSwitch.setChecked(true);
                             Helpers.alertDialog(this, getResources().getString(R.string.account),
                                     getResources().getString(R.string.account_not_activated),
                                     doctorOnlineSwitch);

@@ -84,7 +84,7 @@ public class Appointments extends Fragment implements
             public void onRefresh() {
                 swipeRefresh = true;
                 getAgendaList(agendaDate);
-                getDashBoardDetails();
+                getDashBoardDetails(agendaDate);
             }
         });
         foreground = true;
@@ -129,7 +129,7 @@ public class Appointments extends Fragment implements
                 mListView.setAdapter(arrayAdapter);
                 agendaDate = dateFormat.format(formattedDate);
                 getAgendaList(agendaDate);
-                getDashBoardDetails();
+                getDashBoardDetails(agendaDate);
             }
         });
 
@@ -235,6 +235,7 @@ public class Appointments extends Fragment implements
                                 agenda.setAgendaState(state);
                                 arrayAdapter.notifyDataSetChanged();
                                 Logger.getLogger("TAG").info(request.getResponseText());
+                                getDashBoardDetails(agendaDate);
                                 break;
                             case HttpURLConnection.HTTP_GATEWAY_TIMEOUT:
                                 Helpers.alertDialog(getActivity(), "Warning", "check your internet connection", null);
@@ -259,7 +260,7 @@ public class Appointments extends Fragment implements
     public void onResume() {
         super.onResume();
         foreground = true;
-        getDashBoardDetails();
+        getDashBoardDetails(agendaDate);
     }
 
     @Override
@@ -268,7 +269,7 @@ public class Appointments extends Fragment implements
         foreground = false;
     }
 
-    private void getDashBoardDetails() {
+    private void getDashBoardDetails(String date) {
         HttpRequest dashBoardRequest = new HttpRequest(getActivity().getApplicationContext());
         dashBoardRequest.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -282,13 +283,13 @@ public class Appointments extends Fragment implements
                                 try {
                                     JSONObject dashBoardValues = new JSONObject(request.getResponseText());
                                     confirmedAppointments.setText(String.valueOf(dashBoardValues
-                                            .getString("appointments_confirmed")));
+                                            .getString("confirmed")));
                                     pendingAppointments.setText(String.valueOf(dashBoardValues
-                                            .getInt("appointments_to_be_confirmed")));
+                                            .getInt("pending")));
                                     totalAppointments.setText(String.valueOf(String.valueOf(dashBoardValues
-                                            .getInt("appointments_count"))));
+                                            .getInt("total"))));
                                     attendedAppointments.setText(String.valueOf(String.valueOf(String.valueOf(dashBoardValues
-                                            .getInt("appointments_attended")))));
+                                            .getInt("attended")))));
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -296,7 +297,7 @@ public class Appointments extends Fragment implements
                 }
             }
         });
-        dashBoardRequest.open("GET", String.format("%sdoctor/statistics", AppGlobals.BASE_URL));
+        dashBoardRequest.open("GET", String.format("%sdoctor/single-day-stats/?date=%s", AppGlobals.BASE_URL, date));
         dashBoardRequest.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         dashBoardRequest.send();
@@ -317,17 +318,14 @@ public class Appointments extends Fragment implements
                             return false;
                         }
                         updateAppointmentStatus(AppGlobals.REJECTED, agenda.getAgendaId(), position);
-                        getDashBoardDetails();
                         return true;
                     // tick
                     case 1:
                         if (agenda.getAgendaState().equals(AppGlobals.ATTENDED)) {
                             Helpers.showSnackBar(getView(), getResources().getString(R.string.cannot_reject_attended_appointment));
-                            getDashBoardDetails();
                             return false;
                         }
                         updateAppointmentStatus(AppGlobals.ACCEPTED, agenda.getAgendaId(), position);
-                        getDashBoardDetails();
                         return true;
                     default:
                         return false;

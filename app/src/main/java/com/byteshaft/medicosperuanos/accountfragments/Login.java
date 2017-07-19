@@ -165,7 +165,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                             if (accountType.equals("doctor")) {
                                 AppGlobals.userType(true);
                             }
-                            gettingUserData();
+                            gettingUserData(true);
                             Log.e("TAG", "BAMMMM " + jsonObject.getInt("id"));
                             String userId = jsonObject.getString(AppGlobals.KEY_USER_ID);
                             String email = jsonObject.getString(AppGlobals.KEY_EMAIL);
@@ -191,7 +191,7 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
         AppGlobals.alertDialog(getActivity(), getString(R.string.login_faild), getResources().getString(R.string.check_internet));
     }
 
-    private void gettingUserData() {
+    public static void gettingUserData(final boolean callActivity) {
         HttpRequest request = new HttpRequest(AppGlobals.getContext());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
@@ -204,6 +204,8 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                 try {
                                     JSONObject jsonObject = new JSONObject(request.getResponseText());
                                     String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
+                                    String expiryDate = jsonObject.getString("subscription_expiry_date");
+                                    AppGlobals.saveSubscriptionState("Subscription Exp: "+expiryDate);
                                     String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                                     String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
                                     String docID = jsonObject.getString(AppGlobals.KEY_DOC_ID);
@@ -255,8 +257,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         String subscriptionType = subscriptionPlanObject.getString("plan_type");
 
                                         JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
-//                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTE,
-//                                                affiliateClinicObject.getInt("id"));
                                         String affiliateClinic = affiliateClinicObject.getString("name");
                                         String collageId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
                                         String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
@@ -287,7 +287,11 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
                                     AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                                     AppGlobals.gotInfo(true);
-                                    startActivity(new Intent(getActivity().getApplicationContext(), MainActivity.class));
+                                    if (callActivity) {
+                                        Intent intent = new Intent(AppGlobals.getContext(), MainActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        AppGlobals.getContext().startActivity(intent);
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

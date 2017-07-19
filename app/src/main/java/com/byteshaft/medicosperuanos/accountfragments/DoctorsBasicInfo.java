@@ -418,7 +418,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         savedSpecialities.add(string);
                                         Log.i("TAG", "speciality "+ string);
                                     }
-                                    if (AppGlobals.isDoctor()) {
+                                    if (AppGlobals.isDoctor() && AppGlobals.isInfoAvailable()) {
                                         String[] specialityIds = AppGlobals.getDoctorSpecialities().replace("[", "").replace("]", "").split(",");
                                         for (int j = 0; j < specialityIds.length; j++) {
                                             Log.i("TAG", "loop " + specialityIds[j]);
@@ -674,6 +674,9 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             String userId = jsonObject.getString("user");
             String profileId = jsonObject.getString("id");
             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
+            if (jsonObject.isNull("subscription_expiry_date")) {
+                AppGlobals.saveSubscriptionState("Subscription Exp: Doctor inactive");
+            }
             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
 
             String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
