@@ -410,6 +410,9 @@ public class MainActivity extends AppCompatActivity
 
     public void updateMessages() {
 //        if (foreground) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
             NavigationView navigationView;
             if (AppGlobals.isDoctor())
                 navigationView = doctorNavigationView;
@@ -429,6 +432,8 @@ public class MainActivity extends AppCompatActivity
             }
             invalidateOptionsMenu();
 //        }
+            }
+        });
     }
 
     @Override

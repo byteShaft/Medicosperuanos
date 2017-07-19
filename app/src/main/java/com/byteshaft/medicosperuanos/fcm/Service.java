@@ -30,6 +30,9 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
 
@@ -117,6 +120,17 @@ public class Service extends FirebaseMessagingService {
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
+                    Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
+                    Set<String> set = new HashSet<String>();
+                    set.addAll(alreadyExisting);
+                    if (alreadyExisting.contains(String.valueOf(senderId))) {
+                        Log.i("TAG", "unread messages already exist");
+                    } else {
+                        Log.i("TAG", "unread messages doesnot exist");
+                        set.add(String.valueOf(senderId));
+                        AppGlobals.setUnreadMessages(set);
+                        MainActivity.getInstance().updateMessages();
+                    }
                 } else {
                     createdAt = remoteMessage.getData().get("created_at");
                     ChatModel chatModel = new ChatModel();

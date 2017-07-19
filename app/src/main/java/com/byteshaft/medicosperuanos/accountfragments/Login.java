@@ -204,8 +204,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                 try {
                                     JSONObject jsonObject = new JSONObject(request.getResponseText());
                                     String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
-                                    String expiryDate = jsonObject.getString("subscription_expiry_date");
-                                    AppGlobals.saveSubscriptionState("Subscription Exp: "+expiryDate);
                                     String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
                                     String gender = jsonObject.getString(AppGlobals.KEY_GENDER);
                                     String docID = jsonObject.getString(AppGlobals.KEY_DOC_ID);
@@ -222,7 +220,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     if (!AppGlobals.isDoctor()) {
                                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, jsonObject.getString("emergency_contact"));
                                     }
-
                                     AppGlobals.saveChatStatus(availableToChatState);
                                     AppGlobals.saveNotificationState(notificationState);
                                     AppGlobals.saveNewsState(showNewsState);
@@ -236,6 +233,8 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                             stateJson.getInt("id"));
 
                                     if (AppGlobals.isDoctor()) {
+                                        String expiryDate = jsonObject.getString("subscription_expiry_date");
+                                        AppGlobals.saveSubscriptionState("Subscription Exp: "+expiryDate);
                                         JSONArray specialityJsonArray = jsonObject.getJSONArray("speciality");
                                         Log.i("Specialities", specialityJsonArray.toString());
                                         ArrayList<Integer> ids = new ArrayList<Integer>();
