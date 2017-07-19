@@ -166,26 +166,7 @@ public class Appointments extends Fragment implements
         // set creator
         mListView.setMenuCreator(creator);
         mListView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
-//        mListView.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                Log.i("TAG", String.valueOf(motionEvent.getAction()));
-//                switch (motionEvent.getAction()) {
-//                    case MotionEvent.ACTION_DOWN:
-//                        swipeRefreshLayout.setEnabled(false);
-//                        return false;
-//                    case MotionEvent.ACTION_UP:
-//                        x2 = motionEvent.getX();
-//                        float deltaX = x2 - x1;
-//                        if (Math.abs(deltaX) > MIN_DISTANCE) {
-//                        } else {
-//                            // consider as something else - a screen tap for example
-//                        }
-//                        return false;
-//                    default: gestureDetector.onTouchEvent(motionEvent); return false;
-//                }
-//            }
-//        });
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -210,45 +191,6 @@ public class Appointments extends Fragment implements
                 startActivity(intent);
             }
         });
-//        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
-//            @Override
-//            public boolean onDown(MotionEvent motionEvent) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onShowPress(MotionEvent motionEvent) {
-//
-//            }
-//
-//            @Override
-//            public boolean onSingleTapUp(MotionEvent motionEvent) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-//                if (v1 > 0){
-//                    // you are going up
-//                    Log.i("TAG", "scroll up");
-//                } else {
-//                    // you are going down
-//                    Log.i("TAG", "scroll down");
-//                    swipeRefreshLayout.setEnabled(true);
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public void onLongPress(MotionEvent motionEvent) {
-//
-//            }
-//
-//            @Override
-//            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
-//                return false;
-//            }
-//        });
         return mBaseView;
     }
 
