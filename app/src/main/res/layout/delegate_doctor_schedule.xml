@@ -41,16 +41,11 @@
                 android:layout_toRightOf="@+id/view_" />
 
             <CheckBox
-                android:id="@+id/check_box_appointment"
+                android:id="@+id/check_box_schedule"
+                android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
-                android:checked="false"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginEnd="27dp"
-                android:layout_marginRight="27dp"
-                android:button="@drawable/circular_checkbox" />
+                android:button="@drawable/circular_checkbox"/>
         </RelativeLayout>
 
     </RelativeLayout>
