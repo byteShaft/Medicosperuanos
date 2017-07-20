@@ -573,8 +573,6 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isDoctor()) {
-                            doctorOnlineSwitch.setEnabled(true);
-                            doctorOnlineSwitch.setChecked(true);
                             Helpers.alertDialog(this, getResources().getString(R.string.account),
                                     getResources().getString(R.string.account_not_activated),
                                     doctorOnlineSwitch);
