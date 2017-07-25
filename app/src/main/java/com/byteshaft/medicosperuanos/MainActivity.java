@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView doctorNavigationView;
     private NavigationView patientNavigationView;
     private boolean foreground = false;
+    private boolean isLoggingOut = false;
 
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
@@ -214,9 +215,9 @@ public class MainActivity extends AppCompatActivity
                             if (isError) {
                                 isError = false;
                             } else {
-                                    changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
-                                            String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
-                                            consultationTime, String.valueOf(subscriptionPlan), collegeId);
+                                changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                        String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                        consultationTime, String.valueOf(subscriptionPlan), collegeId);
                                 doctorOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -370,8 +371,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
-                                   String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
-                                   String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
+                                        String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
+                                        String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
         FormData formData  = new FormData();
         formData.append(FormData.TYPE_CONTENT_TEXT, "available_to_chat", String.valueOf(status));
         formData.append(FormData.TYPE_CONTENT_TEXT, "address", address);
@@ -413,24 +414,24 @@ public class MainActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-            NavigationView navigationView;
-            if (AppGlobals.isDoctor())
-                navigationView = doctorNavigationView;
-            else
-                navigationView = patientNavigationView;
-            Menu menu = navigationView.getMenu();
-            // find MenuItem you want to change
-            MenuItem navMessages = menu.findItem(R.id.nav_messages);
-            if (AppGlobals.getUnReadMessages().size() > 0) {
-                SpannableString s = new SpannableString("Messages         " +
-                        String.valueOf(AppGlobals.getUnReadMessages().size()));
-                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-                navMessages.setTitle(s);
-            } else {
-                navMessages.setTitle("Messages");
-            }
-            invalidateOptionsMenu();
+                NavigationView navigationView;
+                if (AppGlobals.isDoctor())
+                    navigationView = doctorNavigationView;
+                else
+                    navigationView = patientNavigationView;
+                Menu menu = navigationView.getMenu();
+                // find MenuItem you want to change
+                MenuItem navMessages = menu.findItem(R.id.nav_messages);
+                if (AppGlobals.getUnReadMessages().size() > 0) {
+                    SpannableString s = new SpannableString("Messages         " +
+                            String.valueOf(AppGlobals.getUnReadMessages().size()));
+                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                    navMessages.setTitle(s);
+                } else {
+                    navMessages.setTitle("Messages");
+                }
+                invalidateOptionsMenu();
 //        }
             }
         });
@@ -515,10 +516,15 @@ public class MainActivity extends AppCompatActivity
                     .setCancelable(false).setPositiveButton("Yes",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            AppGlobals.clearSettings();
-                            AppGlobals.firstTimeLaunch(true);
+                            isLoggingOut = true;
+                            Helpers.showProgressDialog(MainActivity.this, "Logging out...");
+                            changeStatus(false, address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                    String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                    consultationTime, String.valueOf(subscriptionPlan), collegeId);
+//                            AppGlobals.clearSettings();
+//                            AppGlobals.firstTimeLaunch(true);
                             dialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+//                            startActivity(new Intent(getApplicationContext(), IntroScreen.class));
                         }
                     });
             alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -545,11 +551,19 @@ public class MainActivity extends AppCompatActivity
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         LOGGER.info(request.getResponseText());
                         try {
                             JSONObject jsonObject1  = new JSONObject(request.getResponseText());
+                            if (isLoggingOut) {
+                                AppGlobals.clearSettings();
+                                AppGlobals.firstTimeLaunch(true);
+                                startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+                                isLoggingOut = false;
+                                return;
+                            }
                             if (!AppGlobals.isDoctor()) {
                                 if (jsonObject1.getBoolean("available_to_chat")) {
                                     patientOnlineSwitch.setText(R.string.online);
@@ -573,6 +587,7 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isDoctor()) {
+                            doctorOnlineSwitch.setEnabled(true);
                             Helpers.alertDialog(this, getResources().getString(R.string.account),
                                     getResources().getString(R.string.account_not_activated),
                                     doctorOnlineSwitch);
@@ -582,12 +597,15 @@ public class MainActivity extends AppCompatActivity
                         System.out.println(request.getResponseText());
                         break;
                 }
+                isLoggingOut = false;
         }
     }
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         isError = true;
+        isLoggingOut = false;
+        Helpers.dismissProgressDialog();
         Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
         if (!AppGlobals.isDoctor()) {
             new android.os.Handler().postDelayed(new Runnable() {
