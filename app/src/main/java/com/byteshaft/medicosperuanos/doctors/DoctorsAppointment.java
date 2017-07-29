@@ -149,10 +149,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     private ArrayList<Services> arrayList;
     private ArrayList<String> imagesArrayList;
     private static String method = "POST";
-    private String photo1 = "";
-    private String photo2 = "";
-    private String photo3 = "";
-    private String photo4 = "";
+    private String photo1 = null;
+    private String photo2 = null;
+    private String photo3 = null;
+    private String photo4 = null;
     private ArrayList<Integer> providedServicesIds;
     private int totalImagesCounter = 0;
     public static ArrayList<String> removedImages;
@@ -697,6 +697,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                 getDiagnostic();
                                 break;
                             case HttpURLConnection.HTTP_NOT_FOUND:
+                                method = "POST";
                                 getMedications();
                                 getDiagnostic();
                         }
@@ -783,8 +784,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
+        Log.i("TAG", "method " + method);
         try {
-//            getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time);
             request.send(getAttentionsData(conclusion, date, dateOfReturn, destination, exploration, time));
         } catch (JSONException e) {
             e.printStackTrace();
@@ -794,7 +795,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-        alertDialog.dismiss();
+        if (alertDialog != null) {
+            alertDialog.dismiss();
+        }
         switch (readyState) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
                 Helpers.showSnackBar(findViewById(android.R.id.content), "connection time out");
@@ -814,9 +817,9 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
-        Log.i("TAG", "progress " + progress);
-        Log.i("TAG", "dialog "+ String.valueOf(alertDialog == null));
-        Log.i("TAG", "dialog "+ String.valueOf(donutProgress == null));
+//        Log.i("TAG", "progress " + progress);
+//        Log.i("TAG", "dialog "+ String.valueOf(alertDialog == null));
+//        Log.i("TAG", "dialog "+ String.valueOf(donutProgress == null));
         if (alertDialog != null) {
             donutProgress.setProgress((int) progress);
         }
@@ -878,6 +881,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         for (DiagnosticMedication diagnosticMedication : selectedDiagnosticsList) {
             jsonArray.put(diagnosticMedication.getId());
         }
+        Log.i("TAG", "Dia Sent " + jsonArray);
         data.append(FormData.TYPE_CONTENT_JSON, "diagnostics", jsonArray.toString());
         JSONArray treatmentArray = new JSONArray();
         for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
@@ -886,6 +890,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             treatmentObject.put("quantity", diagnosticMedication.getQuantity());
             treatmentArray.put(treatmentObject);
         }
+        Log.i("TAG", "Treatments Sent " + treatmentArray);
         data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
         data.append(FormData.TYPE_CONTENT_JSON, "services_provided", providedServicesIds.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
@@ -907,6 +912,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                         String name = "photo" + removedImages.get(i);
                         data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
                     }
+                } else {
+                    Log.i("TAG", "else photo hashmap" + photosHashMap);
+                    for (int i = 0; i < totalImagesCounter; i++) {
+                        String key = "photo"+i+1;
+                        if (photosHashMap.containsKey(key)) {
+//                            data.append(FormData.TYPE_CONTENT_FILE, key, photosHashMap.get(key));
+                        } else {
+                            data.append(FormData.TYPE_CONTENT_TEXT, key, "");
+                        }
+                        Log.i("TAG", "added" +  key);
+                    }
                 }
             } else if (totalImagesCounter < 4) {
                 if (imagesArrayList != null) {
@@ -927,6 +943,31 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                         Log.i("NAME", "file" + imagesArrayList.get(i));
                         data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
                     }
+                } else  {
+                    Log.i("NAME", "else photo hashmap" + photosHashMap);
+                    for (int i = 0; i < totalImagesCounter; i++) {
+                        String key = "photo"+(i+1);
+                        if (photosHashMap.containsKey(key)) {
+//                            data.append(FormData.TYPE_CONTENT_FILE, key, photosHashMap.get(key));
+                        } else {
+                            data.append(FormData.TYPE_CONTENT_TEXT, key, "");
+                        }
+                        Log.i("TAG", "added" +  key);
+                    }
+//                    for (int i = 0; i < (imagesArrayList.size()); i++) {
+//                        String name;
+//                        if (i < removedImages.size() && removedImages.size() > 0) {
+//                            name = "photo" + removedImages.get(i) + 1;
+//                            Log.i("IF", "name" + name);
+//                        } else {
+//                            counter = counter + 1;
+//                            name = "photo" + (counter);
+//                            Log.i("else", "name" + name);
+//                        }
+//                        Log.i("NAME", "name" + name);
+//                        Log.i("NAME", "file" + imagesArrayList.get(i));
+//                        data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
+//                    }
                 }
 
             }

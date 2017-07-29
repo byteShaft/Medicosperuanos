@@ -802,6 +802,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 // Create a DateFormatter object for displaying date in specified format.
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
                 formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));
+                formatter.setTimeZone(TimeZone.getTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT, Locale.getDefault()).replace("GMT", "GMT ")));
+//                Log.i("TAG", TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT, Locale.getDefault()));
                 Date date = null;
                 try {
                     date = formatter.parse(createdAt);

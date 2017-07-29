@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat doctorOnlineSwitch;
     private SwitchCompat patientOnlineSwitch;
     private static CircleImageView profilePicture;
-    private HttpRequest request;
     private boolean isError;
 
     private String address;
@@ -164,6 +163,8 @@ public class MainActivity extends AppCompatActivity
             TextView docExpDate = (TextView) headerView.findViewById(R.id.doc_nav_expiry_date);
             doctorOnlineSwitch = (SwitchCompat) headerView.findViewById(R.id.doc_nav_online_switch);
             profilePicture = (CircleImageView) headerView.findViewById(R.id.nav_imageView);
+
+            doctorOnlineSwitch.setChecked(AppGlobals.isOnline());
 
             //setting typeface
             docName.setTypeface(AppGlobals.typefaceNormal);
@@ -259,6 +260,7 @@ public class MainActivity extends AppCompatActivity
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);
             patientOnlineSwitch = (SwitchCompat) headerView.findViewById(R.id.patient_nav_online_switch);
+            patientOnlineSwitch.setChecked(AppGlobals.isOnline());
             profilePicture = (CircleImageView) headerView.findViewById(R.id.nav_imageView);
             patientName.setText(AppGlobals.getStringFromSharedPreferences(
                     AppGlobals.KEY_FIRST_NAME) + " " +
@@ -348,12 +350,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
+    public static void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
                               String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
                               String consultation_time, String subscription_plan, String collegeId) {
-        request = new HttpRequest(this);
-        request.setOnReadyStateChangeListener(this);
-        request.setOnErrorListener(this);
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(getInstance());
+        request.setOnErrorListener(getInstance());
         request.open("PUT", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -370,7 +372,7 @@ public class MainActivity extends AppCompatActivity
                 consultation_time, ids, subscription_plan, collegeId));
     }
 
-    private FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
+    private static FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
                                         String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
                                         String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
         FormData formData  = new FormData();
@@ -432,7 +434,6 @@ public class MainActivity extends AppCompatActivity
                     navMessages.setTitle("Messages");
                 }
                 invalidateOptionsMenu();
-//        }
             }
         });
     }
@@ -587,10 +588,17 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isDoctor()) {
-                            doctorOnlineSwitch.setEnabled(true);
-                            Helpers.alertDialog(this, getResources().getString(R.string.account),
-                                    getResources().getString(R.string.account_not_activated),
-                                    doctorOnlineSwitch);
+                            if (isLoggingOut) {
+                                AppGlobals.clearSettings();
+                                AppGlobals.firstTimeLaunch(true);
+                                startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+                                isLoggingOut = false;
+                            } else {
+                                doctorOnlineSwitch.setEnabled(true);
+                                Helpers.alertDialog(this, getResources().getString(R.string.account),
+                                        getResources().getString(R.string.account_not_activated),
+                                        doctorOnlineSwitch);
+                            }
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
