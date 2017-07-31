@@ -18,7 +18,7 @@
         <!--android:id="@+id/ivUserChat"-->
         <!--android:layout_alignBottom="@+id/contentMessageChat" />-->
 
-    <me.himanshusoni.chatmessageview.ChatMessageView
+    <com.byteshaft.medicosperuanos.messages.ChatMessageView
         android:layout_toLeftOf="@+id/ivUserChat"
         android:layout_toStartOf="@+id/ivUserChat"
         android:id="@+id/contentMessageChat"
@@ -34,7 +34,7 @@
         app:cmv_showArrow="true"
        >
 
-    <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
+        <com.byteshaft.medicosperuanos.utils.Helper.EmojiconTextView
         android:textColor="#fff"
         android:textIsSelectable="true"
         android:text="Alessandr sdlsdklsd \n slkdlskdlks \nsdlkslkds dsdso"
@@ -44,7 +44,7 @@
         emojicon:emojiconSize="28sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-    </me.himanshusoni.chatmessageview.ChatMessageView>
+    </com.byteshaft.medicosperuanos.messages.ChatMessageView>
 
     <TextView
         android:text="22/06/2016"
