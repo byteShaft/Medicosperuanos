@@ -480,7 +480,12 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.return_date_edit_text:
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+                Log.i("TAG", "curent time millis " + System.currentTimeMillis());
+                final Calendar c = Calendar.getInstance();
+                int year = c.get(Calendar.YEAR);
+                int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
+                datePickerDialog.getDatePicker().setMinDate(c.getTimeInMillis());
                 datePickerDialog.show();
                 break;
             case R.id.back_press:

@@ -839,8 +839,19 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
         }
 
-        private CharSequence converteTimestamp(String mileSegundos) {
-            return DateUtils.getRelativeTimeSpanString(Long.parseLong(mileSegundos), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+        private String converteTimestamp(String milliseconds) {
+            String timeSpanString = DateUtils.getRelativeTimeSpanString(Long.parseLong(milliseconds),
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+            if (timeSpanString.contains("hours")) {
+                timeSpanString = timeSpanString.replace("hours ago", "horas");
+            } else if (timeSpanString.contains("minutes")) {
+                timeSpanString = timeSpanString.replace("minutes ago", "minutos");
+            } else if (timeSpanString.contains("seconds ago")) {
+                timeSpanString = timeSpanString.replace("seconds ago", "Ahora");
+            } else if (timeSpanString.contains("days ago")) {
+                timeSpanString = timeSpanString.replace("days ago", "días hace");
+            }
+            return timeSpanString;
         }
     }
 

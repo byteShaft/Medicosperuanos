@@ -60,6 +60,11 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
     private AffiliateClinic mAffiliateClinic;
     private Specialities mSpecialities;
     private boolean isFavList = true;
+    private static boolean selectedStartDate = false;
+    private static boolean selectedEndDate = false;
+    private static boolean selectedAffiliateClinic = false;
+    private static boolean selectedSpeciality = false;
+    private static boolean selectedDistance = false;
 
     public FilterDialog(Activity activity, boolean isFavList) {
         super(activity);
@@ -84,8 +89,6 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
         mSpecialities = new Specialities();
         mAffiliatedClinicsSpinner = (Spinner) findViewById(R.id.clinics_spinner_filter);
         mSpecialitySpinner = (Spinner) findViewById(R.id.speciality_spinner_filter);
-        mAffiliatedClinicsSpinner.setOnItemSelectedListener(this);
-        mSpecialitySpinner.setOnItemSelectedListener(this);
         getAffiliateClinic();
         getSpecialities();
 
@@ -109,6 +112,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 seekBarText.setText(String.valueOf(seekBar.getProgress()));
                 System.out.println(seekBar.getProgress());
+                selectedDistance = true;
             }
 
             @Override
@@ -134,12 +138,13 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                 datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7));
                 datePickerDialog.show();
-                System.out.println("start date");
+                selectedStartDate = true;
                 break;
             case R.id.end_date:
                 isStartDate = false;
                 datePickerDialog.show();
                 System.out.println("end date");
+                selectedEndDate = true;
                 break;
             case R.id.button_clear_filters:
                 System.out.println("Clear filters..");
@@ -154,21 +159,39 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
             case R.id.button_apply_filters:
                 String sDate = startDate.getText().toString();
                 String eDate = endDate.getText().toString();
+                String query ="?";
+                boolean alreadyAddedSomething = false;
+                if (selectedStartDate) {
+                    alreadyAddedSomething = true;
+                    query = query+String.format("start_date=%s", sDate);
+                }
+                if (selectedEndDate) {
+                    if (alreadyAddedSomething) query = query+"&";
+                    query = query+String.format("end_date=%s", eDate);
+                    alreadyAddedSomething = true;
+                }
+                if (selectedDistance) {
+                    if (alreadyAddedSomething) query = query+"&";
+                    query = query+String.format("radius=%s", seekBar.getProgress());
+                    alreadyAddedSomething = true;
+                }
+                if (selectedAffiliateClinic) {
+                    if (alreadyAddedSomething) query = query+"&";
+                    query = query+String.format("affiliate_clinic=%s", mAffiliateClinic.getId());
+                    alreadyAddedSomething = true;
+                }
+                if (selectedSpeciality) {
+                    if (alreadyAddedSomething) query = query+"&";
+                    query = query+String.format("speciality=%s", mSpecialitySpinner.getId());
+                }
 
                 if (!isFavList) {
-                    DoctorsList.getInstance().getDoctorList(
-                            sDate,
-                            eDate,
-                            seekBar.getProgress(),
-                            mAffiliateClinic.getId(),
-                            mSpecialities.getSpecialitiesId());
+                    DoctorsList.getInstance().getDoctorList(query);
+                    alreadyAddedSomething = false;
                     dismiss();
                 } else {
-                    FavouriteDoctors.getsInstance().getFavDoctorList(sDate,
-                            eDate,
-                            seekBar.getProgress(),
-                            mAffiliateClinic.getId(),
-                            mSpecialities.getSpecialitiesId());
+
+                    FavouriteDoctors.getsInstance().getFavDoctorList(query);
                     dismiss();
                 }
                 break;
@@ -199,6 +222,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                             activity, affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
                                     mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
+                                    mAffiliatedClinicsSpinner.setOnItemSelectedListener(FilterDialog.this);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -234,6 +258,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                             activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
                                     mSpecialitySpinner.setSelection(specialistPosition);
+                                    mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -263,10 +288,12 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
             case R.id.clinics_spinner_filter:
                 System.out.println("clinic onItemSelected");
                 mAffiliateClinic = affiliateClinicsList.get(i);
+                selectedAffiliateClinic = true;
                 break;
             case R.id.speciality_spinner_filter:
                 System.out.println("speciality onItemSelected");
                 mSpecialities = specialitiesList.get(i);
+                selectedSpeciality = true;
                 break;
         }
 
@@ -274,6 +301,8 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+        selectedAffiliateClinic = false;
+        selectedSpeciality = false;
 
     }
 }

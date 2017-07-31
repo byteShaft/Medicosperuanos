@@ -592,7 +592,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
 
     // Dialog with option to capture image or choose from gallery
     private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library", "Cancel"};
+        final CharSequence[] items = {"Take Photo", "Choose from Library", "Remove"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Select Photo");
         builder.setItems(items, new DialogInterface.OnClickListener() {
@@ -609,7 +609,10 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                     startActivityForResult(
                             Intent.createChooser(intent, "Select File"),
                             SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
+                } else if (items[item].equals("Remove")) {
+                    imageUrl = "";
+                    mProfilePicture.setImageBitmap(null);
+                    mProfilePicture.setBackgroundResource(R.mipmap.camera);
                     dialog.dismiss();
                 }
 

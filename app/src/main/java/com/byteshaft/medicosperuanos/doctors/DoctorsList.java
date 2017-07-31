@@ -93,6 +93,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
     private boolean swipeRefresh = false;
     private boolean foreground = false;
 
+
     public static DoctorsList getInstance() {
         return sInstance;
     }
@@ -354,13 +355,13 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
         }
     }
 
-    public void getDoctorList(String startDate, String endDate, int radius, int affiliateClinicId, int specialityID) {
+    public void getDoctorList(String query) {
         Helpers.showProgressDialog(DoctorsList.getInstance().getActivity(), DoctorsList.getInstance().getString(R.string.getting_doctor_list));
         HttpRequest request = new HttpRequest(AppGlobals.getContext());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%sdoctors/?start_date=%s&end_date=%s&radius=%s&speciality=%s&affiliate_clininc=%s",
-                AppGlobals.BASE_URL, startDate, endDate, radius, affiliateClinicId, specialityID));
+        request.open("GET", String.format("%sdoctors/"+query,
+                AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();
@@ -375,6 +376,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         swipeRefreshLayout.setRefreshing(false);
+                        Log.i("TAG", "response " + request.getResponseURL());
                         Log.i("TAG", "response " + request.getResponseText());
                         if (request.getResponseText().trim().isEmpty()) {
                             return;

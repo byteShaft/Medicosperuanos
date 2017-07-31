@@ -51,11 +51,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     private HashMap<Integer, ArrayList<Integer>> toBeDelete;
     private ArrayList<Integer> toBeDeleteSelectedIds;
     private int outerId = -1;
-    private int innerId = -1;
+    private boolean foreground = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mBaseView = inflater.inflate(R.layout.my_schedule, container, false);
+        foreground = true;
         toBeDelete = new HashMap<>();
         mListView = (ListView) mBaseView.findViewById(R.id.schedule_list);
         ((AppCompatActivity) getActivity()).getSupportActionBar()
@@ -98,6 +99,18 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
         save = (AppCompatButton) mBaseView.findViewById(R.id.save_button);
         save.setOnClickListener(this);
         return mBaseView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        foreground = true;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        foreground = false;
     }
 
     private void getTimeSlotsForDate(String targetDate, long duration) {
@@ -498,8 +511,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
 //                                }
 //                                scheduleList.put(currentDate, jsonObjects);
 //                            }
-                            scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
-                            mListView.setAdapter(scheduleAdapter);
+                            if (foreground) {
+                                scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
+                                mListView.setAdapter(scheduleAdapter);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
