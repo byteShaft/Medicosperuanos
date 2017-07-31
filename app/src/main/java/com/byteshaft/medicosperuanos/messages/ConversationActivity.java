@@ -43,6 +43,7 @@ import com.byteshaft.medicosperuanos.MainActivity;
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
+import com.byteshaft.medicosperuanos.utils.Helper.EmojiconTextView;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.medicosperuanos.utils.RotateUtil;
 import com.byteshaft.medicosperuanos.utils.SoftKeyboard;
@@ -68,7 +69,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
 
 /**
  * Created by s9iper1 on 3/23/17.
@@ -725,16 +725,16 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         public MyChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view;
             if (viewType == RIGHT_MSG) {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right, parent, false);
+                view = getLayoutInflater().inflate(R.layout.item_message_right, parent, false);
                 return new MyChatViewHolder(view);
             } else if (viewType == LEFT_MSG) {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left, parent, false);
+                view = getLayoutInflater().inflate(R.layout.item_message_left, parent, false);
                 return new MyChatViewHolder(view);
             } else if (viewType == RIGHT_MSG_IMG) {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_right_img, parent, false);
+                view = getLayoutInflater().inflate(R.layout.item_message_right_img, parent, false);
                 return new MyChatViewHolder(view);
             } else {
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_left_img, parent, false);
+                view = getLayoutInflater().inflate(R.layout.item_message_left_img, parent, false);
                 return new MyChatViewHolder(view);
             }
         }

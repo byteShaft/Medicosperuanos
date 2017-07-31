@@ -3,4 +3,34 @@
 	<declare-styleable name="CalendarView">
 		<attr name="dateFormat" format="string"/>
 	</declare-styleable>
+	<declare-styleable name="ChatMessageView">
+		<attr name="cmv_showArrow" format="boolean" />
+		<attr name="cmv_arrowPosition" format="enum">
+			<enum name="left" value="0" />
+			<enum name="right" value="1" />
+			<enum name="top" value="2" />
+			<enum name="bottom" value="3" />
+		</attr>
+		<attr name="cmv_arrowGravity" format="enum">
+			<enum name="start" value="0" />
+			<enum name="center" value="1" />
+			<enum name="end" value="2" />
+		</attr>
+		<attr name="cmv_backgroundColor" format="color" />
+		<attr name="cmv_backgroundColorPressed" format="color" />
+		<attr name="cmv_cornerRadius" format="dimension" />
+		<attr name="cmv_contentPadding" format="dimension" />
+		<attr name="cmv_arrowMargin" format="dimension" />
+
+	</declare-styleable>
+    <declare-styleable name="Emojicon">
+        <attr name="emojiconSize" format="dimension" />
+        <attr name="emojiconAlignment" format="enum">
+            <enum name="bottom" value="0" />
+            <enum name="baseline" value="1" />
+        </attr>
+        <attr name="emojiconTextStart" format="integer" />
+        <attr name="emojiconTextLength" format="integer" />
+        <attr name="emojiconUseSystemDefault" format="boolean" />
+    </declare-styleable>
 </resources>

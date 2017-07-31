@@ -17,7 +17,7 @@
         android:layout_height="35dp"
         android:id="@+id/ivUserChat" />
 
-    <me.himanshusoni.chatmessageview.ChatMessageView
+    <com.byteshaft.medicosperuanos.messages.ChatMessageView
         android:id="@+id/contentMessageChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    </me.himanshusoni.chatmessageview.ChatMessageView>
+    </com.byteshaft.medicosperuanos.messages.ChatMessageView>
 
     <TextView
         android:text="22/06/2016"
