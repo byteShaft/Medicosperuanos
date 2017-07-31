@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -182,15 +183,14 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                 }
                 if (selectedSpeciality) {
                     if (alreadyAddedSomething) query = query+"&";
-                    query = query+String.format("speciality=%s", mSpecialitySpinner.getId());
+                    query = query+String.format("speciality=%s", mSpecialities.getSpecialitiesId());
                 }
-
+                Log.i("TAG", "query"  + query);
                 if (!isFavList) {
                     DoctorsList.getInstance().getDoctorList(query);
                     alreadyAddedSomething = false;
                     dismiss();
                 } else {
-
                     FavouriteDoctors.getsInstance().getFavDoctorList(query);
                     dismiss();
                 }
@@ -257,8 +257,14 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                     specialitiesAdapter = new SpecialitiesAdapter(
                                             activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
-                                    mSpecialitySpinner.setSelection(specialistPosition);
-                                    mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
+                                    mSpecialitySpinner.setSelection(specialistPosition, false);
+                                    new android.os.Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
+                                        }
+                                    }, 2000);
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -286,13 +292,13 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
 //        System.out.println("clinic onItemSelected");
         switch (adapterView.getId()) {
             case R.id.clinics_spinner_filter:
-                System.out.println("clinic onItemSelected");
                 mAffiliateClinic = affiliateClinicsList.get(i);
+                System.out.println("clinic onItemSelected" + mAffiliateClinic.getName());
                 selectedAffiliateClinic = true;
                 break;
             case R.id.speciality_spinner_filter:
-                System.out.println("speciality onItemSelected");
                 mSpecialities = specialitiesList.get(i);
+                System.out.println("speciality onItemSelected " + mSpecialities.getSpeciality());
                 selectedSpeciality = true;
                 break;
         }
