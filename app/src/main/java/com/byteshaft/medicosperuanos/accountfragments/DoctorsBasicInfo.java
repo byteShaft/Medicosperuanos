@@ -53,6 +53,7 @@ import java.util.Set;
 
 import static android.R.attr.id;
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.getDoctorProfileIds;
+import static com.byteshaft.medicosperuanos.utils.AppGlobals.isInfoAvailable;
 
 public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSelectedListener,
         CompoundButton.OnCheckedChangeListener, View.OnClickListener,
@@ -167,12 +168,15 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
         mPhoneTwoEditText.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY));
         mConsultationTimeEditText.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME));
         mCollegeIdEditText.setText(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_COLLEGE_ID));
-
         mStateSpinner.setOnItemSelectedListener(this);
         mCitySpinner.setOnItemSelectedListener(this);
         mAffiliatedClinicsSpinner.setOnItemSelectedListener(this);
-        mSubscriptionSpinner.setOnItemSelectedListener(this);
-
+        if (!AppGlobals.isInfoAvailable()) {
+            mSubscriptionSpinner.setOnItemSelectedListener(this);
+            mSubscriptionSpinner.setEnabled(true);
+        } else if (AppGlobals.isLogin() && isInfoAvailable()) {
+            mSubscriptionSpinner.setEnabled(false);
+        }
         mNotificationCheckBox.setOnCheckedChangeListener(this);
         mNewsCheckBox.setOnCheckedChangeListener(this);
         mTermsConditionCheckBox.setOnCheckedChangeListener(this);

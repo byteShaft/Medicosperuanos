@@ -39,7 +39,7 @@ import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 public class Service extends FirebaseMessagingService {
 //    private String message;
 
-    private static int APPOINTMENT_NOTIFICATION_ID = 101;
+    public static int APPOINTMENT_NOTIFICATION_ID = 101;
     private static String KEY_TEXT_REPLY = "key_text_reply";
 
     private String doctorName;
@@ -116,7 +116,6 @@ public class Service extends FirebaseMessagingService {
                 sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
                         "to renew your subscription ", "Subscription Expired", "Subscription Expired");
                 AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
-
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();

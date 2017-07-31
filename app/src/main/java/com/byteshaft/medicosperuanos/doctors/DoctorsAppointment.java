@@ -538,7 +538,10 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             Helpers.showSnackBar(findViewById(android.R.id.content), "Select medication");
             valid = false;
         }
-
+        if (providedServicesIds.size() < 1) {
+            Helpers.showSnackBar(findViewById(android.R.id.content), "please select provided service");
+            valid = false;
+        }
         return valid;
     }
 

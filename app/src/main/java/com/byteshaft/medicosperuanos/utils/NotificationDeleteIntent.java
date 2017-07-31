@@ -34,7 +34,9 @@ public class NotificationDeleteIntent extends BroadcastReceiver {
                 Log.i("TAG", "unread messages doesnot exist");
                 set.add(String.valueOf(senderId));
                 AppGlobals.setUnreadMessages(set);
-                MainActivity.getInstance().updateMessages();
+                if (MainActivity.getInstance() != null) {
+                    MainActivity.getInstance().updateMessages();
+                }
             }
         }
     }

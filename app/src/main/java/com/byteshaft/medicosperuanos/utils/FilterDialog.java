@@ -186,13 +186,20 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                     query = query+String.format("speciality=%s", mSpecialities.getSpecialitiesId());
                 }
                 Log.i("TAG", "query"  + query);
-                if (!isFavList) {
-                    DoctorsList.getInstance().getDoctorList(query);
+                if (query.equals("?")) {
                     alreadyAddedSomething = false;
                     dismiss();
+                    return;
+
                 } else {
-                    FavouriteDoctors.getsInstance().getFavDoctorList(query);
-                    dismiss();
+                    if (!isFavList) {
+                        DoctorsList.getInstance().getDoctorList(query);
+                        alreadyAddedSomething = false;
+                        dismiss();
+                    } else {
+                        FavouriteDoctors.getsInstance().getFavDoctorList(query);
+                        dismiss();
+                    }
                 }
                 break;
         }
@@ -221,7 +228,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                     affiliateClinicAdapter = new AffiliateClinicAdapter(
                                             activity, affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
-                                    mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
+                                    mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition, false);
                                     mAffiliatedClinicsSpinner.setOnItemSelectedListener(FilterDialog.this);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -258,12 +265,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                             activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
                                     mSpecialitySpinner.setSelection(specialistPosition, false);
-                                    new android.os.Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
-                                        }
-                                    }, 2000);
+                                    mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();

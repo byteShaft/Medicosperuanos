@@ -160,6 +160,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         } else {
             userStatus.setText("offline");
         }
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(AppGlobals.REPLY_NOTIFICATION_ID);
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
