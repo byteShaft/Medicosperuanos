@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat doctorOnlineSwitch;
     private SwitchCompat patientOnlineSwitch;
     private static CircleImageView profilePicture;
-    private HttpRequest request;
     private boolean isError;
 
     private String address;
@@ -93,6 +92,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView doctorNavigationView;
     private NavigationView patientNavigationView;
     private boolean foreground = false;
+    private boolean isLoggingOut = false;
 
     private static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
@@ -164,6 +164,8 @@ public class MainActivity extends AppCompatActivity
             doctorOnlineSwitch = (SwitchCompat) headerView.findViewById(R.id.doc_nav_online_switch);
             profilePicture = (CircleImageView) headerView.findViewById(R.id.nav_imageView);
 
+            doctorOnlineSwitch.setChecked(AppGlobals.isOnline());
+
             //setting typeface
             docName.setTypeface(AppGlobals.typefaceNormal);
             docEmail.setTypeface(AppGlobals.typefaceNormal);
@@ -214,9 +216,9 @@ public class MainActivity extends AppCompatActivity
                             if (isError) {
                                 isError = false;
                             } else {
-                                    changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
-                                            String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
-                                            consultationTime, String.valueOf(subscriptionPlan), collegeId);
+                                changeStatus(b, address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                        String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                        consultationTime, String.valueOf(subscriptionPlan), collegeId);
                                 doctorOnlineSwitch.setEnabled(false);
                             }
                             break;
@@ -258,6 +260,7 @@ public class MainActivity extends AppCompatActivity
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);
             patientOnlineSwitch = (SwitchCompat) headerView.findViewById(R.id.patient_nav_online_switch);
+            patientOnlineSwitch.setChecked(AppGlobals.isOnline());
             profilePicture = (CircleImageView) headerView.findViewById(R.id.nav_imageView);
             patientName.setText(AppGlobals.getStringFromSharedPreferences(
                     AppGlobals.KEY_FIRST_NAME) + " " +
@@ -347,12 +350,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
+    public static void changeStatus(boolean status, String address, String city, String dob, String first_name, String gender, String identity_document,
                               String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
                               String consultation_time, String subscription_plan, String collegeId) {
-        request = new HttpRequest(this);
-        request.setOnReadyStateChangeListener(this);
-        request.setOnErrorListener(this);
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(getInstance());
+        request.setOnErrorListener(getInstance());
         request.open("PUT", String.format("%sprofile", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
@@ -369,9 +372,9 @@ public class MainActivity extends AppCompatActivity
                 consultation_time, ids, subscription_plan, collegeId));
     }
 
-    private FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
-                                   String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
-                                   String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
+    private static FormData dataWithChatStatus(boolean status, String address, String city, String dob,String first_name, String gender, String identity_document,
+                                        String insurance_carrier, String last_name, String location, String phone_number_primary, String state,
+                                        String consultation_time, ArrayList<Integer> speciality, String subscription_plan, String collegeId) {
         FormData formData  = new FormData();
         formData.append(FormData.TYPE_CONTENT_TEXT, "available_to_chat", String.valueOf(status));
         formData.append(FormData.TYPE_CONTENT_TEXT, "address", address);
@@ -413,25 +416,24 @@ public class MainActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-            NavigationView navigationView;
-            if (AppGlobals.isDoctor())
-                navigationView = doctorNavigationView;
-            else
-                navigationView = patientNavigationView;
-            Menu menu = navigationView.getMenu();
-            // find MenuItem you want to change
-            MenuItem navMessages = menu.findItem(R.id.nav_messages);
-            if (AppGlobals.getUnReadMessages().size() > 0) {
-                SpannableString s = new SpannableString("Messages         " +
-                        String.valueOf(AppGlobals.getUnReadMessages().size()));
-                s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-                navMessages.setTitle(s);
-            } else {
-                navMessages.setTitle("Messages");
-            }
-            invalidateOptionsMenu();
-//        }
+                NavigationView navigationView;
+                if (AppGlobals.isDoctor())
+                    navigationView = doctorNavigationView;
+                else
+                    navigationView = patientNavigationView;
+                Menu menu = navigationView.getMenu();
+                // find MenuItem you want to change
+                MenuItem navMessages = menu.findItem(R.id.nav_messages);
+                if (AppGlobals.getUnReadMessages().size() > 0) {
+                    SpannableString s = new SpannableString("Messages         " +
+                            String.valueOf(AppGlobals.getUnReadMessages().size()));
+                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                    navMessages.setTitle(s);
+                } else {
+                    navMessages.setTitle("Messages");
+                }
+                invalidateOptionsMenu();
             }
         });
     }
@@ -515,10 +517,15 @@ public class MainActivity extends AppCompatActivity
                     .setCancelable(false).setPositiveButton("Yes",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            AppGlobals.clearSettings();
-                            AppGlobals.firstTimeLaunch(true);
+                            isLoggingOut = true;
+                            Helpers.showProgressDialog(MainActivity.this, "Logging out...");
+                            changeStatus(false, address , String.valueOf(city), dob, firstName, gender, identityDocument,
+                                    String.valueOf(insuranceCarrier), lastName, location, phoneNumberPrimary, String.valueOf(state),
+                                    consultationTime, String.valueOf(subscriptionPlan), collegeId);
+//                            AppGlobals.clearSettings();
+//                            AppGlobals.firstTimeLaunch(true);
                             dialog.dismiss();
-                            startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+//                            startActivity(new Intent(getApplicationContext(), IntroScreen.class));
                         }
                     });
             alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -545,11 +552,19 @@ public class MainActivity extends AppCompatActivity
     public void onReadyStateChange(HttpRequest request, int readyState) {
         switch (readyState) {
             case HttpRequest.STATE_DONE:
+                Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         LOGGER.info(request.getResponseText());
                         try {
                             JSONObject jsonObject1  = new JSONObject(request.getResponseText());
+                            if (isLoggingOut) {
+                                AppGlobals.clearSettings();
+                                AppGlobals.firstTimeLaunch(true);
+                                startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+                                isLoggingOut = false;
+                                return;
+                            }
                             if (!AppGlobals.isDoctor()) {
                                 if (jsonObject1.getBoolean("available_to_chat")) {
                                     patientOnlineSwitch.setText(R.string.online);
@@ -573,21 +588,32 @@ public class MainActivity extends AppCompatActivity
                         break;
                     case HttpURLConnection.HTTP_UNAUTHORIZED:
                         if (AppGlobals.isDoctor()) {
-                            Helpers.alertDialog(this, getResources().getString(R.string.account),
-                                    getResources().getString(R.string.account_not_activated),
-                                    doctorOnlineSwitch);
+                            if (isLoggingOut) {
+                                AppGlobals.clearSettings();
+                                AppGlobals.firstTimeLaunch(true);
+                                startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+                                isLoggingOut = false;
+                            } else {
+                                doctorOnlineSwitch.setEnabled(true);
+                                Helpers.alertDialog(this, getResources().getString(R.string.account),
+                                        getResources().getString(R.string.account_not_activated),
+                                        doctorOnlineSwitch);
+                            }
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
                         System.out.println(request.getResponseText());
                         break;
                 }
+                isLoggingOut = false;
         }
     }
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
         isError = true;
+        isLoggingOut = false;
+        Helpers.dismissProgressDialog();
         Helpers.showSnackBar(findViewById(android.R.id.content), exception.getLocalizedMessage());
         if (!AppGlobals.isDoctor()) {
             new android.os.Handler().postDelayed(new Runnable() {

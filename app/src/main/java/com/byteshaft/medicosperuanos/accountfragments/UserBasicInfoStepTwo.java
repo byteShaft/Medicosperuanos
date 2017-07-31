@@ -460,6 +460,10 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
             alertDialog.show();
         } else {
             Helpers.showProgressDialog(getActivity(), "Updating your Profile...");
+            if (UserBasicInfoStepOne.imageUrl.equals("")) {
+                data.append(FormData.TYPE_CONTENT_TEXT, "photo",
+                        UserBasicInfoStepOne.imageUrl);
+            }
         }
         data.append(FormData.TYPE_CONTENT_TEXT, "state", mStatesSpinnerValueString);
         data.append(FormData.TYPE_CONTENT_TEXT, "city", mCitiesSpinnerValueString);

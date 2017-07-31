@@ -306,13 +306,13 @@ public class FavouriteDoctors extends Fragment implements HttpRequest.OnReadySta
         request.send();
     }
 
-    public void getFavDoctorList(String startDate, String endDate, int radius, int affiliateClinicId, int specialityID) {
+    public void getFavDoctorList(String query) {
         Helpers.showProgressDialog(getActivity(), FavouriteDoctors.getsInstance().getString(R.string.getting_doctor_list));
         HttpRequest request = new HttpRequest(AppGlobals.getContext());
         request.setOnReadyStateChangeListener(this);
         request.setOnErrorListener(this);
-        request.open("GET", String.format("%sdoctors/?start_date=%s&end_date=%s&radius=%s&speciality=%s&affiliate_clininc=%s",
-                AppGlobals.BASE_URL, startDate, endDate, radius, affiliateClinicId, specialityID));
+        request.open("GET", String.format("%sdoctors/"+query,
+                AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
         request.send();

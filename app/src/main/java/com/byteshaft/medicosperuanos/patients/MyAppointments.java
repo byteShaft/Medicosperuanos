@@ -47,10 +47,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -146,7 +143,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                         if (StringUtils.containsIgnoreCase(patientAppointment.getDrFirstName(),
                                 s.toString()) ||
                                 StringUtils.containsIgnoreCase(patientAppointment.getDrLastName(),
-                                s.toString()) ||
+                                        s.toString()) ||
                                 StringUtils.containsIgnoreCase(patientAppointment.getDrSpeciality(),
                                         s.toString()) ) {
                             searchList.add(patientAppointment);
@@ -296,7 +293,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                     case HttpURLConnection.HTTP_OK:
                         appointments = new ArrayList<>();
                         if (foreground)
-                        patientAppointmentAdapter = new Adapter(getContext(), appointments);
+                            patientAppointmentAdapter = new Adapter(getContext(), appointments);
                         appointmentList.setAdapter(patientAppointmentAdapter);
                         Log.i("TAG", "patient appointments " + request.getResponseText());
                         try {
@@ -305,7 +302,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject appointmentObject = jsonArray.getJSONObject(i);
                                 PatientAppointment appointment = new PatientAppointment();
-                                appointment.setDate(appointmentObject.getString("created_at"));
+                                appointment.setDate(appointmentObject.getString("date"));
                                 JSONObject doctorObject = appointmentObject.getJSONObject("doctor");
                                 appointment.setDrFirstName(doctorObject.getString("first_name"));
                                 appointment.setDrLastName(doctorObject.getString("last_name"));
@@ -374,15 +371,7 @@ public class MyAppointments extends Fragment implements HttpRequest.OnReadyState
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             PatientAppointment patientAppointment = appointmentsList.get(position);
-            SimpleDateFormat formatterFrom = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date formattedDate = null;
-            try {
-                formattedDate = formatterFrom.parse(patientAppointment.getDate());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            viewHolder.appointmentDate.setText(dateFormat.format(formattedDate));
+            viewHolder.appointmentDate.setText(patientAppointment.getDate());
             viewHolder.appointmentTime.setText(patientAppointment.getAppointmentTime());
             StringBuilder stringBuilder = new StringBuilder();
             if (patientAppointment.getGender().equals("M")) {

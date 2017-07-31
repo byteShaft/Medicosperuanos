@@ -2,6 +2,7 @@ package com.byteshaft.medicosperuanos.messages;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
@@ -29,10 +30,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -42,6 +45,7 @@ import com.byteshaft.medicosperuanos.doctors.FullscreenImageView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.medicosperuanos.utils.RotateUtil;
+import com.byteshaft.medicosperuanos.utils.SoftKeyboard;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
@@ -70,7 +74,8 @@ import hani.momanii.supernova_emoji_library.Helper.EmojiconTextView;
  * Created by s9iper1 on 3/23/17.
  */
 
-public class ConversationActivity extends AppCompatActivity implements View.OnClickListener, HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
+public class ConversationActivity extends AppCompatActivity implements View.OnClickListener,
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener{
 
     private View view;
     private ImageButton deleteButton;
@@ -102,6 +107,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private boolean loading = false;
     private boolean loadingPrevious = false;
     private int scrollPosition = 0;
+    private RelativeLayout activityMessage;
+    private SoftKeyboard softKeyboard;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -128,6 +135,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         TextView userStatus = (TextView) v.findViewById(R.id.user_online);
         getSupportActionBar().setCustomView(v);
         setContentView(R.layout.activity_conversation);
+        activityMessage = (RelativeLayout) findViewById(R.id.activity_message);
+        InputMethodManager im = (InputMethodManager) getSystemService(Service.INPUT_METHOD_SERVICE);
+        softKeyboard = new SoftKeyboard(activityMessage, im);
         foreground = true;
         id = getIntent().getIntExtra("id", -1);
         if (getIntent().getExtras() != null) {
@@ -153,6 +163,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setStackFromEnd(true);
         conversation.setLayoutManager(linearLayoutManager);
         conversation.canScrollVertically(1);
         conversation.setHasFixedSize(true);
@@ -166,6 +177,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         cameraButton = (CircleImageView) view.findViewById(R.id.camera_button);
         writeMessageEditText = (EditText) view.findViewById(R.id.write_message_edit_text);
         writeMessageEditText.setTypeface(AppGlobals.typefaceNormal);
+
         deleteButton.setOnClickListener(this);
         sendButton.setOnClickListener(this);
         cameraButton.setOnClickListener(this);
@@ -211,15 +223,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
-        writeMessageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    conversation.scrollToPosition(messages.size() - 1);
-                } else {
-                }
-            }
-        });
         Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
         Set<String> ids = new HashSet<>();
         Log.i("TAg", String.valueOf(alreadyExisting.contains(String.valueOf(id))));
@@ -228,8 +231,34 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         }
         ids.addAll(alreadyExisting);
         AppGlobals.setUnreadMessages(ids);
+        softKeyboard.setSoftKeyboardCallback(new SoftKeyboard.SoftKeyboardChanged() {
+            @Override
+            public void onSoftKeyboardHide() {
+                Log.i("TAG", "hidden");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conversation.smoothScrollToPosition(conversation.getAdapter().getItemCount());
+                    }
+                });
+
+            }
+
+            @Override
+            public void onSoftKeyboardShow() {
+                Log.i("TAG", "show");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        conversation.smoothScrollToPosition(conversation.getAdapter().getItemCount());
+                    }
+                });
+
+            }
+        });
+        if (MainActivity.getInstance() != null)
         MainActivity.getInstance().updateMessages();
-        Log.i("TAg", alreadyExisting.toString());
+
     }
 
     public void onScrolledUp() {
@@ -373,7 +402,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             ChatModel chatModel = new ChatModel();
             chatModel.setId(Integer.parseInt(AppGlobals.
-                    getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
+                    getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
             chatModel.setMessage(message);
             chatModel.setImageUrl(imageUrl);
             SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/yyyy HH:mm", Locale.getDefault());
@@ -765,6 +794,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 if (profilePhoto == null) return;
                 Glide.with(profilePhoto.getContext()).load(photoUrl).centerCrop()
                         .transform(new CircleTransform(profilePhoto.getContext())).override(60, 60)
+                        .placeholder(R.mipmap.image_placeholder)
                         .into(profilePhoto);
             }
 
@@ -772,6 +802,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 // Create a DateFormatter object for displaying date in specified format.
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.UK);
                 formatter.setTimeZone(TimeZone.getTimeZone("GMT +05:00"));
+                formatter.setTimeZone(TimeZone.getTimeZone(TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT, Locale.getDefault()).replace("GMT", "GMT ")));
+//                Log.i("TAG", TimeZone.getDefault().getDisplayName(false, TimeZone.SHORT, Locale.getDefault()));
                 Date date = null;
                 try {
                     date = formatter.parse(createdAt);
@@ -807,8 +839,19 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
         }
 
-        private CharSequence converteTimestamp(String mileSegundos) {
-            return DateUtils.getRelativeTimeSpanString(Long.parseLong(mileSegundos), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+        private String converteTimestamp(String milliseconds) {
+            String timeSpanString = DateUtils.getRelativeTimeSpanString(Long.parseLong(milliseconds),
+                    System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+            if (timeSpanString.contains("hours")) {
+                timeSpanString = timeSpanString.replace("hours ago", "horas");
+            } else if (timeSpanString.contains("minutes")) {
+                timeSpanString = timeSpanString.replace("minutes ago", "minutos");
+            } else if (timeSpanString.contains("seconds ago")) {
+                timeSpanString = timeSpanString.replace("seconds ago", "Ahora");
+            } else if (timeSpanString.contains("days ago")) {
+                timeSpanString = timeSpanString.replace("days ago", "días hace");
+            }
+            return timeSpanString;
         }
     }
 

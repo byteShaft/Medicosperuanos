@@ -102,8 +102,8 @@ public class SelectedImages extends AppCompatActivity {
                     if (DoctorsAppointment.photosHashMap.containsKey(imagesList.get(position))) {
                         DoctorsAppointment.photosHashMap.remove(imagesList.get(position));
                         DoctorsAppointment.removedImages.add(imagesList.get(position));
-                        androidGridView = (GridView) findViewById(R.id.selected_images);
-                        adapter = new ImagesAdapter(arrayList);
+                        imagesList.remove(position);
+                        notifyDataSetChanged();
                     }
                 }
             });
