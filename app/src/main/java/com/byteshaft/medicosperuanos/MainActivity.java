@@ -256,7 +256,6 @@ public class MainActivity extends AppCompatActivity
             navigationView.addHeaderView(headerView);
             navigationView.inflateMenu(R.menu.patient_menu);
             patientNavigationView = navigationView;
-
             TextView patientName = (TextView) headerView.findViewById(R.id.patient_nav_name);
             TextView patientEmail = (TextView) headerView.findViewById(R.id.patient_nav_email);
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);

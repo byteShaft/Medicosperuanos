@@ -71,6 +71,12 @@ public class Service extends FirebaseMessagingService {
 
             }
         } else {
+            if (remoteMessage.getData().get("type").equals("subscription_expired")) {
+                sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
+                        "to renew your subscription ", "Subscription Expired", "Subscription Expired");
+                AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
+                return;
+            }
             doctorName = remoteMessage.getData().get("doctor_name");
             patientName = remoteMessage.getData().get("patient_name");
             appointmentReason = remoteMessage.getData().get("appointment_reason");
@@ -111,10 +117,6 @@ public class Service extends FirebaseMessagingService {
                     if (AppGlobals.isShowNotification())
                     sendNotification(message, doctor, appointmentReason);
                 }
-            } else if (remoteMessage.getData().get("type").equals("subscription_expired")) {
-                sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
-                        "to renew your subscription ", "Subscription Expired", "Subscription Expired");
-                AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
