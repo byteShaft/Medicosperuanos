@@ -229,8 +229,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     JSONObject stateJson = jsonObject.getJSONObject("state");
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
                                             stateJson.getInt("id"));
-                                    Log.i("TAG", "subscription_date "+ jsonObject
-                                            .getString("subscription_expiry_date"));
                                     if (AppGlobals.isDoctor()) {
                                         String expiryDate = jsonObject.getString("subscription_expiry_date");
                                         AppGlobals.saveSubscriptionState("Subscription Exp: "+expiryDate);
