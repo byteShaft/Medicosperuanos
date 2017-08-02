@@ -403,6 +403,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         foreground = true;
         updateMessages();
+        getMessages();
     }
 
     @Override
@@ -646,5 +647,27 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+    }
+
+    public void getMessages() {
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest httpRequest, int i) {
+                switch (i) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (httpRequest.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                Log.e("TAG", httpRequest.getResponseText());
+                        }
+                }
+            }
+        });
+        request.setOnErrorListener(this);
+        request.open("GET", String.format("%smessages_metadata", AppGlobals.BASE_URL));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 }

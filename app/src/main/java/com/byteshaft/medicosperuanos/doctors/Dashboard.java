@@ -171,12 +171,13 @@ public class Dashboard extends Fragment {
             public void onError(HttpRequest request, int readyState, short error, Exception exception) {
                 swipeRefreshLayout.setRefreshing(false);
                 swipeRefresh = false;
+                if (exception.getLocalizedMessage() != null)
                 if (exception.getLocalizedMessage().equals("Network is unreachable")) {
                     Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
                 }
                 switch (readyState) {
                     case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
-                        Helpers.showSnackBar(getView(), "connection time out");
+                        Helpers.showSnackBar(getView(), getResources().getString(R.string.connection_time_out));
                         break;
                 }
             }

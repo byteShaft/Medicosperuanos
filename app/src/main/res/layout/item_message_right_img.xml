@@ -18,8 +18,6 @@
         <!--android:layout_alignBottom="@+id/contentMessageChat" />-->
 
     <com.byteshaft.medicosperuanos.messages.ChatMessageView
-        android:layout_toLeftOf="@+id/ivUserChat"
-        android:layout_toStartOf="@+id/ivUserChat"
         android:id="@+id/contentMessageChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -30,7 +28,7 @@
         app:cmv_backgroundColorPressed="#FFBABABA"
         app:cmv_contentPadding="4dp"
         app:cmv_cornerRadius="2dp"
-        app:cmv_showArrow="true"
+        app:cmv_showArrow="false"
        >
 
         <ImageView

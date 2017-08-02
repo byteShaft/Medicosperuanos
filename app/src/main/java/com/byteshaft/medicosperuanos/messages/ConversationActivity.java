@@ -147,6 +147,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 status = getIntent().getBooleanExtra("status", false);
                 photoUrl = getIntent().getStringExtra("image_url");
                 this.name = getIntent().getStringExtra("name");
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.cancel(AppGlobals.REPLY_NOTIFICATION_ID);
             }
         }
         status = getIntent().getBooleanExtra("status", false);

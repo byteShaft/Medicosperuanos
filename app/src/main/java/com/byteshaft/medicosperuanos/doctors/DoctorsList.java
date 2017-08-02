@@ -423,9 +423,6 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                     doctorDetails.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                     Log.i("TAG", "size " + doctors.size());
                                     doctors.add(doctorDetails);
-                                    if (foreground) {
-                                        customAdapter.notifyDataSetChanged();
-                                    }
                                     JSONArray services = doctorDetail.getJSONArray("services");
                                     if (services.length() > 0) {
                                         ArrayList<com.byteshaft.medicosperuanos.gettersetter.Services> servicesArrayList = new ArrayList<>();
@@ -456,6 +453,9 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                         doctorLocations.setAvailableToChat(doctorDetail.getBoolean("available_to_chat"));
                                         locationsArrayList.add(doctorLocations);
                                     }
+                                }
+                                if (foreground) {
+                                    customAdapter.notifyDataSetChanged();
                                 }
                             }
                             if (doctors.size() < 1) {
