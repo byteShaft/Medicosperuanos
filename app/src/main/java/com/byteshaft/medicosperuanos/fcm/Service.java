@@ -23,7 +23,6 @@ import com.byteshaft.medicosperuanos.messages.ChatModel;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
-import com.byteshaft.medicosperuanos.utils.NotificationDeleteIntent;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -39,7 +38,7 @@ import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 public class Service extends FirebaseMessagingService {
 //    private String message;
 
-    private static int APPOINTMENT_NOTIFICATION_ID = 101;
+    public static int APPOINTMENT_NOTIFICATION_ID = 101;
     private static String KEY_TEXT_REPLY = "key_text_reply";
 
     private String doctorName;
@@ -116,21 +115,9 @@ public class Service extends FirebaseMessagingService {
                 sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
                         "to renew your subscription ", "Subscription Expired", "Subscription Expired");
                 AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
-
             } else {
                 if (!ConversationActivity.foreground) {
                     replyNotification();
-                    Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
-                    Set<String> set = new HashSet<String>();
-                    set.addAll(alreadyExisting);
-                    if (alreadyExisting.contains(String.valueOf(senderId))) {
-                        Log.i("TAG", "unread messages already exist");
-                    } else {
-                        Log.i("TAG", "unread messages doesnot exist");
-                        set.add(String.valueOf(senderId));
-                        AppGlobals.setUnreadMessages(set);
-                        MainActivity.getInstance().updateMessages();
-                    }
                 } else {
                     createdAt = remoteMessage.getData().get("created_at");
                     ChatModel chatModel = new ChatModel();
@@ -150,15 +137,6 @@ public class Service extends FirebaseMessagingService {
         }
     }
 
-    private PendingIntent createOnDismissedIntent(Context context, int notificationId, int senderId) {
-        Intent intent = new Intent(context, NotificationDeleteIntent.class);
-        intent.putExtra("com.byteshaft.medicosperuanos.notificationId", notificationId);
-        intent.putExtra("senderId", senderId);
-        PendingIntent pendingIntent =
-                PendingIntent.getBroadcast(context.getApplicationContext(),
-                        notificationId, intent, 0);
-        return pendingIntent;
-    }
 
     public void replyNotification() {
         String replyLabel = "Enter your reply here";
@@ -201,7 +179,6 @@ public class Service extends FirebaseMessagingService {
                         .setContentTitle(senderName)
                         .setContentText(messageBody)
                         .setSound(defaultSoundUri)
-                        .setDeleteIntent(createOnDismissedIntent(this, AppGlobals.REPLY_NOTIFICATION_ID, senderId))
                         .addAction(replyAction).build();
 
         NotificationManager notificationManager =

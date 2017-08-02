@@ -26,7 +26,7 @@
         app:cmv_arrowGravity="end"
         app:cmv_arrowPosition="left"
         app:cmv_cornerRadius="3dp"
-        app:cmv_showArrow="true"
+        app:cmv_showArrow="false"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/ivUserChat"
         android:layout_toEndOf="@+id/ivUserChat">

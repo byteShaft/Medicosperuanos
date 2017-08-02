@@ -19,19 +19,17 @@
         <!--android:layout_alignBottom="@+id/contentMessageChat" />-->
 
     <com.byteshaft.medicosperuanos.messages.ChatMessageView
-        android:layout_toLeftOf="@+id/ivUserChat"
-        android:layout_toStartOf="@+id/ivUserChat"
         android:id="@+id/contentMessageChat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cmv_arrowGravity="end"
-        app:cmv_arrowMargin="3dp"
+        app:cmv_arrowMargin="5dp"
         app:cmv_arrowPosition="right"
         app:cmv_backgroundColor="@color/my_message_color"
         app:cmv_backgroundColorPressed="#FFBABABA"
         app:cmv_contentPadding="10dp"
-        app:cmv_cornerRadius="3dp"
-        app:cmv_showArrow="true"
+        app:cmv_cornerRadius="10dp"
+        app:cmv_showArrow="false"
        >
 
         <com.byteshaft.medicosperuanos.utils.Helper.EmojiconTextView

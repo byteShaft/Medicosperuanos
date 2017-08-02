@@ -2,7 +2,6 @@ package com.byteshaft.medicosperuanos.adapters;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -43,7 +42,6 @@ public class AffiliateClinicAdapter extends BaseAdapter {
         }
         AffiliateClinic affiliateClinic = affiliateClinics.get(position);
         viewHolder.spinnerText.setText(affiliateClinic.getName());
-        Log.i("TAF", affiliateClinic.getName());
         return convertView;
     }
 

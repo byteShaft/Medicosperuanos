@@ -109,6 +109,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     private int scrollPosition = 0;
     private RelativeLayout activityMessage;
     private SoftKeyboard softKeyboard;
+    private int unreadCount = 0;
+    private int readCount = 0;
 
     public static ConversationActivity getInstance() {
         return sInstance;
@@ -147,6 +149,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 status = getIntent().getBooleanExtra("status", false);
                 photoUrl = getIntent().getStringExtra("image_url");
                 this.name = getIntent().getStringExtra("name");
+                NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.cancel(AppGlobals.REPLY_NOTIFICATION_ID);
             }
         }
         status = getIntent().getBooleanExtra("status", false);
@@ -160,6 +164,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         } else {
             userStatus.setText("offline");
         }
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(AppGlobals.REPLY_NOTIFICATION_ID);
         messages = new ArrayList<>();
         conversation = (RecyclerView) findViewById(R.id.conversation);
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -223,14 +229,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
-        Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
-        Set<String> ids = new HashSet<>();
-        Log.i("TAg", String.valueOf(alreadyExisting.contains(String.valueOf(id))));
-        if (alreadyExisting.contains(String.valueOf(id))) {
-            alreadyExisting.remove(String.valueOf(id));
-        }
-        ids.addAll(alreadyExisting);
-        AppGlobals.setUnreadMessages(ids);
         softKeyboard.setSoftKeyboardCallback(new SoftKeyboard.SoftKeyboardChanged() {
             @Override
             public void onSoftKeyboardHide() {
@@ -256,9 +254,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             }
         });
-        if (MainActivity.getInstance() != null)
-        MainActivity.getInstance().updateMessages();
-
     }
 
     public void onScrolledUp() {
@@ -447,7 +442,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 loading = false;
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-//                        Log.i("TAG", httpRequest.getResponseText());
+                        Log.i("TAG", httpRequest.getResponseText());
                         ArrayList<ChatModel> previousMessages = new ArrayList<>();
                         if (loadingPrevious) {
                             for (ChatModel chatModel : messages) {
@@ -472,6 +467,10 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 Log.i("TAG", "Looping");
                                 JSONObject singleMessage = jsonArray.getJSONObject(j);
                                 ChatModel chatModel = new ChatModel();
+                                if (!singleMessage.getBoolean("read")) {
+                                    setReadMessages(singleMessage.getInt("id"));
+                                    unreadCount = unreadCount+1;
+                                }
                                 chatModel.setPatientId(singleMessage.getInt("patient"));
                                 chatModel.setDoctorId(singleMessage.getInt("doctor"));
                                 chatModel.setId(singleMessage.getInt("creator"));
@@ -900,5 +899,31 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             e.printStackTrace();
         }
         request.send(jsonObject.toString());
+    }
+
+    public void setReadMessages(int messageId) {
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest httpRequest, int i) {
+                switch (i) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (httpRequest.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                Log.e("TAG", httpRequest.getResponseText());
+                                readCount = readCount+1;
+                                if (readCount == unreadCount) {
+                                    MainActivity.getInstance().getMessages();
+                                }
+                        }
+                }
+            }
+        });
+        request.setOnErrorListener(this);
+        request.open("POST", String.format("%smessages/%s/mark-read", AppGlobals.BASE_URL, messageId));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 }

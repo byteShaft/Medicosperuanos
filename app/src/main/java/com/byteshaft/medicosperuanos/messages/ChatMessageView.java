@@ -71,7 +71,6 @@ public class ChatMessageView extends RelativeLayout {
 
         int intGravity = a.getInt(com.byteshaft.medicosperuanos.R.styleable.ChatMessageView_cmv_arrowGravity, ArrowGravity.START.getValue());
         arrowGravity = ArrowGravity.getEnum(intGravity);
-
         a.recycle();
         initContent();
     }
