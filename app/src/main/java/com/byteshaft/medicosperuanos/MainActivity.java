@@ -46,6 +46,7 @@ import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -643,23 +644,35 @@ public class MainActivity extends AppCompatActivity
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 Log.e("TAG", httpRequest.getResponseText());
-//                                NavigationView navigationView;
-//                                if (AppGlobals.isDoctor())
-//                                    navigationView = doctorNavigationView;
-//                                else
-//                                    navigationView = patientNavigationView;
-//                                Menu menu = navigationView.getMenu();
-//                                // find MenuItem you want to change
-//                                MenuItem navMessages = menu.findItem(R.id.nav_messages);
-//                                if (AppGlobals.getUnReadMessages().size() > 0) {
-//                                    SpannableString s = new SpannableString("Messages         " +
-//                                            String.valueOf(AppGlobals.getUnReadMessages().size()));
-//                                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-//                                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-//                                    navMessages.setTitle(s);
-//                                } else {
-//                                    navMessages.setTitle("Messages");
-//                                }
+                                int count = 0;
+                                try {
+                                    JSONArray jsonArray = new JSONArray(httpRequest.getResponseText());
+                                    for (int k = 0; k < jsonArray.length(); k++) {
+                                        JSONObject jsonObject =  jsonArray.getJSONObject(k);
+                                        if (jsonObject.getInt("unread_count") != 0) {
+                                            count = count+1;
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                NavigationView navigationView;
+                                if (AppGlobals.isDoctor())
+                                    navigationView = doctorNavigationView;
+                                else
+                                    navigationView = patientNavigationView;
+                                Menu menu = navigationView.getMenu();
+                                // find MenuItem you want to change
+                                MenuItem navMessages = menu.findItem(R.id.nav_messages);
+                                if (count > 0) {
+                                    SpannableString s = new SpannableString("Messages         " +
+                                            String.valueOf(count));
+                                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+                                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+                                    navMessages.setTitle(s);
+                                } else {
+                                    navMessages.setTitle("Messages");
+                                }
                         }
                 }
             }
