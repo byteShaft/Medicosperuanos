@@ -417,24 +417,7 @@ public class MainActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                NavigationView navigationView;
-                if (AppGlobals.isDoctor())
-                    navigationView = doctorNavigationView;
-                else
-                    navigationView = patientNavigationView;
-                Menu menu = navigationView.getMenu();
-                // find MenuItem you want to change
-                MenuItem navMessages = menu.findItem(R.id.nav_messages);
-                if (AppGlobals.getUnReadMessages().size() > 0) {
-                    SpannableString s = new SpannableString("Messages         " +
-                            String.valueOf(AppGlobals.getUnReadMessages().size()));
-                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
-                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
-                    navMessages.setTitle(s);
-                } else {
-                    navMessages.setTitle("Messages");
-                }
-                invalidateOptionsMenu();
+                getMessages();
             }
         });
     }
@@ -660,6 +643,23 @@ public class MainActivity extends AppCompatActivity
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 Log.e("TAG", httpRequest.getResponseText());
+//                                NavigationView navigationView;
+//                                if (AppGlobals.isDoctor())
+//                                    navigationView = doctorNavigationView;
+//                                else
+//                                    navigationView = patientNavigationView;
+//                                Menu menu = navigationView.getMenu();
+//                                // find MenuItem you want to change
+//                                MenuItem navMessages = menu.findItem(R.id.nav_messages);
+//                                if (AppGlobals.getUnReadMessages().size() > 0) {
+//                                    SpannableString s = new SpannableString("Messages         " +
+//                                            String.valueOf(AppGlobals.getUnReadMessages().size()));
+//                                    s.setSpan(new ForegroundColorSpan(Color.RED), 0, s.length(), 0);
+//                                    s.setSpan(new AbsoluteSizeSpan(14, true), 0, s.length(), 0);
+//                                    navMessages.setTitle(s);
+//                                } else {
+//                                    navMessages.setTitle("Messages");
+//                                }
                         }
                 }
             }

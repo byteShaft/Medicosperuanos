@@ -227,14 +227,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                 }
             }
         });
-        Set<String> alreadyExisting = AppGlobals.getUnReadMessages();
-        Set<String> ids = new HashSet<>();
-        Log.i("TAg", String.valueOf(alreadyExisting.contains(String.valueOf(id))));
-        if (alreadyExisting.contains(String.valueOf(id))) {
-            alreadyExisting.remove(String.valueOf(id));
-        }
-        ids.addAll(alreadyExisting);
-        AppGlobals.setUnreadMessages(ids);
         softKeyboard.setSoftKeyboardCallback(new SoftKeyboard.SoftKeyboardChanged() {
             @Override
             public void onSoftKeyboardHide() {
@@ -260,9 +252,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             }
         });
-        if (MainActivity.getInstance() != null)
-        MainActivity.getInstance().updateMessages();
-
+        setReadMessages();
     }
 
     public void onScrolledUp() {
@@ -904,5 +894,29 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             e.printStackTrace();
         }
         request.send(jsonObject.toString());
+    }
+
+    public void setReadMessages() {
+        HttpRequest request = new HttpRequest(AppGlobals.getContext());
+        request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
+            @Override
+            public void onReadyStateChange(HttpRequest httpRequest, int i) {
+                switch (i) {
+                    case HttpRequest.STATE_DONE:
+                        Helpers.dismissProgressDialog();
+                        switch (httpRequest.getStatus()) {
+                            case HttpURLConnection.HTTP_OK:
+                                Log.e("TAG", httpRequest.getResponseText());
+                                MainActivity.getInstance().getMessages();
+                        }
+                }
+            }
+        });
+        request.setOnErrorListener(this);
+        request.open("POST", String.format("%smessages/%s/mark-read", AppGlobals.BASE_URL,
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID)));
+        request.setRequestHeader("Authorization", "Token " +
+                AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        request.send();
     }
 }

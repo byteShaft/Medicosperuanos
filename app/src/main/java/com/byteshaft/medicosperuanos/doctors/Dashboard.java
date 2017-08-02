@@ -136,9 +136,19 @@ public class Dashboard extends Fragment {
                         swipeRefresh = false;
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
+                                String response = request.getResponseText();
+
                                 Log.i("TAG", "res " + request.getResponseText());
+                                if (response == null) {
+                                    Log.i("TAG", "null return ");
+                                    return;
+                                }
+                                if (response.trim().isEmpty()) {
+                                    Log.i("TAG", "empty return ");
+                                    return;
+                                }
                                 try {
-                                    dashBoardValues = new JSONObject(request.getResponseText());
+                                    dashBoardValues = new JSONObject(response);
                                     JSONArray jsonArray = dashBoardValues.getJSONArray("thirty_days_stats");
                                     Log.i("Income Arrayyyyyyyyy", jsonArray.toString());
                                     for (int i = 0; i < jsonArray.length(); i++) {

@@ -190,21 +190,6 @@ public class AppGlobals extends Application {
         return sharedPreferences.getBoolean(KEY_LOGIN, false);
     }
 
-    public static void setUnreadMessages(Set<String> count) {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putStringSet(UNREAD_MESSAGES, count).apply();
-    }
-
-    public static Set<String> getUnReadMessages() {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getStringSet(UNREAD_MESSAGES, new HashSet<String>());
-    }
-
-    public static void removeUnreadMessages() {
-        SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().remove(UNREAD_MESSAGES).apply();
-    }
-
     public static void userType(boolean type) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putBoolean(KEY_ACCOUNT_TYPE, type).apply();
