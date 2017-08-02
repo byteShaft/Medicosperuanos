@@ -153,7 +153,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                         break;
 
                     case HttpURLConnection.HTTP_OK:
@@ -200,7 +199,6 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                System.out.println(request.getResponseText());
                                 try {
                                     JSONObject jsonObject = new JSONObject(request.getResponseText());
                                     String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
@@ -231,7 +229,8 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                     JSONObject stateJson = jsonObject.getJSONObject("state");
                                     AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_STATE_SELECTED,
                                             stateJson.getInt("id"));
-
+                                    Log.i("TAG", "subscription_date "+ jsonObject
+                                            .getString("subscription_expiry_date"));
                                     if (AppGlobals.isDoctor()) {
                                         String expiryDate = jsonObject.getString("subscription_expiry_date");
                                         AppGlobals.saveSubscriptionState("Subscription Exp: "+expiryDate);

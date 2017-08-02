@@ -79,12 +79,11 @@
 
         <TextView
             android:id="@+id/doc_nav_expiry_date"
-            android:padding="2dp"
-            android:maxLines="1"
+            android:padding="1dp"
             android:textColor="@color/orange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:text="subscription Exp: 30-12-17" />
 
     </LinearLayout>
