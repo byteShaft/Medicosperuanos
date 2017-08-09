@@ -381,6 +381,8 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         if (request.getResponseText() != null && request.getResponseText().trim().isEmpty()) {
                             return;
                         }
+                        mListView.setVisibility(View.VISIBLE);
+                        noDoctor.setVisibility(View.GONE);
                         addedDates = new ArrayList<>();
                         showingPosition = new HashMap<>();
                         doctors = new ArrayList<>();
@@ -454,11 +456,12 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                                         locationsArrayList.add(doctorLocations);
                                     }
                                 }
-                                if (foreground) {
-                                    customAdapter.notifyDataSetChanged();
-                                }
                             }
-                            if (doctors.size() < 1) {
+                            if (foreground) {
+                                customAdapter.notifyDataSetChanged();
+                            }
+                            Log.i("TAG", "before hiding" + doctors.size());
+                            if (doctors.size()  == 0) {
                                 mListView.setVisibility(GONE);
                                 noDoctor.setVisibility(View.VISIBLE);
                                 Helpers.showSnackBar(getView(), R.string.no_doctor_available_snack_bar);

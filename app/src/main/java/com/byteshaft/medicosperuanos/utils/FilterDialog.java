@@ -168,6 +168,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                 }
                 if (selectedEndDate) {
                     if (alreadyAddedSomething) query = query+"&";
+                    else query = query+String.format("start_date=%s&", Helpers.getDate());
                     query = query+String.format("end_date=%s", eDate);
                     alreadyAddedSomething = true;
                 }
@@ -176,12 +177,12 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                     query = query+String.format("radius=%s", seekBar.getProgress());
                     alreadyAddedSomething = true;
                 }
-                if (selectedAffiliateClinic && !mAffiliateClinic.getName().equals(" ")) {
+                if (selectedAffiliateClinic && !mAffiliateClinic.getName().equals("All")) {
                     if (alreadyAddedSomething) query = query+"&";
                     query = query+String.format("affiliate_clinic=%s", mAffiliateClinic.getId());
                     alreadyAddedSomething = true;
                 }
-                if (selectedSpeciality && !mSpecialities.getSpeciality().equals(" ")) {
+                if (selectedSpeciality && !mSpecialities.getSpeciality().equals("All")) {
                     if (alreadyAddedSomething) query = query+"&";
                     query = query+String.format("speciality=%s", mSpecialities.getSpecialitiesId());
                 }
@@ -218,10 +219,10 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                 try {
                                     JSONObject spObject = new JSONObject(request.getResponseText());
                                     JSONArray spArray = spObject.getJSONArray("results");
-                                    AffiliateClinic affiliate = new AffiliateClinic();
-                                    affiliate.setId(-1);
-                                    affiliate.setName(" ");
-                                    affiliateClinicsList.add(affiliate);
+                                    AffiliateClinic clinic = new AffiliateClinic();
+                                    clinic.setId(-1);
+                                    clinic.setName("All");
+                                    affiliateClinicsList.add(clinic);
                                     for (int i = 0; i < spArray.length(); i++) {
                                         JSONObject jsonObject = spArray.getJSONObject(i);
                                         AffiliateClinic affiliateClinic = new AffiliateClinic();
@@ -229,10 +230,6 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         affiliateClinic.setName(jsonObject.getString("name"));
                                         affiliateClinicsList.add(affiliateClinic);
                                     }
-                                    AffiliateClinic clinic = new AffiliateClinic();
-                                    clinic.setId(-1);
-                                    clinic.setName("All");
-                                    affiliateClinicsList.add(clinic);
                                     affiliateClinicAdapter = new AffiliateClinicAdapter(
                                             activity, affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
@@ -259,11 +256,11 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 try {
+                                    Specialities special = new Specialities();
+                                    special.setSpecialitiesId(-1);
+                                    special.setSpeciality("All");
+                                    specialitiesList.add(special);
                                     JSONObject spObject = new JSONObject(request.getResponseText());
-                                    Specialities speciality = new Specialities();
-                                    speciality.setSpecialitiesId(-1);
-                                    speciality.setSpeciality(" ");
-                                    specialitiesList.add(speciality);
                                     JSONArray spArray = spObject.getJSONArray("results");
                                     for (int i = 0; i < spArray.length(); i++) {
                                         JSONObject jsonObject = spArray.getJSONObject(i);
@@ -272,10 +269,6 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                     }
-                                    Specialities special = new Specialities();
-                                    special.setSpecialitiesId(-1);
-                                    special.setSpeciality("All");
-                                    specialitiesList.add(speciality);
                                     specialitiesAdapter = new SpecialitiesAdapter(
                                             activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
