@@ -864,7 +864,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 finish();
-                                MainMessages.getInstance().getMessages();
+                                if (MainMessages.getInstance() != null) {
+                                    MainMessages.getInstance().getMessages();
+                                }
                                 break;
                         }
                 }

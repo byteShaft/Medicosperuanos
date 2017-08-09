@@ -351,6 +351,10 @@ public class MyPatients extends Fragment {
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 System.out.println(request.getResponseText());
+                                myPatientsList = new ArrayList<>();
+                                customAdapter = new CustomAdapter(getActivity().getApplicationContext(),
+                                        R.layout.doctors_search_delagete, myPatientsList);
+                                mListView.setAdapter(customAdapter);
                                 try {
                                     JSONObject object = new JSONObject(request.getResponseText());
                                     JSONArray jsonArray = object.getJSONArray("results");
