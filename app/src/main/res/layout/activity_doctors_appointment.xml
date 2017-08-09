@@ -37,7 +37,7 @@
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:focusable="false"
-                        android:hint="Date" />
+                        android:hint="@string/date" />
                 </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
@@ -61,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:editable="false"
                         android:focusable="false"
-                        android:hint="Time"
+                        android:hint="@string/time"
                         android:inputType="textPersonName" />
                 </android.support.design.widget.TextInputLayout>
             </RelativeLayout>
@@ -78,7 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:text="Requested services"
+                android:text="@string/requested_services"
                 android:textSize="15sp" />
 
         </LinearLayout>
@@ -92,7 +92,7 @@
                 android:id="@+id/appointment_reason_editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Appointment reason"
+                android:hint="@string/appointment_reason"
                 android:inputType="textPersonName" />
         </android.support.design.widget.TextInputLayout>
 
@@ -108,7 +108,7 @@
                 android:id="@+id/explanation_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Exploration.(250 character max)"
+                android:hint="@string/exploration_250_character_max"
                 android:inputType="text"
                 android:lines="3"
                 android:maxLength="250" />
@@ -131,7 +131,7 @@
                     android:id="@+id/diagnostics_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Diagnostics" />
+                    android:text="@string/diagnostics" />
 
                 <Spinner
                     android:id="@+id/diagnostics_spinner"
@@ -189,7 +189,7 @@
                     android:layout_margin="2dp"
                     android:drawablePadding="8dp"
                     android:drawableRight="@mipmap/dropdown"
-                    android:text="List of medication for selection" />
+                    android:text="@string/list_of_medication_for_selection" />
 
             </LinearLayout>
 
@@ -275,7 +275,7 @@
                         android:layout_marginBottom="-7dp"
                         android:editable="false"
                         android:focusable="false"
-                        android:hint="Date of return"
+                        android:hint="@string/date_of_return"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
 
@@ -293,7 +293,7 @@
                 android:id="@+id/conclusions_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Conclusion"
+                android:hint="@string/conclusion"
                 android:inputType="text"
                 android:maxLength="250" />
         </android.support.design.widget.TextInputLayout>
@@ -305,7 +305,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:layout_marginTop="15dp"
-            android:text="Save"
+            android:text="@string/save"
             android:theme="@style/MyButton" />
 
         <TextView
@@ -314,7 +314,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
-            android:text="Terms and conditions of the services"
+            android:text="@string/terms_and_conditions_of_the_services"
             android:textSize="15sp" />
     </LinearLayout>
 </ScrollView>

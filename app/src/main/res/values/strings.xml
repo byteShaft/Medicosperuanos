@@ -174,9 +174,40 @@
     <string name="loading">loading</string>
     <string name="an_error_occurred">An error occurred, please try again</string>
     <string name="profile_update_failed">Profile update Failed!</string>
-    <string name="provide_valid_email">Provide a valid EmailAddress</string>
+    <string name="provide_valid_email">Provide a valid Email Address</string>
     <string name="account_inactive">Inactive Account</string>
     <string name="inactive_message">Your account is inactive, please wait for admin\'s approval. You will receive a activation Email</string>
+
+    <string name="write_a_message">Write a message</string>
+    <string name="book">Book</string>
+    <string name="view_all_reviews">View All Reviews</string>
+
+    <string name="date">Date:</string>
+    <string name="time">Time:</string>
+    <string name="services">Services</string>
+    <string name="select_required_services">Select Required Services</string>
+    <string name="appointment_reason">appointment reason...</string>
+    <string name="total">Total :</string>
+    <string name="requested_services">Requested services</string>
+    <string name="exploration_250_character_max">Exploration.(250 character max)</string>
+    <string name="list_of_medication_for_selection">List of medication for selection</string>
+    <string name="date_of_return">Date of return</string>
+    <string name="conclusion">Conclusion</string>
+    <string name="appointment">Appointment</string>
+    <string name="confirmed">Confirmed</string>
+    <string name="attended">Attended</string>
+    <string name="total_appointments_today">Total Appointments Today</string>
+    <string name="to_be_confirmed">To be Confirmed</string>
+    <string name="today_income">Today Income</string>
+    <string name="clear_filters">Clear Filters</string>
+    <string name="apply_filters">Apply Filters</string>
+    <string name="distance_km">Distance (km)</string>
+    <string name="speciality">Speciality</string>
+    <string name="clinic">Clinic</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="from_date">From Date</string>
+    <string name="to_date">To Date</string>
+    <string name="verification_code">Verification Code</string>
     <string name="select_quantity">please select quantity first</string>
 
 </resources>

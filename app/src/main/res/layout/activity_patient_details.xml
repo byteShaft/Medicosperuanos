@@ -99,7 +99,7 @@
                 android:id="@+id/button_appointment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Appointment"
+                android:text="@string/appointment"
                 android:theme="@style/MyButton" />
         </RelativeLayout>
 
@@ -182,7 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:editable="false"
-                    android:hint="Address"
+                    android:hint="@string/address"
                     android:textSize="15sp" />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
@@ -215,7 +215,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:editable="false"
-                        android:hint="State"
+                        android:hint="@string/state_prompt"
                         android:textSize="15sp" />
                 </android.support.design.widget.TextInputLayout>
 
