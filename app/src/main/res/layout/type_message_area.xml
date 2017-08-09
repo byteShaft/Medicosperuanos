@@ -35,7 +35,7 @@
         android:background="@drawable/custom_edit_text_background"
         android:textColorHint="#bcc0c8"
         android:textColor="@android:color/black"
-        android:hint="Write a message"
+        android:hint="@string/write_a_message"
         android:padding="10dp"
         android:layout_margin="1dp"/>
 

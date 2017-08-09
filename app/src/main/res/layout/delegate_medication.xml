@@ -24,7 +24,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@+id/id_text_view"
-        android:text="Diagnostic List djjdjddj j jdjd jdjjd jjdjd"
+        android:text="Diagnostic List"
         android:textColor="@android:color/black" />
 
     <LinearLayout

@@ -33,7 +33,7 @@
                 android:layout_toRightOf="@+id/image_"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:text="Today's Income"
+                android:text="@string/today_income"
                 android:textColor="@android:color/black"
                 android:textSize="16sp" />
 
