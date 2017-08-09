@@ -177,6 +177,7 @@
     <string name="provide_valid_email">Provide a valid Email Address</string>
     <string name="account_inactive">Inactive Account</string>
     <string name="inactive_message">Your account is inactive, please wait for admin\'s approval. You will receive a activation Email</string>
+
     <string name="write_a_message">Write a message</string>
     <string name="book">Book</string>
     <string name="view_all_reviews">View All Reviews</string>
@@ -207,6 +208,7 @@
     <string name="from_date">From Date</string>
     <string name="to_date">To Date</string>
     <string name="verification_code">Verification Code</string>
+    <string name="select_quantity">please select quantity first</string>
 
 </resources>
 

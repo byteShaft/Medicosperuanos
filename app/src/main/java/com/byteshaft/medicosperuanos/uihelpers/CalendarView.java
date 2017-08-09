@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,15 +166,15 @@ public class CalendarView extends LinearLayout {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                eventHandler.onDayPress((Date) adapterView.getItemAtPosition(i));
                 Date date = (Date) adapterView.getItemAtPosition(i);
+                Log.i("TAG", "onItemClick" +date.getYear());
                 DateFormat df = SimpleDateFormat.getDateInstance();
                 String resultDate = df.format(date);
                 currentDate.setTime(date);
                 txtDate.setText(resultDate);
                 selectedDate = (Date) adapterView.getItemAtPosition(i);
+                eventHandler.onDayPress(selectedDate);
                 calendarAdapter.notifyDataSetChanged();
-
             }
         });
     }
@@ -199,6 +200,7 @@ public class CalendarView extends LinearLayout {
     /**
      * Display dates correctly in hori
      */
+
     public void updateCalendar(HashSet<Date> events, Date date) {
         ArrayList<Date> cells = new ArrayList<>();
 //        ArrayList<String> weekDay = new ArrayList<>();
