@@ -128,7 +128,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         cv.updateCalendar(convertedDate);
         CalendarView.currentDate.set(Calendar.DATE, convertedDate.getDate());
         cv.updateCalendar(convertedDate);
-        cv.update(new Date(), Calendar.getInstance());
+//        cv.update(new Date(), Calendar.getInstance());
         Log.i("TAG", "current date"+ convertedDate);
 
         // assign event handler
@@ -149,7 +149,6 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                 currentDate = dateFormat.format(formattedDate);
                 Log.i("TAG", "current date  " + currentDate);
                 getSchedule(currentDate);
-
             }
         });
         mDoctorName = (TextView) findViewById(R.id.doctor_name);

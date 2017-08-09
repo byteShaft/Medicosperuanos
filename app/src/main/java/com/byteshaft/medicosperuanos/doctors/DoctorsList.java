@@ -378,7 +378,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
                         swipeRefreshLayout.setRefreshing(false);
                         Log.i("TAG", "response " + request.getResponseURL());
                         Log.i("TAG", "response " + request.getResponseText());
-                        if (request.getResponseText().trim().isEmpty()) {
+                        if (request.getResponseText() != null && request.getResponseText().trim().isEmpty()) {
                             return;
                         }
                         addedDates = new ArrayList<>();
@@ -477,7 +477,7 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 //        if (exception.getLocalizedMessage())
         swipeRefreshLayout.setRefreshing(false);
         swipeRefresh = false;
-        if (exception.getLocalizedMessage().equals("Network is unreachable")) {
+        if (exception != null && exception.getLocalizedMessage().equals("Network is unreachable")) {
             Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
         }
         switch (readyState) {
