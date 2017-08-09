@@ -38,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.byteshaft.medicosperuanos.R;
 import com.byteshaft.medicosperuanos.adapters.ViewHolder;
@@ -427,7 +428,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
         Document document = new Document();
         String path = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         try {
-            PdfWriter.getInstance(document, new FileOutputStream(path + "/medicosperuanos.pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream(path +
+                    "/medicosperuanos"+ new Date().getTime() +".pdf"));
         } catch (DocumentException | FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -735,7 +737,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     case HttpRequest.STATE_DONE:
                         switch (request.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
-                                targetsArrayList = new ArrayList<Targets>();
+                                targetsArrayList = new ArrayList<>();
                                 try {
                                     JSONObject targetsObject = new JSONObject(request.getResponseText());
                                     JSONArray targetsArray = targetsObject.getJSONArray("results");
@@ -825,9 +827,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
     @Override
     public void onFileUploadProgress(HttpRequest request, File file, long loaded, long total) {
         double progress = (loaded / (double) total) * 100;
-//        Log.i("TAG", "progress " + progress);
-//        Log.i("TAG", "dialog "+ String.valueOf(alertDialog == null));
-//        Log.i("TAG", "dialog "+ String.valueOf(donutProgress == null));
         if (alertDialog != null) {
             donutProgress.setProgress((int) progress);
         }
@@ -890,7 +889,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             jsonArray.put(diagnosticMedication.getId());
         }
         Log.i("TAG", "Dia Sent " + jsonArray);
-        data.append(FormData.TYPE_CONTENT_JSON, "diagnostics", jsonArray.toString());
+        data.append(FormData.TYPE_CONTENT_TEXT, "diagnostics", jsonArray.toString());
         JSONArray treatmentArray = new JSONArray();
         for (DiagnosticMedication diagnosticMedication : selectedMedicationList) {
             JSONObject treatmentObject = new JSONObject();
@@ -899,8 +898,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             treatmentArray.put(treatmentObject);
         }
         Log.i("TAG", "Treatments Sent " + treatmentArray);
-        data.append(FormData.TYPE_CONTENT_JSON, "treatments", treatmentArray.toString());
-        data.append(FormData.TYPE_CONTENT_JSON, "services_provided", providedServicesIds.toString());
+        data.append(FormData.TYPE_CONTENT_TEXT, "treatments", treatmentArray.toString());
+        data.append(FormData.TYPE_CONTENT_TEXT, "services_provided", providedServicesIds.toString());
         data.append(FormData.TYPE_CONTENT_TEXT, "exploration", exploration);
         data.append(FormData.TYPE_CONTENT_TEXT, "time", time);
         if (method.equals("PUT")) {
@@ -1321,6 +1320,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (diagnostic.getQuantity() < 1) {
+                        Toast.makeText(DoctorsAppointment.this, getResources()
+                                .getString(R.string.select_quantity), Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     int pos = (int) viewHolder.checkBox.getTag();
                     View checkBoxView = medicationDiagnosticListView.getChildAt(pos);
                     if (checkBoxView != null) {

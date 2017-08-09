@@ -71,10 +71,10 @@
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/patient_nav_online_switch"
             android:layout_width="120dp"
-            android:checked="true"
+            android:checked="false"
             android:layout_height="wrap_content"
             android:padding="1dp"
-            android:text="@string/online"
+            android:text="@string/offline"
             android:textColor="@android:color/white"
             android:textSize="12dp"
             app:theme="@style/switchTheme" />

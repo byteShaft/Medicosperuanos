@@ -128,6 +128,7 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
         System.out.println("date is : " + scheduleDate);
+        System.out.println("appointment date is : " + appointmentDate);
         dateText.setText(scheduleDate);
         timeText.setText(slotTime);
 

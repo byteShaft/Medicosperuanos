@@ -177,6 +177,7 @@
     <string name="provide_valid_email">Provide a valid EmailAddress</string>
     <string name="account_inactive">Inactive Account</string>
     <string name="inactive_message">Your account is inactive, please wait for admin\'s approval. You will receive a activation Email</string>
+    <string name="select_quantity">please select quantity first</string>
 
 </resources>
 

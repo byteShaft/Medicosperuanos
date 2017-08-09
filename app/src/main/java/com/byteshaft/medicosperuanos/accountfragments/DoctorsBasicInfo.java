@@ -453,13 +453,11 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         @Override
                                         public void selectedIndices(List<Integer> indices) {
                                             Log.i("selectedIndices", indices.toString());
-
                                         }
 
                                         @Override
                                         public void selectedStrings(List<String> strings) {
-                                            Log.i("selectedStrings", strings.toString());
-                                            mSpecialitySpinnerArray = new ArrayList<Integer>();
+                                            mSpecialitySpinnerArray = new ArrayList<>();
                                             // here
                                             for (String selected : strings) {
                                                 for (int i =0; i < specialitiesList.size(); i++) {
@@ -595,6 +593,8 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         if (getDoctorProfileIds(AppGlobals.KEY_SUBSCRIPTION_SELECTED)
                                                 == jsonObject.getInt("id")) {
                                             subscriptionPosition = i;
+                                            mSubscriptionSpinnerValueString  = String
+                                                    .valueOf(jsonObject.getInt("id"));
                                         }
                                         subscriptionTypesList.add(subscriptionType);
                                     }

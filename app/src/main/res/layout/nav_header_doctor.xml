@@ -70,10 +70,10 @@
             android:id="@+id/doc_nav_online_switch"
             android:layout_width="120dp"
             android:padding="2dp"
-            android:checked="true"
+            android:checked="false"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
-            android:text="@string/online"
+            android:text="@string/offline"
             android:textSize="12sp"
             app:theme="@style/switchTheme"/>
 

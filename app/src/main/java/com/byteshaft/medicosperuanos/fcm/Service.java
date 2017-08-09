@@ -32,6 +32,7 @@ import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.byteshaft.medicosperuanos.utils.AppGlobals.KEY_USER_ID;
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.sImageLoader;
 
 
@@ -74,7 +75,19 @@ public class Service extends FirebaseMessagingService {
             if (remoteMessage.getData().get("type").equals("subscription_expired")) {
                 sendNotification("Your subscription has expired and your account is inactive. kindly contact admin" +
                         "to renew your subscription ", "Subscription Expired", "Subscription Expired");
-                AppGlobals.saveSubscriptionState("Subscription Expired on : " + AppGlobals.getSubscription());
+                String expiry = AppGlobals.getSubscription();
+                if (expiry.contains("Subscription Expired on : ")) {
+                    expiry = AppGlobals.getSubscription().replace("Subscription Expired on : ", "");
+                    AppGlobals.saveSubscriptionState(expiry);
+                    expiry = AppGlobals.getSubscription();
+                } else if (expiry.contains("Subscription Exp: ")){
+                    expiry = AppGlobals.getSubscription().replace("Subscription Exp: ", "");
+                    AppGlobals.saveSubscriptionState(expiry);
+                    expiry = AppGlobals.getSubscription();
+                }
+                AppGlobals.saveSubscriptionState("Subscription Expired on : " +expiry);
+                FirebaseMessaging.getInstance().subscribeToTopic(String.format("doctor-activate-%s",
+                        AppGlobals.getStringFromSharedPreferences(KEY_USER_ID)));
                 return;
             }
             doctorName = remoteMessage.getData().get("doctor_name");

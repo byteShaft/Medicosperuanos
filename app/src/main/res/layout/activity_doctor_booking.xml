@@ -4,7 +4,7 @@
     android:id="@+id/activity_doctor_booking"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp">
+    android:layout_margin="6dp">
 
     <RelativeLayout
         android:id="@+id/my_layout"
@@ -154,22 +154,24 @@
         </android.support.v7.widget.CardView>
     </RelativeLayout>
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/my_layout"
-        android:scrollbars="none">
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_below="@+id/my_layout"-->
+        <!--android:scrollbars="none">-->
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/my_layout">
 
 
-            <com.byteshaft.medicosperuanos.uihelpers.CalendarView xmlns:calendarNS="http://schemas.android.com/apk/res/com.byteshaft.medicosperuanos"
+            <com.byteshaft.medicosperuanos.uihelpers.CalendarView
+                xmlns:calendarNS="http://schemas.android.com/apk/res/com.byteshaft.medicosperuanos"
                 android:id="@+id/calendar_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:background="@color/fav_doctor_calendar_background"
                 calendarNS:dateFormat="MMM yyyy" />
 
@@ -184,14 +186,14 @@
             <GridView
                 android:id="@+id/time_table"
                 android:layout_width="match_parent"
-                android:layout_height="125dp"
+                android:layout_height="match_parent"
                 android:layout_below="@+id/calendar_view"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:horizontalSpacing="2dp"
                 android:numColumns="4"
                 android:verticalSpacing="2dp"
                 android:visibility="gone" />
         </RelativeLayout>
-    </ScrollView>
+    <!--</ScrollView>-->
 
 </RelativeLayout>
