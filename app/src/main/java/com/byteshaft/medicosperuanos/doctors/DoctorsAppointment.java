@@ -487,7 +487,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 int year = c.get(Calendar.YEAR);
                 int month = c.get(Calendar.MONTH);
                 int day = c.get(Calendar.DAY_OF_MONTH);
-                datePickerDialog.getDatePicker().setMinDate(c.getTimeInMillis());
                 datePickerDialog.show();
                 break;
             case R.id.back_press:
@@ -1312,6 +1311,17 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 public void onClick(View view) {
                     if (diagnostic.getQuantity() > 0) {
                         diagnostic.setQuantity(diagnostic.getQuantity() - 1);
+                        if (diagnostic.getQuantity() == 0) {
+                            selectedMedication.remove(position);
+//                            selectedMedicationList.remove(diagnostic);
+                            selectedMedicationsHashMap.remove(diagnostic.getId());
+                            notifyDataSetChanged();
+                        }
+                        notifyDataSetChanged();
+                    } else if (diagnostic.getQuantity() == 0) {
+                        selectedMedication.remove(position);
+//                            selectedMedicationList.remove(diagnostic);
+                        selectedMedicationsHashMap.remove(diagnostic.getId());
                         notifyDataSetChanged();
                     }
 
@@ -1323,6 +1333,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     if (diagnostic.getQuantity() < 1) {
                         Toast.makeText(DoctorsAppointment.this, getResources()
                                 .getString(R.string.select_quantity), Toast.LENGTH_SHORT).show();
+                        compoundButton.setChecked(false);
                         return;
                     }
                     int pos = (int) viewHolder.checkBox.getTag();

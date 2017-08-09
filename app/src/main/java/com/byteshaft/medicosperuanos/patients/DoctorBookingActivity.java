@@ -30,6 +30,7 @@ import com.byteshaft.medicosperuanos.doctors.DoctorsList;
 import com.byteshaft.medicosperuanos.gettersetter.AppointmentDetail;
 import com.byteshaft.medicosperuanos.messages.ConversationActivity;
 import com.byteshaft.medicosperuanos.uihelpers.CalendarView;
+import com.byteshaft.medicosperuanos.uihelpers.ExpandableHeightGridView;
 import com.byteshaft.medicosperuanos.utils.AppGlobals;
 import com.byteshaft.medicosperuanos.utils.Helpers;
 import com.byteshaft.requests.HttpRequest;
@@ -61,7 +62,7 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
     private ImageButton mCallButton;
     private ImageButton mChatButton;
     private ImageButton mFavButton;
-    private GridView timeTableGrid;
+    private ExpandableHeightGridView timeTableGrid;
     private ImageView status;
     private int id;
     private HttpRequest request;
@@ -99,7 +100,8 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_doctor_booking);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         sInstance = this;
-        timeTableGrid = (GridView) findViewById(R.id.time_table);
+        timeTableGrid = (ExpandableHeightGridView) findViewById(R.id.time_table);
+        timeTableGrid.setExpanded(true);
         timeTableGrid.setOnItemClickListener(this);
         timeSlots = new ArrayList<>();
         HashSet<Date> events = new HashSet<>();
@@ -360,11 +362,13 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 AppointmentDetail appointmentDetail = new AppointmentDetail();
                                 appointmentDetail.setSlotId(jsonObject.getInt("id"));
+                                Log.i("TAG", "Slot time" + Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setStartTime(Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setState(jsonObject.getBoolean("taken"));
                                 timeSlots.add(appointmentDetail);
                                 timeTableAdapter.notifyDataSetChanged();
                             }
+                            Log.e("TAG", "total slots " + timeSlots.size());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
