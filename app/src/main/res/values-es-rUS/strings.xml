@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Medicosperuanos</string>
+    <string name="navigation_drawer_open">Abrir el cajón de navegación</string>
+    <string name="navigation_drawer_close">Cerrar el cajón de navegación</string>
+    <string name="title_activity_maps">Mapa</string>
+    <string name="state_prompt">Estado</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"> AIzaSyAvL-0g4dIUJ57UQDh3OIvIAm6W5P7Th6s </string>
+
+    <string name="action_settings">Ajustes</string>
+    <string name="next">Siguiente</string>
+    <string name="skip">Omitir</string>
+    <string name="start">comienzo</string>
+    <string name="review">The best doctor In this area, The best doctor In this area. OK kr k doctor hai ye!</string>
+    <string name="signup_string">¿No tiene una cuenta? <i>Regístrate</i> </string>
+    <string name="sign_up_string">¿No tiene una cuenta? <i>Regístrate</i></string>
+
+
+    <!-- Screens background color-->
+    <color name="bg_screen1">#f64c73</color>
+    <color name="bg_screen2">#20d2bb</color>
+    <color name="bg_screen3">#3395ff</color>
+    <color name="bg_screen4">#c873f4</color>
+
+    <!-- dots inactive colors -->
+    <color name="dot_dark_screen1">#d1395c</color>
+    <color name="dot_dark_screen2">#14a895</color>
+    <color name="dot_dark_screen3">#2278d4</color>
+    <color name="dot_dark_screen4">#a854d4</color>
+
+    <!-- dots active colors -->
+    <color name="dot_light_screen1">#f98da5</color>
+    <color name="dot_light_screen2">#8cf9eb</color>
+    <color name="dot_light_screen3">#93c6fd</color>
+    <color name="dot_light_screen4">#e4b5fc</color>
+
+    <array name="array_dot_active">
+        <item>@color/dot_light_screen1</item>
+        <item>@color/dot_light_screen2</item>
+        <item>@color/dot_light_screen3</item>
+        <item>@color/dot_light_screen4</item>
+    </array>
+
+    <array name="array_dot_inactive">
+        <item>@color/dot_dark_screen1</item>
+        <item>@color/dot_dark_screen2</item>
+        <item>@color/dot_dark_screen3</item>
+        <item>@color/dot_dark_screen4</item>
+    </array>
+
+    <string-array name="date_array">
+        <item>12–2–2017</item>
+    </string-array>
+
+    <string name="account_activation">activación de cuenta</string>
+    <string name="sign_up">Regístrate</string>
+    <string name="forgot_password">Se te olvidó tu contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="reset_password">Restablecer la contraseña</string>
+    <string name="permission_dialog_title">Ubicación Permiso requerido</string>
+    <string name="permission_dialog_message">Para obtener la dirección, se requiere permiso de ubicación. Concédelo manualmente</string>
+    <string name="location_permission_for_route">Para ver a los médicos en el mapa Se requiere permiso de ubicación. Concédelo manualmente</string>
+
+    <string name="close">Cerca</string>
+    <string name="permission_denied">Permiso denegado !</string>
+    <string name="date_of_birth">Fecha de nacimiento</string>
+    <string name="acquiring_location">Adquiriendo la ubicación por favor espere ..</string>
+    <string name="email">correo electrónico</string>
+    <string name="resend">Reenviar</string>
+    <string name="activate">Activar</string>
+    <string name="phone_1">Teléfono-1</string>
+    <string name="phone_2">Teléfono-2</string>
+    <string name="college_id">ID de la universidad</string>
+    <string name="consultation_time">Tiempo de consulta</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="news">Noticias</string>
+    <string name="terms_and_conditions">Acepto los términos y condiciones</string>
+    <string name="save">Salvar</string>
+    <string name="terms_and_conditions_of_the_services">Términos y condiciones de los servicios</string>
+    <string name="recover">Recuperar</string>
+    <string name="password_forgot">¿Se te olvidó tu contraseña?</string>
+    <string name="old_password">Clave de restablecimiento de contraseña</string>
+    <string name="new_password">nueva contraseña</string>
+    <string name="reset">Reiniciar</string>
+    <string name="password">Contraseña</string>
+    <string name="confirm_password">Confirmar contraseña</string>
+    <string name="i_am_a_doctor">Soy un doctor</string>
+    <string name="create_account">Crear una cuenta</string>
+    <string name="already_have_an_account_login">¿Ya tienes una cuenta? <i>Iniciar sesión</i></string>
+    <string name="doc_id">DocID</string>
+    <string name="first_name">Nombre de pila</string>
+    <string name="last_name">Apellido</string>
+    <string name="male">Masculino</string>
+    <string name="female">Hembra</string>
+    <string name="choose_your_gender">Por favor seleccione su Género</string>
+    <string name="pick_for_current_location">Selección de ubicación actual</string>
+    <string name="enter_address">Por favor proporcione su dirección</string>
+    <string name="address">Dirección</string>
+    <string name="emergency_contact">Contacto de emergencia</string>
+    <string name="i_accept_the_terms_and_conditions">Acepto los términos y condiciones</string>
+    <string name="login_faild">¡Error de inicio de sesion!</string>
+    <string name="check_internet">Por favor revise su conexion a internet</string>
+    <string name="email_not_exist">El correo electrónico no existe en el servidor</string>
+    <string name="check_password">Introduzca la contraseña correcta</string>
+    <string name="activate_your_account">Por favor, active su cuenta!</string>
+    <string name="online">En línea</string>
+    <string name="offline">Desconectado</string>
+    <string name="dashboard">Tablero</string>
+    <string name="storage_permission_message">Para el uso sin conexión de esta aplicación, la aplicación debe guardar algunas imágenes y datos en tu móvil.
+            Permiso de almacenamiento</string>
+    <string name="storage_permission_dialog_title">Permiso de almacenamiento requerido</string>
+    <string name="time_slot_booked">La franja horaria ya está reservada</string>
+    <string name="sample_message">Ejemplo de mensaje</string>
+    <string name="updating">Configuración del perfil</string>
+    <string name="updating_profile">Actualización de perfil</string>
+    <string name="updating_attention">Actualización de la atención</string>
+    <string name="finishing_up">Terminando</string>
+    <string name="appointments">Equipo</string>
+    <string name="my_patient_details">Detalles de mi paciente</string>
+    <string name="messages">Mensajes</string>
+    <string name="permission_granted">Permiso concedido</string>
+    <string name="no_doctor_available">No Doctor Disponible</string>
+    <string name="no_doctor_available_snack_bar">No hay médico disponible en los próximos 7 días</string>
+    <string name="success">Programación creada con éxito</string>
+    <string name="my_patient">Mi paciente</string>
+    <string name="my_schedule">Mi horario</string>
+    <string name="update_profile">Actualización del perfil</string>
+    <string name="profile_updated">Perfil Actualizado correctamente</string>
+    <string name="cannot_go_back_from_current_date">No se puede volver de la fecha actual</string>
+    <string name="please_enter_appointment_reason">Por favor ingrese el motivo de la cita</string>
+    <string name="appointment_created">Creación de la cita</string>
+    <string name="account_not_activated">Cuenta no activada. Le enviaremos un correo electrónico cuando se active su cuenta</string>
+    <string name="account">Cuenta</string>
+    <string name="review_submitted_failed">Doctor ya revisado por usted</string>
+    <string name="review_failed">Revisión enviada fallada!</string>
+    <string name="review_submitted">Revisión enviada!</string>
+    <string name="review_submitted_successfully">Has revisado con éxito</string>
+    <string name="getting_doctor_list">Obtener lista de médicos ...</string>
+    <string name="getting_schedule">Obtener horario ...</string>
+    <string name="setting_up_schedule">Estableciendo el horario ...</string>
+    <string name="updating_schedule">Programa de actualización ...</string>
+    <string name="getting_patients">Buscar a los pacientes ...</string>
+    <string name="getting_favourite_doctors">Buscar médico favorito</string>
+    <string name="fetching_my_appointments">Obtener citas ...</string>
+    <string name="no_services">Sin servicio</string>
+    <string name="no_services_message">No Servicio establecido por este médico</string>
+    <string name="schedule_is_not_set_by_any_of_your_favorite_doctors">El horario no está establecido por ninguno de tus médicos favoritos</string>
+    <string name="select_service">Seleccionar servicio requerido</string>
+    <string name="accept_appointment_first">Debe aceptar esta cita primero ...</string>
+    <string name="network_unreachable">La red es inalcanzable</string>
+    <string name="already_taken">No se puede eliminar la ranura reservada</string>
+    <string name="slot_deleted">Ranura eliminada</string>
+    <string name="cannot_reject_attended_appointment">No puedo rechazar la cita asistida</string>
+    <string name="diagnostics">Seleccione Diagnósticos</string>
+    <string name="medications">Seleccione medicamentos</string>
+    <string name="schedule_updated">Calendario actualizado con éxito</string>
+    <string name="connection_time_out">El tiempo de conexión expiro</string>
+    <string name="connection_lost">Conexión perdida</string>
+    <string name="getting_appointments">Obtener citas</string>
+    <string name="cancel_label">Cancelar</string>
+    <string name="confirm_label">Confirmar</string>
+    <string name="selected_folder_label">Carpeta seleccionada:</string>
+    <string name="create_folder_label">Crear carpeta</string>
+    <string name="create_folder_msg">Crear una nueva carpeta con nombre "%1$s"?</string>
+    <string name="create_folder_success">Creó una nueva carpeta</string>
+    <string name="create_folder_error_no_write_access">No se puede escribir en esta carpeta</string>
+    <string name="create_folder_error_already_exists">La carpeta ya existe</string>
+    <string name="create_folder_error">No se pudo crear la carpeta</string>
+    <string name="up_label">Arriba</string>
+    <string name="message_error">No puede enviar mensaje vacío</string>
+    <string name="appointment_already_taken">Cita ya tomada</string>
+    <string name="rejected_appointment_cannot_be_opened">No puede abrir la cita rechazada</string>
+    <string name="no_speciality_selected">Por favor seleccione al menos una especialidad</string>
+    <string name="loading">cargando</string>
+    <string name="an_error_occurred">Ha ocurrido un error. Por favor intente de nuevo</string>
+    <string name="profile_update_failed">¡La actualización del perfil ha fallado!</string>
+    <string name="provide_valid_email">Proporcione una dirección de correo electrónico válida</string>
+    <string name="account_inactive">Cuenta inactiva</string>
+    <string name="inactive_message">Su cuenta está inactiva, espere por favor la aprobación del administrador. Recibirá un Email de activación</string>
+    <string name="write_a_message">Escribe un mensaje</string>
+    <string name="book">reserva</string>
+    <string name="view_all_reviews">Ver todos los comentarios</string>
+
+    <string name="date">fecha:</string>
+    <string name="time">Hora:</string>
+    <string name="services">Servicios</string>
+    <string name="select_required_services">Seleccione Servicios Requeridos</string>
+    <string name="appointment_reason">Razón de cita...</string>
+    <string name="total">Total :</string>
+    <string name="requested_services">Servicios solicitados</string>
+    <string name="exploration_250_character_max">Exploración (250 caracteres máximo)</string>
+    <string name="list_of_medication_for_selection">Lista de medicamentos para la selección</string>
+    <string name="date_of_return">Fecha de retorno</string>
+    <string name="conclusion">Conclusión</string>
+    <string name="appointment">Cita</string>
+    <string name="confirmed">Confirmado</string>
+    <string name="attended">Asistió</string>
+    <string name="total_appointments_today">Total de citas hoy</string>
+    <string name="to_be_confirmed">Para ser confirmado</string>
+    <string name="today_income">Hoy Ingresos</string>
+    <string name="clear_filters">Eliminar filtros</string>
+    <string name="apply_filters">Aplicar filtros</string>
+    <string name="distance_km">Distancia (km)</string>
+    <string name="speciality">Especialidad</string>
+    <string name="clinic">Clínica</string>
+    <string name="pick_date">Fecha de selección</string>
+    <string name="from_date">Partir de la fecha</string>
+    <string name="to_date">Hasta la fecha</string>
+    <string name="verification_code">Código de verificación</string>
+
+</resources>

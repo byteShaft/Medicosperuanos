@@ -173,7 +173,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="40dp"
-                android:text="Date: "
+                android:text="@string/date"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -206,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="40dp"
-                android:text="Time: "
+                android:text="@string/time"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -230,7 +230,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:padding="8dp"
-            android:text="Services"
+            android:text="@string/services"
             android:textSize="16sp" />
 
         <TextView
@@ -241,7 +241,7 @@
             android:layout_below="@+id/txt_service"
             android:layout_marginTop="6dp"
             android:clickable="true"
-            android:text="Select Required Services" />
+            android:text="@string/select_required_services" />
 
         <EditText
             android:id="@+id/appointment_reason_editText"
@@ -252,7 +252,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginTop="8dp"
-            android:hint="appointment reason..." />
+            android:hint="@string/appointment_reason" />
 
         <LinearLayout
             android:id="@+id/total_price_layout"
@@ -269,7 +269,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Total :  "
+                android:text="@string/total"
                 android:textSize="18sp" />
 
             <EditText
@@ -290,7 +290,7 @@
             android:layout_below="@+id/total_price_layout"
             android:layout_centerHorizontal="true"
             android:layout_margin="10dp"
-            android:text="Save"
+            android:text="@string/save"
             android:theme="@style/MyButton" />
 
     </RelativeLayout>
