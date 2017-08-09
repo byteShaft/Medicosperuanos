@@ -63,9 +63,6 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                chatWithList = new ArrayList<ChatModel>();
-                adapter = new Adapter(getActivity().getApplicationContext(), chatWithList);
-                mMessagesListView.setAdapter(adapter);
                 swipeRefresh = true;
                 getMessages();
             }
@@ -125,6 +122,9 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", httpRequest.getResponseText());
+                        chatWithList = new ArrayList<ChatModel>();
+                        adapter = new Adapter(getActivity().getApplicationContext(), chatWithList);
+                        mMessagesListView.setAdapter(adapter);
                         try {
                             JSONArray jsonArray = new JSONArray(httpRequest.getResponseText());
                             for (int j = 0; j < jsonArray.length();j++) {
