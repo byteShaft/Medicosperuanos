@@ -222,6 +222,7 @@ public class PatientDetails extends AppCompatActivity implements View.OnClickLis
                 Intent appointmentIntent = new Intent(getApplicationContext(),
                         DoctorBookingActivity.class);
                 appointmentIntent.putExtra("user", patientId);
+                appointmentIntent.putExtra("start_time", "12:00 AM");
                 appointmentIntent.putExtra("name", patientNameString);
                 appointmentIntent.putExtra("dob", patientAgeString);
                 appointmentIntent.putExtra("photo", circleImageViewString);

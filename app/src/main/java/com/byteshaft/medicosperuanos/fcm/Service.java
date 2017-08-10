@@ -68,8 +68,6 @@ public class Service extends FirebaseMessagingService {
                         AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID)));
                 Log.i("DATA" + " Reg key ", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FCM_TOKEN));
                 Login.gettingUserData(false);
-
-
             }
         } else {
             if (remoteMessage.getData().get("type").equals("subscription_expired")) {

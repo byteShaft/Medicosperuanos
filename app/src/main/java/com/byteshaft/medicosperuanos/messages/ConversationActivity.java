@@ -23,6 +23,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -50,6 +51,7 @@ import com.byteshaft.medicosperuanos.utils.SoftKeyboard;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,7 +60,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -382,7 +386,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             user = "patient";
         }
         formData.append(FormData.TYPE_CONTENT_TEXT, user, String.valueOf(id));
-        formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
+            formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
         if (attachment != null && !attachment.trim().isEmpty()) {
             formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
             request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
@@ -418,6 +422,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.open("GET", String.format("%smessages/%s", AppGlobals.BASE_URL, secondPersonId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
+        Log.e("TAG", "second person id"  + secondPersonId);
         request.send();
     }
 
@@ -786,7 +791,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             public void setTxtMessage(String message) {
                 if (txtMessage == null) return;
-                txtMessage.setText(message);
+                    txtMessage.setText(Html.fromHtml(message));
+
             }
 
             public void setProfilePhoto(final String urlPhotoUser) {
@@ -846,7 +852,8 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
             } else if (timeSpanString.contains("minutes")) {
                 timeSpanString = timeSpanString.replace("minutes ago", "minutos");
             } else if (timeSpanString.contains("seconds ago")) {
-                timeSpanString = timeSpanString.replace("seconds ago", "Ahora");
+                timeSpanString = timeSpanString.replace("seconds ago", "Ahora").replaceAll("\\d", "");
+
             } else if (timeSpanString.contains("days ago")) {
                 timeSpanString = timeSpanString.replace("days ago", "días hace");
             }
