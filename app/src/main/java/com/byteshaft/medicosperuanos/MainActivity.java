@@ -583,6 +583,13 @@ public class MainActivity extends AppCompatActivity
                                         getResources().getString(R.string.account_not_activated),
                                         doctorOnlineSwitch);
                             }
+                        } else {
+                            if (isLoggingOut) {
+                                AppGlobals.clearSettings();
+                                AppGlobals.firstTimeLaunch(true);
+                                startActivity(new Intent(getApplicationContext(), IntroScreen.class));
+                                isLoggingOut = false;
+                            }
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:

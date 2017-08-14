@@ -362,13 +362,25 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 AppointmentDetail appointmentDetail = new AppointmentDetail();
                                 appointmentDetail.setSlotId(jsonObject.getInt("id"));
-                                Log.i("TAG", "Slot time" + Helpers.getFormattedTime(jsonObject.getString("start_time")));
+//                                Log.i("TAG", "Slot time" + Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setStartTime(Helpers.getFormattedTime(jsonObject.getString("start_time")));
                                 appointmentDetail.setState(jsonObject.getBoolean("taken"));
-                                timeSlots.add(appointmentDetail);
-                                timeTableAdapter.notifyDataSetChanged();
+                              if (fromDoctor) {
+                                  Log.i("TAG", "current date " + currentDate.equals(Helpers.getDate()));
+                                    if (currentDate.equals(Helpers.getDate()) && Helpers
+                                            .getDifference(Helpers.getFormattedTime(
+                                                    jsonObject.getString("start_time")))) {
+                                        timeSlots.add(appointmentDetail);
+                                        timeTableAdapter.notifyDataSetChanged();
+                                    } else if (!currentDate.equals(Helpers.getDate())) {
+                                        timeSlots.add(appointmentDetail);
+                                        timeTableAdapter.notifyDataSetChanged();
+                                    }
+                                } else {
+                                    timeSlots.add(appointmentDetail);
+                                    timeTableAdapter.notifyDataSetChanged();
+                                }
                             }
-                            Log.e("TAG", "total slots " + timeSlots.size());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

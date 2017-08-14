@@ -102,13 +102,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
 
     private DatePickerDialog datePickerDialog;
 
-    private String mDocIDString;
-    private String mFirstNameString;
-    private String mLastNameString;
-    private String mDateOfBirthString;
-    private String mGenderButtonString;
-    private String mAddressString;
-    private String mLocationString;
+    public static String mDocIDString;
+    public static String mFirstNameString;
+    public static String mLastNameString;
+    public static String mDateOfBirthString;
+    public static String mGenderButtonString;
+    public static String mAddressString;
+    public static String mLocationString;
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -271,13 +271,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                         mLocationString = String.format("%s,%s", location.latitude, location.longitude);
                         System.out.println(mLocationString + "location");
                     }
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, mDocIDString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, mFirstNameString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, mLastNameString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, mDateOfBirthString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, mGenderButtonString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, mAddressString);
-                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, mLocationString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, mDocIDString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, mFirstNameString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, mLastNameString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, mDateOfBirthString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, mGenderButtonString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, mAddressString);
+//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, mLocationString);
                     if (!imageUrl.trim().isEmpty()) {
                         Log.i("TAG", "image" + imageUrl);
                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL, imageUrl);
@@ -541,6 +541,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
             mLocationString = location.getLatitude() + "," + location.getLongitude();
             System.out.println("Lat: " + location.getLatitude() + "Long: " + location.getLongitude());
             getAddress(location.getLatitude(), location.getLongitude());
+            locationCounter = 0;
 //        getLocationFromAddress(AppGlobals.getContext(), "314 E 4th St,Seiling, OK 73663");
 //        System.out.println("Latlong from address" + getLocationFromAddress(AppGlobals.getContext(), "314 E 4th St,Seiling, OK 73663"));
         }
@@ -554,6 +555,8 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+            mGoogleApiClient.connect();
+        } else {
             mGoogleApiClient.connect();
         }
     }
