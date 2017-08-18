@@ -477,18 +477,18 @@ public class DoctorsList extends Fragment implements HttpRequest.OnReadyStateCha
 
     @Override
     public void onError(HttpRequest request, int readyState, short error, Exception exception) {
-//        if (exception.getLocalizedMessage())
         swipeRefreshLayout.setRefreshing(false);
         swipeRefresh = false;
-        if (exception != null && exception.getLocalizedMessage().equals("Network is unreachable")) {
-            Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+        if (exception != null && exception.getLocalizedMessage() != null && exception.getLocalizedMessage().equals("Network is unreachable")) {
+
+            Helpers.showSnackBar(getView(), getResources().getString(R.string.check_internet));
         }
         switch (readyState) {
             case HttpRequest.ERROR_CONNECTION_TIMED_OUT:
                 Helpers.showSnackBar(getView(), getResources().getString(R.string.connection_time_out));
                 break;
             case HttpRequest.ERROR_NETWORK_UNREACHABLE:
-                Helpers.showSnackBar(getView(), exception.getLocalizedMessage());
+                Helpers.showSnackBar(getView(), getResources().getString(R.string.check_internet));
                 break;
 
         }

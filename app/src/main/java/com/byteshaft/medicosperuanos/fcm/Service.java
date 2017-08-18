@@ -99,7 +99,8 @@ public class Service extends FirebaseMessagingService {
             photo = remoteMessage.getData().get("sender_photo");
             chatStatus = Boolean.parseBoolean(remoteMessage.getData().get("available_to_chat"));
 
-            if (remoteMessage.getData().get("type").equals("appointment") && remoteMessage.getData().get("gender").equals("M")) {
+            if (remoteMessage.getData().get("type").equals("appointment") &&  remoteMessage.getData().get("gender").equals("M") ||
+                    remoteMessage.getData().get("gender").equals("F")) {
                 isMale = true;
             } else {
                 isMale = false;
@@ -118,6 +119,20 @@ public class Service extends FirebaseMessagingService {
                             remoteMessage.getData().get("start_time");
                     if (AppGlobals.isShowNotification())
                     sendNotification(message, patientName, appointmentReason);
+                } else if (remoteMessage.getData().get("reason").equals("created-by-doctor")) {
+                    final SpannableStringBuilder sb = new SpannableStringBuilder("Date");
+                    final StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD); //Span to make text italic
+                    sb.setSpan(bss, 0, 4, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                    String doctor;
+                    if (isMale)
+                        doctor = "Dr "+ doctorName;
+                    else doctor = "Dra " + doctorName;
+                    String message  = doctor + doctorName+ " has gives appointment \n"+sb.toString()+": " +
+                            remoteMessage.getData().get("date") + " Start Time: " +
+                            remoteMessage.getData().get("start_time");
+                    if (AppGlobals.isShowNotification())
+                        sendNotification(message, doctor + " "+doctorName, "Doctor give appointment");
+
                 } else {
                     String doctor;
                     if (isMale)

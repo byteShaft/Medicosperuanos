@@ -355,6 +355,9 @@ public class DoctorBookingActivity extends AppCompatActivity implements View.OnC
                         timeTableAdapter = new TimeTableAdapter(getApplicationContext(), timeSlots);
                         timeTableGrid.setAdapter(timeTableAdapter);
                         timeTableGrid.setVisibility(View.VISIBLE);
+                        if (request.getResponseText() == null) {
+                            return;
+                        }
                         try {
                             JSONObject mainObject = new JSONObject(request.getResponseText());
                             JSONArray jsonArray = mainObject.getJSONArray("time_slots");

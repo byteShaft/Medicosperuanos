@@ -261,6 +261,11 @@ public class MainActivity extends AppCompatActivity
             TextView patientAge = (TextView) headerView.findViewById(R.id.patient_nav_age);
             patientOnlineSwitch = (SwitchCompat) headerView.findViewById(R.id.patient_nav_online_switch);
             patientOnlineSwitch.setChecked(AppGlobals.isOnline());
+            if (AppGlobals.isOnline()) {
+                patientOnlineSwitch.setText(getResources().getString(R.string.online));
+            } else {
+                patientOnlineSwitch.setText(getResources().getString(R.string.offline));
+            }
             profilePicture = (CircleImageView) headerView.findViewById(R.id.nav_imageView);
             patientName.setText(AppGlobals.getStringFromSharedPreferences(
                     AppGlobals.KEY_FIRST_NAME) + " " +

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -71,9 +72,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             @Override
             public void onDayPress(Date date) {
                 // show returned day
-                DateFormat df = SimpleDateFormat.getDateInstance();
+                Log.i("TAG", "date " + date);
+                DateFormat df = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.US);
                 String resultDate = df.format(date);
-                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                Log.i("TAG", " locale "+ resultDate);
+                SimpleDateFormat formatterFrom;
+                formatterFrom = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date formattedDate = null;
                 try {
@@ -82,6 +86,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     e.printStackTrace();
                 }
 //                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+                Log.i("TAG", "current date :" +String.valueOf(currentDate == null));
+                Log.i("TAG", "dateFormat :" +String.valueOf(dateFormat == null));
+                Log.i("TAG", "formattedDate :" +String.valueOf(formattedDate == null));
                 currentDate = dateFormat.format(formattedDate);
                 getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME

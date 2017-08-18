@@ -605,6 +605,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
                             boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
+                            Log.e("TAG", "chat status" + chatStatus);
                             String state = jsonObject.getString(AppGlobals.KEY_STATE);
                             String city = jsonObject.getString(AppGlobals.KEY_CITY);
                             String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
