@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 
 /**
  * Created by a7med on 28/06/2015.
@@ -134,7 +135,7 @@ public class CalendarView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 Calendar calendar = (Calendar) currentDate.clone();
-                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
                 Date dateOne = null;
                 Date dateTwo = null;
                 try {
@@ -168,7 +169,7 @@ public class CalendarView extends LinearLayout {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Date date = (Date) adapterView.getItemAtPosition(i);
                 Log.i("TAG", "onItemClick" +date.getYear());
-                DateFormat df = SimpleDateFormat.getDateInstance();
+                DateFormat df = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault());
                 String resultDate = df.format(date);
                 currentDate.setTime(date);
                 txtDate.setText(resultDate);
@@ -214,7 +215,7 @@ public class CalendarView extends LinearLayout {
         calendarAdapter = new CalendarAdapter(getContext(), cells, events);
         grid.setAdapter(calendarAdapter);
         // update title
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy" ,Locale.getDefault());
         txtDate.setText(sdf.format(currentDate.getTime()));
     }
 

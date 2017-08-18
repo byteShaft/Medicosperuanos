@@ -182,7 +182,7 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                     query = query+String.format("affiliate_clinic=%s", mAffiliateClinic.getId());
                     alreadyAddedSomething = true;
                 }
-                if (selectedSpeciality && !mSpecialities.getSpeciality().equals("All")) {
+                if (selectedSpeciality && mSpecialities != null &&  !mSpecialities.getSpeciality().equals("All")) {
                     if (alreadyAddedSomething) query = query+"&";
                     query = query+String.format("speciality=%s", mSpecialities.getSpecialitiesId());
                 }

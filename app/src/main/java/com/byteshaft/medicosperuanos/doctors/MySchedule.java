@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 
@@ -71,9 +72,12 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             @Override
             public void onDayPress(Date date) {
                 // show returned day
-                DateFormat df = SimpleDateFormat.getDateInstance();
+                Log.i("TAG", "date " + date);
+                DateFormat df = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.US);
                 String resultDate = df.format(date);
-                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                Log.i("TAG", " locale "+ resultDate);
+                SimpleDateFormat formatterFrom;
+                formatterFrom = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date formattedDate = null;
                 try {
@@ -82,6 +86,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                     e.printStackTrace();
                 }
 //                Toast.makeText(getActivity(), dateFormat.format(formattedDate), Toast.LENGTH_SHORT).show();
+                Log.i("TAG", "current date :" +String.valueOf(currentDate == null));
+                Log.i("TAG", "dateFormat :" +String.valueOf(dateFormat == null));
+                Log.i("TAG", "formattedDate :" +String.valueOf(formattedDate == null));
                 currentDate = dateFormat.format(formattedDate);
                 getTimeSlotsForDate(currentDate, TimeUnit.MINUTES.toMillis(Long.parseLong(AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.KEY_CONSULTATION_TIME
@@ -172,8 +179,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             }
         }
         getSchedule(currentDate);
-        Log.i("TAG", "state "+ scheduleList);
-        Log.i("TAG", "created");
+        Log.i("TAG", "state "+ currentDate);
     }
 
 
@@ -181,12 +187,16 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.save_button:
-                Log.i("TAG", "tobe delete size " + toBeDelete.size() + "schedule " + outerId);
+                Log.i("TAG", "DELETE size " + toBeDelete.size());
+                Log.i("TAG", "Outer id " + outerId);
                 if (toBeDelete.size() == 0 && outerId == -1) {
+                    Log.i("TAG", "POST");
                     sendSchedule();
                 } else if (toBeDeleteSelectedIds.size() > 0 || outerId != -1) {
+                    Log.i("TAG", "Update");
                     updateSchedule(outerId);
                     if (outerId != -1) {
+                        Log.i("TAG", "delete");
                         deleteSchedule(outerId, toBeDeleteSelectedIds);
                     }
                 }
@@ -385,7 +395,6 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
             public void onReadyStateChange(HttpRequest httpRequest, int i) {
                 switch (i) {
                     case HttpRequest.STATE_DONE:
-                        Log.i("URL", httpRequest.getResponseURL());
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 Helpers.showSnackBar(getView(), getResources().getString(R.string.schedule_updated));
@@ -473,8 +482,9 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 Helpers.dismissProgressDialog();
                 switch (request.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
-                        Log.i("TAG", "GEt schedule " + request.getResponseText());
                         outerId = -1;
+                        HashMap<String, String[]> alreadyExist = new HashMap<>();
+                        ArrayList<String> alreadyExistStartTime = new ArrayList<>();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
                             jsonArray = jsonObject.getJSONArray("results");
@@ -482,35 +492,28 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                                 JSONObject object = jsonArray.getJSONObject(i);
                                 outerId = object.getInt("id");
                                 JSONArray timeSlots = object.getJSONArray("time_slots");
+                                Log.i("TAG", "slots " +timeSlots.toString());
+//                                Log.i("TAG", "time slots loop");
                                 for (int r = 0; r < timeSlots.length(); r++) {
-                                    JSONObject alreadyCreated = scheduleList.get(r);
                                     JSONObject timeSlot = timeSlots.getJSONObject(r);
                                     String startTime = timeSlot.getString("start_time").trim();
-                                    if (startTime.equals(alreadyCreated.getString("start_time"))) {
-                                        alreadyCreated.put("state"+r, true);
-                                        alreadyCreated.put("id", timeSlot.getInt("id"));
-                                        Log.i("TAG", "added " + alreadyCreated);
-                                        scheduleList.remove(r);
-                                        scheduleList.add(r, alreadyCreated);
+                                    if (!alreadyExistStartTime.contains(startTime)) {
+                                        alreadyExistStartTime.add(startTime);
+                                        alreadyExist.put(startTime,new String[] {startTime, String.valueOf(timeSlot.getInt("id"))});
                                     }
-
-//                                    map.put(startTime.trim(), new Integer[]{
-//                                            timeSlot.getInt("id"), object.getInt("id")});
                                 }
                             }
-//                            ArrayList<JSONObject> jsonObjects = scheduleList.get(currentDate);
-//                            if (jsonObjects.size() > 0) {
-//                                for (int j = 0; j < jsonObjects.size(); j++) {
-//                                    if (map.containsKey(jsonObjects.get(j).getString("start_time").trim())) {
-//                                        JSONObject slot = jsonObjects.get(j);
-//                                        slot.put("ids", map.get(jsonObjects.get(j)
-//                                                .getString("start_time").trim()));
-//                                        jsonObjects.remove(j);
-//                                        jsonObjects.add(j, slot);
-//                                    }
-//                                }
-//                                scheduleList.put(currentDate, jsonObjects);
-//                            }
+                            for (int q = 0; q < scheduleList.size(); q++) {
+                                JSONObject alreadyCreated = scheduleList.get(q);
+//                                Log.i("TAG", "already created" + alreadyCreated.getString("start_time"));
+                                if (alreadyExist.containsKey(alreadyCreated.getString("start_time"))) {
+                                    String[] strings = alreadyExist.get(alreadyCreated.getString("start_time"));
+                                    alreadyCreated.put("state" + q, true);
+                                    alreadyCreated.put("id", strings[1]);
+                                    scheduleList.remove(q);
+                                    scheduleList.add(q, alreadyCreated);
+                                }
+                            }
                             if (foreground) {
                                 scheduleAdapter = new ScheduleAdapter(getActivity().getApplicationContext(), scheduleList);
                                 mListView.setAdapter(scheduleAdapter);
@@ -530,7 +533,7 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                         }
                         break;
                     case HttpURLConnection.HTTP_BAD_REQUEST:
-                        Log.i("TAG", "schedule " + request.getResponseText());
+                        Log.i("TAG", "Bad request " + request.getResponseText());
                         break;
                 }
         }

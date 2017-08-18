@@ -330,6 +330,7 @@ public class Helpers {
         return String.format("%.2f", valueResult);
     }
 
+
     public static String getFormattedTime(String startTime) {
         SimpleDateFormat formatterFrom = new SimpleDateFormat("hh:mm:ss");
         SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aa");
@@ -343,9 +344,16 @@ public class Helpers {
         return formattedDate;
     }
 
-    public static String getCurrentTimeAndDate() {
+
+    public static String getCurrentTime() {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(c.getTime());
+    }
+
+    public static String getCurrentTimeAndDate() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm aa");
         return df.format(c.getTime());
     }
 
@@ -500,6 +508,27 @@ public class Helpers {
             return path;
         }
         return strMyImagePath;
+    }
 
+    public static boolean getDifference(String startTime) {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
+        try {
+            Date startDate = simpleDateFormat.parse(startTime);
+            Date current = simpleDateFormat.parse(simpleDateFormat.format(c.getTime()));
+            Log.i("TAG", "start time" + startTime);
+            Log.i("TAG", "end time" + getTimeForCompare());
+            Log.e("TAG", "before " + String.valueOf(startDate.after(current)));
+            return startDate.after(current);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getTimeForCompare() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("hh:mm a");
+        return df.format(c.getTime());
     }
 }

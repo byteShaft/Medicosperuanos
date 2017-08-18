@@ -437,13 +437,13 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
     private void sendingDataToServer() {
         FormData data = new FormData();
-        data.append(FormData.TYPE_CONTENT_TEXT, "identity_document", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DOC_ID));
-        data.append(FormData.TYPE_CONTENT_TEXT, "first_name", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_FIRST_NAME));
-        data.append(FormData.TYPE_CONTENT_TEXT, "last_name", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LAST_NAME));
-        data.append(FormData.TYPE_CONTENT_TEXT, "dob", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH));
-        data.append(FormData.TYPE_CONTENT_TEXT, "gender", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_GENDER));
-        data.append(FormData.TYPE_CONTENT_TEXT, "location", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_LOCATION));
-        data.append(FormData.TYPE_CONTENT_TEXT, "address", AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_ADDRESS));
+        data.append(FormData.TYPE_CONTENT_TEXT, "identity_document", UserBasicInfoStepOne.mDocIDString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "first_name", UserBasicInfoStepOne.mFirstNameString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "last_name", UserBasicInfoStepOne.mLastNameString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "dob", UserBasicInfoStepOne.mDateOfBirthString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "gender", UserBasicInfoStepOne.mGenderButtonString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "location", UserBasicInfoStepOne.mLocationString);
+        data.append(FormData.TYPE_CONTENT_TEXT, "address", UserBasicInfoStepOne.mAddressString);
         if (!AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL).trim().isEmpty()
                 && !UserBasicInfoStepOne.imageUrl.trim().isEmpty()) {
             data.append(FormData.TYPE_CONTENT_FILE, "photo",
@@ -605,6 +605,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
                             boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
+                            Log.e("TAG", "chat status" + chatStatus);
                             String state = jsonObject.getString(AppGlobals.KEY_STATE);
                             String city = jsonObject.getString(AppGlobals.KEY_CITY);
                             String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
