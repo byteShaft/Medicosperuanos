@@ -53,6 +53,7 @@ import java.util.Set;
 
 import static android.R.attr.id;
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.getDoctorProfileIds;
+import static com.byteshaft.medicosperuanos.utils.AppGlobals.getStringFromSharedPreferences;
 import static com.byteshaft.medicosperuanos.utils.AppGlobals.isInfoAvailable;
 
 public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSelectedListener,
@@ -383,8 +384,10 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
                                         JSONObject jsonObject = spArray.getJSONObject(i);
                                         AffiliateClinic affiliateClinic = new AffiliateClinic();
                                         affiliateClinic.setId(jsonObject.getInt("id"));
+                                        Log.i("TAG", "doctor profile " + getDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED));
                                         if (getDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED)
                                                 == jsonObject.getInt("id")) {
+                                            Log.i("TAG", "doctor profile condition matched");
                                             affiliateClinicPosition = i;
                                         }
                                         affiliateClinic.setName(jsonObject.getString("name"));
@@ -694,6 +697,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
 
             JSONObject affiliateClinicJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_AFFILIATE_CLINIC);
             String affiliateClinic = affiliateClinicJsonObject.getString("name");
+            AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED, affiliateClinicJsonObject.getInt("id"));
             JSONObject subscriptionTypeJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_SUBSCRIPTION_TYPE);
             String subscriptionType = subscriptionTypeJsonObject.getString("plan_type");
             JSONArray specialityJsonArray = jsonObject.getJSONArray("speciality");

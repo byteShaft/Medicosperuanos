@@ -533,6 +533,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
 
                             String insuranceCarrier = jsonObject.getString(AppGlobals.KEY_INSURANCE_CARRIER);
                             String affiliateClinic = jsonObject.getString(AppGlobals.KEY_AFFILIATE_CLINIC);
+                            AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED, jsonObject.getInt("id"));
                             String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
@@ -600,7 +601,8 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String phoneNumberSecondary = jsonObject.getString(AppGlobals.KEY_PHONE_NUMBER_SECONDARY);
 
                             String insuranceCarrier = jsonObject.getString(AppGlobals.KEY_INSURANCE_CARRIER);
-                            String affiliateClinic = jsonObject.getString(AppGlobals.KEY_AFFILIATE_CLINIC);
+                            JSONObject affiliateClinicJsonObject = jsonObject.getJSONObject(AppGlobals.KEY_AFFILIATE_CLINIC);
+                            AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED, affiliateClinicJsonObject.getInt("id"));
                             String address = jsonObject.getString(AppGlobals.KEY_ADDRESS);
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
@@ -625,7 +627,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PHONE_NUMBER_SECONDARY, phoneNumberSecondary);
 //                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC_ID, affiliateClinic);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_INSURANCE_CARRIER, insuranceCarrier);
-                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinic);
+                            AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_AFFILIATE_CLINIC, affiliateClinicJsonObject.getString("name"));
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, address);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, location);
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_PROFILE_ID, profileId);
