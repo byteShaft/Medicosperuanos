@@ -254,6 +254,8 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
 
                                         JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
                                         String affiliateClinic = affiliateClinicObject.getString("name");
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED,
+                                                affiliateClinicObject.getInt("id"));
                                         String collageId = jsonObject.getString(AppGlobals.KEY_COLLEGE_ID);
                                         String consultationTime = jsonObject.getString(AppGlobals.KEY_CONSULTATION_TIME);
 
@@ -267,6 +269,9 @@ public class Login extends Fragment implements View.OnClickListener, HttpRequest
                                         Log.i("TAG", "insurance " + insuranceObject.toString());
                                         AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_INSURANCE_SELECTED,
                                                 insuranceObject.getInt("id"));
+                                        JSONObject affiliateClinicObject = jsonObject.getJSONObject("affiliate_clinic");
+                                        AppGlobals.saveDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED,
+                                                affiliateClinicObject.getInt("id"));
                                     }
                                     String imageUrl = jsonObject.getString(AppGlobals.KEY_IMAGE_URL);
 

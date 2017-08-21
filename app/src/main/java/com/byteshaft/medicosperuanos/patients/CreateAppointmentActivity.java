@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,8 +128,6 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
 
         dateText = (TextView) findViewById(R.id.date_text);
         timeText = (TextView) findViewById(R.id.time_text);
-        System.out.println("date is : " + scheduleDate);
-        System.out.println("appointment date is : " + appointmentDate);
         dateText.setText(scheduleDate);
         timeText.setText(slotTime);
 
@@ -454,12 +453,23 @@ public class CreateAppointmentActivity extends AppCompatActivity implements View
                 case R.id.positive_button:
                     dismiss();
                     amount = 0;
+                    StringBuilder stringBuilder = new StringBuilder();
                     for (Map.Entry<Integer, Integer> entry : selectedServicesArrayList.entrySet()) {
+                        int counter = 0;
                         for (Services services : arrayList) {
                             if (entry.getValue() == services.getServiceId()) {
                                 amount = amount + Integer.valueOf(services.getServicePrice());
+                                stringBuilder.append(services.getServiceName());
+                                if (counter < arrayList.size()) {
+                                    stringBuilder.append(",");
+                                }
                             }
                         }
+                    }
+                    if (selectedServicesArrayList.size() == 0) {
+                        serviceListSpinner.setText(getResources().getString(R.string.select_required_services));
+                    } else {
+                        serviceListSpinner.setText(stringBuilder.toString());
                     }
                     priceTotalEditText.setText(String.valueOf(amount));
                     break;
