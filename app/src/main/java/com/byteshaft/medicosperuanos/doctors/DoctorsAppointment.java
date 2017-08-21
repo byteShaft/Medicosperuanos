@@ -354,7 +354,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.take_screenshot:
                 final Intent chooserIntent = new Intent(this, DirectoryChooserActivity.class);
-
                 final DirectoryChooserConfig config = DirectoryChooserConfig.builder()
                         .newDirectoryName(getResources().getString(R.string.app_name))
                         .allowReadOnlyDirectory(true)

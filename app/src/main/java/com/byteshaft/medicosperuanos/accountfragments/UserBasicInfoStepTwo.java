@@ -586,7 +586,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                         Toast.makeText(getActivity(), "Profile Updated Successfully", Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
-                            System.out.println(jsonObject + "working ");
 
                             String userId = jsonObject.getString("user");
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
