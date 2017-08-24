@@ -188,6 +188,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                     }
                                     insuranceCarriersAdapter = new InsuranceCarriersAdapter(getActivity(), insuranceCarriersList);
                                     mInsuranceCarrierSpinner.setAdapter(insuranceCarriersAdapter);
+                                    mInsuranceCarrierSpinner.setEnabled(true);
                                     mInsuranceCarrierSpinner.setSelection(insuranceCarrierPosition);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -227,6 +228,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                             getActivity(), affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
                                     mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
+                                    mAffiliatedClinicsSpinner.setEnabled(true);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -269,6 +271,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                     statesAdapter = new StatesAdapter(getActivity(), statesList);
                                     mStateSpinner.setAdapter(statesAdapter);
                                     mStateSpinner.setSelection(statePosition);
+                                    mStateSpinner.setEnabled(true);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -311,6 +314,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                                     citiesAdapter = new CitiesAdapter(getActivity(), citiesList);
                                     mCitySpinner.setAdapter(citiesAdapter);
                                     mCitySpinner.setSelection(cityPosition);
+                                    mCitySpinner.setEnabled(true);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -460,7 +464,7 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
             alertDialog.show();
         } else {
             Helpers.showProgressDialog(getActivity(), "Updating your Profile...");
-            if (UserBasicInfoStepOne.imageUrl.equals("")) {
+            if (UserBasicInfoStepOne.imageUrl.equals("") && UserBasicInfoStepOne.serverPhotoUrl.equals("")) {
                 data.append(FormData.TYPE_CONTENT_TEXT, "photo",
                         UserBasicInfoStepOne.imageUrl);
             }

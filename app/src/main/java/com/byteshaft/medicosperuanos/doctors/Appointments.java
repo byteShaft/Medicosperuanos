@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -114,9 +115,9 @@ public class Appointments extends Fragment implements
         calendarView.setEventHandler(new com.byteshaft.medicosperuanos.uihelpers.CalendarView.EventHandler() {
             @Override
             public void onDayPress(Date date) {
-                DateFormat df = SimpleDateFormat.getDateInstance();
+                DateFormat df = SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.US);
                 String resultDate = df.format(date);
-                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM d, yyyy");
+                SimpleDateFormat formatterFrom = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 Date formattedDate = null;
                 try {

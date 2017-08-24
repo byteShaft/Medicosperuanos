@@ -32,6 +32,7 @@
 
                 <Spinner
                     android:id="@+id/states_spinner"
+                    android:clickable="false"
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -46,6 +47,7 @@
 
                 <Spinner
                     android:id="@+id/cities_spinner"
+                    android:clickable="false"
                     style="@style/Widget.AppCompat.Spinner.Underlined"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -123,12 +125,14 @@
 
         <Spinner
             android:id="@+id/insurance_spinner"
+            android:clickable="false"
             style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <Spinner
             android:id="@+id/clinic_spinner_user_basic"
+            android:clickable="false"
             style="@style/Widget.AppCompat.Spinner.Underlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

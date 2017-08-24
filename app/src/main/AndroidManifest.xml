@@ -47,14 +47,18 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"
-            android:launchMode="singleInstance" />
-        <activity android:name=".patients.DoctorsLocator" />
-        <activity android:name=".patients.DoctorsRoute" />
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".patients.DoctorsLocator"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".patients.DoctorsRoute"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".introscreen.IntroScreen"
             android:screenOrientation="portrait"
@@ -68,34 +72,45 @@
         </activity>
         <activity
             android:name=".accountfragments.AccountManagerActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"
+            />
 
-        <activity android:name=".directorychooser.DirectoryChooserActivity" />
+        <activity android:name=".directorychooser.DirectoryChooserActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".doctors.DoctorDetailsActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".doctors.DoctorsAppointment"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".patients.PatientsRecentHistory"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".patients.PatientDetails"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".patients.DoctorBookingActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".patients.CreateAppointmentActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".messages.ConversationActivity"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.darsh.multipleimageselect.activities.AlbumSelectActivity"
-            android:theme="@style/MultipleImageSelectTheme">
+            android:theme="@style/MultipleImageSelectTheme"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -103,8 +118,10 @@
 
         <uses-library android:name="com.google.android.maps" />
 
-        <activity android:name=".doctors.SelectedImages" />
-        <activity android:name=".doctors.FullscreenImageView"/>
+        <activity android:name=".doctors.SelectedImages"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".doctors.FullscreenImageView"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".fcm.FireBaseService">

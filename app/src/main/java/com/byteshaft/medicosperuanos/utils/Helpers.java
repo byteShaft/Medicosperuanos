@@ -411,12 +411,10 @@ public class Helpers {
         request.send();
     }
 
-    public static String getTomorrowDate() {
+    public static String getCurrentDateForDash() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(tomorrow);
 
     }

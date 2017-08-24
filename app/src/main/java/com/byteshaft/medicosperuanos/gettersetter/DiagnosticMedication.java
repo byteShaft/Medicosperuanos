@@ -6,6 +6,15 @@ public class DiagnosticMedication {
 
     private String diagnosticMedication;
     private int Id;
+    private String code;
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     public int getQuantity() {
         return quantity;

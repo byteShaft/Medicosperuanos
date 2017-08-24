@@ -336,7 +336,7 @@ public class DoctorsBasicInfo extends Fragment implements AdapterView.OnItemSele
             alertDialog.show();
         } else {
             Helpers.showProgressDialog(getActivity(), "Updating your Profile...");
-            if (UserBasicInfoStepOne.imageUrl.equals("")) {
+            if (UserBasicInfoStepOne.imageUrl.equals("") && UserBasicInfoStepOne.serverPhotoUrl.equals("")) {
                 data.append(FormData.TYPE_CONTENT_TEXT, "photo",
                         UserBasicInfoStepOne.imageUrl);
             }

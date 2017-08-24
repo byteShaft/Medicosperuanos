@@ -648,9 +648,13 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                         }
                                         Log.i("TAG", "photos " + photosHashMap);
                                         if (totalImagesCounter > 0) {
-                                            showImages.setVisible(true);
+                                            if (showImages != null) {
+                                                showImages.setVisible(true);
+                                            }
                                         } else {
-                                            showImages.setVisible(false);
+                                            if (showImages != null) {
+                                                showImages.setVisible(false);
+                                            }
                                         }
                                         mExplanationEditText.setText(exploration);
                                         mConclusionsEditText.setText(conclusion);
@@ -953,26 +957,11 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                     for (int i = 0; i < totalImagesCounter; i++) {
                         String key = "photo"+(i+1);
                         if (photosHashMap.containsKey(key)) {
-//                            data.append(FormData.TYPE_CONTENT_FILE, key, photosHashMap.get(key));
                         } else {
                             data.append(FormData.TYPE_CONTENT_TEXT, key, "");
                         }
                         Log.i("TAG", "added" +  key);
                     }
-//                    for (int i = 0; i < (imagesArrayList.size()); i++) {
-//                        String name;
-//                        if (i < removedImages.size() && removedImages.size() > 0) {
-//                            name = "photo" + removedImages.get(i) + 1;
-//                            Log.i("IF", "name" + name);
-//                        } else {
-//                            counter = counter + 1;
-//                            name = "photo" + (counter);
-//                            Log.i("else", "name" + name);
-//                        }
-//                        Log.i("NAME", "name" + name);
-//                        Log.i("NAME", "file" + imagesArrayList.get(i));
-//                        data.append(FormData.TYPE_CONTENT_FILE, name, imagesArrayList.get(i));
-//                    }
                 }
 
             }
@@ -1039,7 +1028,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                         medicationDiagnosticListView.setAdapter(diagnosticAdapter);
                         for (DiagnosticMedication diagnosticMedication : diagnosticsList) {
                             if (StringUtils.containsIgnoreCase(diagnosticMedication.getDiagnosticMedication(),
-                                    charSequence.toString()) || StringUtils.containsIgnoreCase(String.valueOf(diagnosticMedication.getId()),
+                                    charSequence.toString()) || StringUtils.containsIgnoreCase(
+                                            String.valueOf(diagnosticMedication.getCode()),
                                     charSequence.toString())) {
                                 searchListForDiagnostics.add(diagnosticMedication);
                                 diagnosticAdapter.notifyDataSetChanged();
@@ -1060,7 +1050,8 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                         medicationDiagnosticListView.setAdapter(medicationAdapter);
                         for (DiagnosticMedication diagnosticMedication : medicationList) {
                             if (StringUtils.containsIgnoreCase(diagnosticMedication.getDiagnosticMedication(),
-                                    charSequence.toString()) || StringUtils.containsIgnoreCase(String.valueOf(diagnosticMedication.getId()),
+                                    charSequence.toString()) || StringUtils.containsIgnoreCase(
+                                            String.valueOf(diagnosticMedication.getCode()),
                                     charSequence.toString())) {
                                 searchListForMedications.add(diagnosticMedication);
                                 medicationAdapter.notifyDataSetChanged();
@@ -1134,6 +1125,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
                                             diagnosticMedication.setId(jsonObject.getInt("id"));
                                             diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            diagnosticMedication.setCode(jsonObject.getString("code"));
                                             diagnosticsList.add(diagnosticMedication);
                                         }
                                     }
@@ -1172,6 +1164,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             DiagnosticMedication diagnosticMedication = new DiagnosticMedication();
                                             diagnosticMedication.setId(jsonObject.getInt("id"));
                                             diagnosticMedication.setDiagnosticMedication(jsonObject.getString("name"));
+                                            diagnosticMedication.setCode(jsonObject.getString("code"));
                                             medicationList.add(diagnosticMedication);
                                         }
                                     }
@@ -1215,7 +1208,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
             final DiagnosticMedication diagnostic = diagnosticMedications.get(position);
             viewHolder.diagnosticListTextView.setText(diagnostic.getDiagnosticMedication());
-            viewHolder.idTextView.setText(String.valueOf(diagnostic.getId()));
+            viewHolder.idTextView.setText(String.valueOf(diagnostic.getCode()));
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -1296,7 +1289,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
             }
             final DiagnosticMedication diagnostic = diagnosticMedications.get(position);
             viewHolder.diagnosticListTextView.setText(diagnostic.getDiagnosticMedication());
-            viewHolder.idTextView.setText(String.valueOf(diagnostic.getId()));
+            viewHolder.idTextView.setText(String.valueOf(diagnostic.getCode()));
             viewHolder.quantity.setText(String.valueOf(diagnostic.getQuantity()));
             viewHolder.add.setOnClickListener(new View.OnClickListener() {
                 @Override
