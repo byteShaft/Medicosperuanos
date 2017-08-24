@@ -47,8 +47,8 @@ import java.util.ArrayList;
 public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItemSelectedListener,
         View.OnClickListener, CompoundButton.OnCheckedChangeListener, HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnFileUploadProgressListener, HttpRequest.OnErrorListener {
-    private View mBaseView;
 
+    private View mBaseView;
     private Spinner mStateSpinner;
     private Spinner mCitySpinner;
     private Spinner mInsuranceCarrierSpinner;
@@ -435,7 +435,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
         } else {
             mEmergencyContactEditText.setError(null);
         }
-
         return valid;
     }
 
@@ -522,8 +521,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                         Toast.makeText(getActivity(), "Profile Created Successfully", Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jsonObject = new JSONObject(request.getResponseText());
-                            System.out.println(jsonObject + "working ");
-
                             String userId = jsonObject.getString("user");
                             String firstName = jsonObject.getString(AppGlobals.KEY_FIRST_NAME);
                             String lastName = jsonObject.getString(AppGlobals.KEY_LAST_NAME);
@@ -576,7 +573,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             AppGlobals.saveNotificationState(showNotification);
 
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT, emergencyContact);
-                            Log.i("Emergency Contact", " " + AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_EMERGENCY_CONTACT));
                             AppGlobals.saveDataToSharedPreferences(AppGlobals.SERVER_PHOTO_URL, imageUrl);
                             AppGlobals.gotInfo(true);
                             AccountManagerActivity.getInstance().finish();
@@ -610,7 +606,6 @@ public class UserBasicInfoStepTwo extends Fragment implements AdapterView.OnItem
                             String location = jsonObject.getString(AppGlobals.KEY_LOCATION);
 
                             boolean chatStatus = jsonObject.getBoolean(AppGlobals.KEY_CHAT_STATUS);
-                            Log.e("TAG", "chat status" + chatStatus);
                             String state = jsonObject.getString(AppGlobals.KEY_STATE);
                             String city = jsonObject.getString(AppGlobals.KEY_CITY);
                             String docId = jsonObject.getString(AppGlobals.KEY_DOC_ID);
