@@ -429,13 +429,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        genderButton = (RadioButton) mBaseView.findViewById(checkedId);
-        if (genderButton.getText().toString().contains("Male")) {
-            mGenderButtonString = "M";
-            System.out.println(mGenderButtonString);
-        } else {
-            mGenderButtonString = "F";
-            System.out.println(mGenderButtonString);
+        switch (checkedId) {
+            case R.id.radio_button_male:
+                mGenderButtonString = "M";
+                break;
+            case R.id.radio_button_female:
+                mGenderButtonString = "F";
+                break;
         }
     }
 
