@@ -529,4 +529,17 @@ public class Helpers {
         SimpleDateFormat df = new SimpleDateFormat("hh:mm a");
         return df.format(c.getTime());
     }
+
+    public static String getFormattedSlotTime(String date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        Date format = null;
+        try {
+            format = simpleDateFormat.parse(date);
+            return formatter.format(format);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 }

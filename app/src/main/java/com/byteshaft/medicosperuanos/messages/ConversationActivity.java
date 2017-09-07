@@ -177,6 +177,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         conversation.setLayoutManager(linearLayoutManager);
         conversation.canScrollVertically(1);
         conversation.setHasFixedSize(true);
+        Log.i("TAG", "message id " + id);
         getMyMessages(id);
         view = (View) findViewById(R.id.include);
         deleteButton = (ImageButton) findViewById(R.id.dustbin_messages);
