@@ -596,6 +596,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             DiagnosticMedication diagnosticMedication =
                                                     new DiagnosticMedication();
                                             diagnosticMedication.setId(diagnosticObject.getInt("id"));
+                                            diagnosticMedication.setCode(diagnosticObject.getString("code"));
                                             diagnosticMedication.setDiagnosticMedication(diagnosticObject
                                                     .getString("name"));
                                             selectedDiagnosticsList.add(diagnosticMedication);
@@ -667,6 +668,7 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                             diagnosticMedication.setQuantity(treatment.getInt("quantity"));
                                             JSONObject treatmentDetail = treatment.getJSONObject("treatment");
                                             diagnosticMedication.setId(treatmentDetail.getInt("id"));
+                                            diagnosticMedication.setCode(treatmentDetail.getString("code"));
                                             diagnosticMedication.setDiagnosticMedication(treatmentDetail.getString("name"));
                                             selectedMedicationList.add(diagnosticMedication);
                                             medicationList.add(diagnosticMedication);
