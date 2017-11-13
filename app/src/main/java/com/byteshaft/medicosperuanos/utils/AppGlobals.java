@@ -51,7 +51,7 @@ public class AppGlobals extends Application {
     public static Typeface robotoRegular;
     public static Typeface robotoThin;
     public static Typeface robotoThinItalic;
-    public static final String SERVER_IP = "http://46.101.34.116:8000";-v
+    public static final String SERVER_IP = "http://46.101.34.116:8000";
     public static final String BASE_URL = String.format("%s/api/", SERVER_IP);
     public static final String REVIEW_URL = BASE_URL + "public/medicosperuanos/%s/review";
     public static final String KEY_USER_NAME = "user_name";
