@@ -111,9 +111,6 @@ public class MainActivity extends AppCompatActivity
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_PROFILE_ID));
-        LOGGER.info(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_USER_ID));
 
         if (AppGlobals.isDoctor()) {
             View headerView;

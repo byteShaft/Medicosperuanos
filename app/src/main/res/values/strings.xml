@@ -4,8 +4,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_maps">Map</string>
     <string name="state_prompt">State</string>
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"> AIzaSyAvL-0g4dIUJ57UQDh3OIvIAm6W5P7Th6s </string>
-
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCR0HFO4Y0vSnj4En-f7yON_JubP-6N5AU</string>
 
     <string name="action_settings">Settings</string>
     <string name="next">Next</string>

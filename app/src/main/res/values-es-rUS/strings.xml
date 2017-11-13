@@ -5,7 +5,7 @@
     <string name="navigation_drawer_close">Cerrar el cajón de navegación</string>
     <string name="title_activity_maps">Mapa</string>
     <string name="state_prompt">Estado</string>
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false"> AIzaSyAvL-0g4dIUJ57UQDh3OIvIAm6W5P7Th6s </string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyCR0HFO4Y0vSnj4En-f7yON_JubP-6N5AU</string>
 
     <string name="action_settings">Ajustes</string>
     <string name="next">Siguiente</string>

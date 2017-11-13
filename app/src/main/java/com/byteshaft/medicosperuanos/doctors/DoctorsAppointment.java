@@ -1035,7 +1035,6 @@ public class DoctorsAppointment extends AppCompatActivity implements View.OnClic
                                     charSequence.toString())) {
                                 searchListForDiagnostics.add(diagnosticMedication);
                                 diagnosticAdapter.notifyDataSetChanged();
-
                             }
                         }
                     } else {
