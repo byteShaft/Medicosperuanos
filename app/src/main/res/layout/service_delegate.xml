@@ -10,7 +10,6 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/doc_service_price"
         android:padding="10dp"
-        android:singleLine="true"
         android:text="Sample Service "
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -19,10 +18,8 @@
         android:id="@+id/doc_service_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/checkbox_doc_service"
         android:padding="10dp"
-        android:singleLine="true"
         android:text="Price"
         android:textSize="16sp"
         android:textStyle="bold" />

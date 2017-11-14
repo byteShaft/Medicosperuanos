@@ -125,6 +125,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
     private static final int STORAGE_CAMERA_PERMISSION = 2;
     private boolean fromAccountManager;
     public static boolean foreground = false;
+    public static String serverPhotoUrl = "";
 
 
     @Override
@@ -175,10 +176,10 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                 mGenderButtonString = gender;
             }
             if (AppGlobals.isLogin() && AppGlobals.isInfoAvailable() && AppGlobals.getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL) != null) {
-                String url = String.format("%s" + AppGlobals
+                serverPhotoUrl = String.format("%s" + AppGlobals
                         .getStringFromSharedPreferences(AppGlobals.SERVER_PHOTO_URL), AppGlobals.SERVER_IP);
-                Log.i("TAG", "URL " + url);
-                getBitMap(url, mProfilePicture);
+                Log.i("TAG", "URL " + serverPhotoUrl);
+                getBitMap(serverPhotoUrl, mProfilePicture);
             }
             if (AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL) != null) {
                 Bitmap bitmap = BitmapFactory.decodeFile(AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_IMAGE_URL));
@@ -270,15 +271,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                         LatLng location = getLocationFromAddress(AppGlobals.getContext(), mAddressString);
                         mLocationString = String.format("%s,%s", location.latitude, location.longitude);
                         System.out.println(mLocationString + "location");
-                    }
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DOC_ID, mDocIDString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_FIRST_NAME, mFirstNameString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LAST_NAME, mLastNameString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_DATE_OF_BIRTH, mDateOfBirthString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_GENDER, mGenderButtonString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_ADDRESS, mAddressString);
-//                    AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_LOCATION, mLocationString);
-                    if (!imageUrl.trim().isEmpty()) {
+                    }if (!imageUrl.trim().isEmpty()) {
                         Log.i("TAG", "image" + imageUrl);
                         AppGlobals.saveDataToSharedPreferences(AppGlobals.KEY_IMAGE_URL, imageUrl);
                     }
@@ -436,13 +429,13 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-        genderButton = (RadioButton) mBaseView.findViewById(checkedId);
-        if (genderButton.getText().toString().contains("Male")) {
-            mGenderButtonString = "M";
-            System.out.println(mGenderButtonString);
-        } else {
-            mGenderButtonString = "F";
-            System.out.println(mGenderButtonString);
+        switch (checkedId) {
+            case R.id.radio_button_male:
+                mGenderButtonString = "M";
+                break;
+            case R.id.radio_button_female:
+                mGenderButtonString = "F";
+                break;
         }
     }
 
@@ -614,6 +607,7 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
                             SELECT_FILE);
                 } else if (items[item].equals("Remove")) {
                     imageUrl = "";
+                    serverPhotoUrl = "";
                     mProfilePicture.setImageBitmap(null);
                     mProfilePicture.setBackgroundResource(R.mipmap.camera);
                     dialog.dismiss();
@@ -690,12 +684,14 @@ public class UserBasicInfoStepOne extends Fragment implements DatePickerDialog.O
         } catch (IOException e) {
             Log.e("tag", e.getMessage());
         }
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mAddress.setText(result.toString());
-            }
-        });
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mAddress.setText(result.toString());
+                }
+            });
+        }
     }
 
     class LocationTask extends AsyncTask<String, String, String> {

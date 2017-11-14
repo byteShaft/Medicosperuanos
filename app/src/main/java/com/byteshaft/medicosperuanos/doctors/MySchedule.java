@@ -228,9 +228,10 @@ public class MySchedule extends Fragment implements HttpRequest.OnReadyStateChan
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             final JSONObject data = scheduleList.get(position);
+
             try {
-                viewHolder.startTime.setText(data.getString("start_time"));
-                viewHolder.endTime.setText(data.getString("end_time"));
+                viewHolder.startTime.setText(Helpers.getFormattedSlotTime(data.getString("start_time")));
+                viewHolder.endTime.setText(Helpers.getFormattedSlotTime(data.getString("end_time")));
             } catch (JSONException e) {
                 e.printStackTrace();
             }

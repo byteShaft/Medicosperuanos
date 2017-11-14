@@ -30,7 +30,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -80,7 +85,6 @@ public class Dashboard extends Fragment {
         list = (ListView) mBaseView.findViewById(R.id.dashboard_list_main_view);
         mChart = (BarChart) mBaseView.findViewById(R.id.chart);
         mChart.setPinchZoom(false);
-        mChart.setDrawGridBackground(false);
         mChart.setDrawGridBackground(false);
         mChart.setAutoScaleMinMaxEnabled(true);
         mChart.setDoubleTapToZoomEnabled(false);
@@ -150,19 +154,35 @@ public class Dashboard extends Fragment {
                                 try {
                                     dashBoardValues = new JSONObject(response);
                                     JSONArray jsonArray = dashBoardValues.getJSONArray("thirty_days_stats");
-                                    Log.i("Income Arrayyyyyyyyy", jsonArray.toString());
                                     for (int i = 0; i < jsonArray.length(); i++) {
-                                        JSONObject incomeObject = jsonArray.getJSONObject(i);
-                                        String[] strings = incomeObject.getString("date").split("-");
-                                        BarEntry incomeDetails = new BarEntry(
-                                                Integer.valueOf(strings[2]),
-                                                incomeObject.getInt("earning"));
-                                        incomeArrayList.add(incomeDetails);
-                                        BarDataSet income = new BarDataSet(incomeArrayList, "income");
-                                        income.setColor(R.color.buttonColor);
-                                        BarData data = new BarData(income);
-                                        income.setColor(Color.BLUE);
-                                        mChart.setData(data);
+                                            JSONObject incomeObject = jsonArray.getJSONObject(i);
+                                            SimpleDateFormat formatterFrom;
+                                            SimpleDateFormat currentDate;
+                                            formatterFrom = new SimpleDateFormat("yyyy-MM-dd");
+                                            currentDate = new SimpleDateFormat("yyyy-MM-dd");
+                                            try {
+                                                String incomingDate = incomeObject.getString("date").trim();
+                                                Date dateFromServer = formatterFrom.parse(incomingDate);
+                                                Date current = currentDate.parse(Helpers.getCurrentDateForDash());
+                                                Log.i("TAG", "date server " + dateFromServer);
+                                                Log.i("TAG", "current " + current);
+                                                Log.i("TAG", "conditions " + dateFromServer.before(current));
+                                                if (dateFromServer.before(current) || dateFromServer.equals(current)) {
+                                                    String[] strings = incomeObject.getString("date").split("-");
+                                                    BarEntry incomeDetails = new BarEntry(
+                                                            Integer.valueOf(strings[2]),
+                                                            incomeObject.getInt("earning"));
+                                                    incomeArrayList.add(incomeDetails);
+                                                    BarDataSet income = new BarDataSet(incomeArrayList, "income");
+                                                    income.setColor(R.color.buttonColor);
+                                                    BarData data = new BarData(income);
+                                                    income.setColor(Color.BLUE);
+                                                    mChart.setData(data);
+                                                }
+
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
                                     }
                                 } catch (JSONException e) {
                                     e.printStackTrace();

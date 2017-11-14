@@ -98,12 +98,13 @@ public class Service extends FirebaseMessagingService {
             senderImageUrl = remoteMessage.getData().get("sender_image_url");
             photo = remoteMessage.getData().get("sender_photo");
             chatStatus = Boolean.parseBoolean(remoteMessage.getData().get("available_to_chat"));
-
-            if (remoteMessage.getData().get("type").equals("appointment") &&  remoteMessage.getData().get("gender").equals("M") ||
-                    remoteMessage.getData().get("gender").equals("F")) {
-                isMale = true;
-            } else {
-                isMale = false;
+            if (remoteMessage.getData().containsKey("gender")) {
+                if (remoteMessage.getData().get("type").equals("appointment") && remoteMessage.getData().get("gender").equals("M") ||
+                        remoteMessage.getData().get("gender").equals("F")) {
+                    isMale = true;
+                } else {
+                    isMale = false;
+                }
             }
             if (remoteMessage.getData().containsKey("attachment")) {
                 attachment = remoteMessage.getData().get("attachment");

@@ -228,11 +228,16 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         AffiliateClinic affiliateClinic = new AffiliateClinic();
                                         affiliateClinic.setId(jsonObject.getInt("id"));
                                         affiliateClinic.setName(jsonObject.getString("name"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_CLINIC_SELECTED)
+                                                == jsonObject.getInt("id")) {
+                                            affiliateClinicPosition = i;
+                                        }
                                         affiliateClinicsList.add(affiliateClinic);
                                     }
                                     affiliateClinicAdapter = new AffiliateClinicAdapter(
                                             activity, affiliateClinicsList);
                                     mAffiliatedClinicsSpinner.setAdapter(affiliateClinicAdapter);
+                                    mAffiliatedClinicsSpinner.setSelection(affiliateClinicPosition);
                                     mAffiliatedClinicsSpinner.setOnItemSelectedListener(FilterDialog.this);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -266,12 +271,17 @@ public class FilterDialog extends Dialog implements View.OnClickListener,
                                         JSONObject jsonObject = spArray.getJSONObject(i);
                                         Specialities specialities = new Specialities();
                                         specialities.setSpecialitiesId(jsonObject.getInt("id"));
+                                        if (AppGlobals.getDoctorProfileIds(AppGlobals.KEY_SPECIALIST_SELECTED)
+                                                == jsonObject.getInt("id")) {
+                                            specialistPosition = i;
+                                        }
                                         specialities.setSpeciality(jsonObject.getString("name"));
                                         specialitiesList.add(specialities);
                                     }
                                     specialitiesAdapter = new SpecialitiesAdapter(
                                             activity, specialitiesList);
                                     mSpecialitySpinner.setAdapter(specialitiesAdapter);
+                                    mSpecialitySpinner.setSelection(specialistPosition);
                                     mSpecialitySpinner.setOnItemSelectedListener(FilterDialog.this);
 
                                 } catch (JSONException e) {

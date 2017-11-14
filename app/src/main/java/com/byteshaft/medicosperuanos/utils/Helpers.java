@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.LocationManager;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
@@ -31,9 +30,6 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -285,6 +281,7 @@ public class Helpers {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         return df.format(c.getTime());
     }
+
     public static String getTime24HourFormat() {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
@@ -345,21 +342,20 @@ public class Helpers {
     }
 
 
-    public static String getCurrentTime() {
-        Calendar c = Calendar.getInstance();
+    public static long getCurrentTimeForCalendar(String time) {
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        return df.format(c.getTime());
+        Date date = null;
+        try {
+            date = df.parse(time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
     }
 
     public static String getCurrentTimeAndDate() {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm aa");
-        return df.format(c.getTime());
-    }
-
-    public static String getDateForHeader() {
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         return df.format(c.getTime());
     }
 
@@ -367,13 +363,6 @@ public class Helpers {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DAY_OF_YEAR, 1);
         SimpleDateFormat df = new SimpleDateFormat("MMM dd, yyyy");
-        return df.format(c.getTime());
-    }
-
-    public static String getPreviousDate() {
-        Calendar c = Calendar.getInstance();
-        c.add(Calendar.DAY_OF_YEAR, -1);
-        SimpleDateFormat df = new SimpleDateFormat("dd MMM yyyy");
         return df.format(c.getTime());
     }
 
@@ -411,12 +400,10 @@ public class Helpers {
         request.send();
     }
 
-    public static String getTomorrowDate() {
+    public static String getCurrentDateForDash() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
         Date tomorrow = calendar.getTime();
-        DateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(tomorrow);
 
     }
@@ -457,59 +444,6 @@ public class Helpers {
         request.send(jsonObject.toString());
     }
 
-    private String decodeFile(String path,int DESIREDWIDTH, int DESIREDHEIGHT) {
-        String strMyImagePath = null;
-        Bitmap scaledBitmap = null;
-
-        try {
-            // Part 1: Decode image
-            Bitmap unscaledBitmap = ScalingUtilities.decodeFile(path, DESIREDWIDTH, DESIREDHEIGHT, ScalingUtilities.ScalingLogic.FIT);
-
-            if (!(unscaledBitmap.getWidth() <= DESIREDWIDTH && unscaledBitmap.getHeight() <= DESIREDHEIGHT)) {
-                // Part 2: Scale image
-                scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, DESIREDWIDTH, DESIREDHEIGHT, ScalingUtilities.ScalingLogic.FIT);
-            } else {
-                unscaledBitmap.recycle();
-                return path;
-            }
-
-            // Store to tmp file
-
-            String extr = Environment.getExternalStorageDirectory().getAbsolutePath();
-            File mFolder = new File(extr + "/Doctor");
-            if (!mFolder.exists()) {
-                mFolder.mkdir();
-            }
-
-            String s = "tmp.png";
-
-            File f = new File(mFolder.getAbsolutePath(), s);
-
-            strMyImagePath = f.getAbsolutePath();
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(f);
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, fos);
-                fos.flush();
-                fos.close();
-            } catch (FileNotFoundException e) {
-
-                e.printStackTrace();
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
-
-            scaledBitmap.recycle();
-        } catch (Throwable e) {
-        }
-
-        if (strMyImagePath == null) {
-            return path;
-        }
-        return strMyImagePath;
-    }
-
     public static boolean getDifference(String startTime) {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm a");
@@ -530,5 +464,18 @@ public class Helpers {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("hh:mm a");
         return df.format(c.getTime());
+    }
+
+    public static String getFormattedSlotTime(String date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+        Date format = null;
+        try {
+            format = simpleDateFormat.parse(date);
+            return formatter.format(format);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }

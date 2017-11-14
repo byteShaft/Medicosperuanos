@@ -177,6 +177,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         conversation.setLayoutManager(linearLayoutManager);
         conversation.canScrollVertically(1);
         conversation.setHasFixedSize(true);
+        Log.i("TAG", "message id " + id);
         getMyMessages(id);
         view = (View) findViewById(R.id.include);
         deleteButton = (ImageButton) findViewById(R.id.dustbin_messages);
@@ -314,7 +315,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void sendMessage(int id, String message, final String attachment) {
-        HttpRequest request = new HttpRequest(getApplicationContext());
+        final HttpRequest request = new HttpRequest(getApplicationContext());
         request.setOnReadyStateChangeListener(new HttpRequest.OnReadyStateChangeListener() {
             @Override
             public void onReadyStateChange(HttpRequest httpRequest, int i) {
@@ -351,6 +352,9 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                             case HttpURLConnection.HTTP_BAD_REQUEST:
                                 Log.i("TAG", httpRequest.getResponseText());
                                 break;
+                            case HttpURLConnection.HTTP_INTERNAL_ERROR:
+                                Log.i("TAG", "hey " + request.getResponseText());
+                                break;
                         }
                 }
 
@@ -369,35 +373,55 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                     case HttpRequest.ERROR_LOST_CONNECTION:
                         Helpers.showSnackBar(findViewById(android.R.id.content), getResources().getString(R.string.connection_lost));
                         break;
+                    case HttpURLConnection.HTTP_INTERNAL_ERROR:
+                        Log.i("TAG", "hey " + request.getResponseText());
+                        break;
                 }
             }
         });
         request.open("POST", String.format("%smessages/", AppGlobals.BASE_URL));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-
-        FormData formData = new FormData();
-        String msg;
-        if (message.trim().isEmpty()) {
-            msg = "attachment";
-        } else msg = message;
-        String user = "doctor";
-        if (AppGlobals.isDoctor()) {
-            user = "patient";
-        }
-        formData.append(FormData.TYPE_CONTENT_TEXT, user, String.valueOf(id));
+        if (attachment == null) {
+            JSONObject messagesObject = new JSONObject();
+            String msg;
+            if (message.trim().isEmpty()) {
+                msg = "attachment";
+            } else msg = message;
+            String user = "doctor";
+            if (AppGlobals.isDoctor()) {
+                user = "patient";
+            }
+            try {
+                messagesObject.put(user, String.valueOf(id));
+                messagesObject.put("text", msg);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            request.send(messagesObject.toString());
+        } else {
+            FormData formData = new FormData();
+            String msg;
+            if (message.trim().isEmpty()) {
+                msg = "attachment";
+            } else msg = message;
+            String user = "doctor";
+            if (AppGlobals.isDoctor()) {
+                user = "patient";
+            }
+            formData.append(FormData.TYPE_CONTENT_TEXT, user, String.valueOf(id));
             formData.append(FormData.TYPE_CONTENT_TEXT, "text", msg);
-        if (attachment != null && !attachment.trim().isEmpty()) {
-            formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
-            request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
-                @Override
-                public void onFileUploadProgress(HttpRequest httpRequest, File file, long l, long l1) {
-                    Log.i("TAG", String.valueOf(l));
-
-                }
-            });
+            if (attachment != null && !attachment.trim().isEmpty()) {
+                formData.append(FormData.TYPE_CONTENT_FILE, "attachment", attachment);
+                request.setOnFileUploadProgressListener(new HttpRequest.OnFileUploadProgressListener() {
+                    @Override
+                    public void onFileUploadProgress(HttpRequest httpRequest, File file, long l, long l1) {
+                        Log.i("TAG", String.valueOf(l));
+                    }
+                });
+            }
+            request.send(formData);
         }
-        request.send(formData);
         if (imageUrl != null && !imageUrl.trim().isEmpty()) {
             ChatModel chatModel = new ChatModel();
             chatModel.setId(Integer.parseInt(AppGlobals.

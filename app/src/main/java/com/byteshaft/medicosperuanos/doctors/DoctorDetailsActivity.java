@@ -334,7 +334,6 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
                                 review.setReviewStars(jsonObject.getInt("stars"));
                                 String currentTime = jsonObject.getString("created_at");
                                 review.setFullName(jsonObject.getString("patient_full_name"));
-                                Log.i("TAG", currentTime);
                                 SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                                 dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                                 Date date = dateFormat.parse(currentTime);
@@ -403,6 +402,7 @@ public class DoctorDetailsActivity extends AppCompatActivity implements View.OnC
             }
             Log.i("TAG", "time " + review.getReviewTime());
             viewHolder.userName.setText(review.getFullName());
+            Log.i("TAG", "review time " + review.getReviewTime());
             viewHolder.time.setText(timeConvert(review.getReviewTime()));
 
             return convertView;
