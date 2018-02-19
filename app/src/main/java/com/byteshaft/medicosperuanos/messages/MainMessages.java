@@ -32,9 +32,6 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * Created by s9iper1 on 3/21/17.
- */
 
 public class MainMessages extends Fragment implements HttpRequest.OnReadyStateChangeListener,
         HttpRequest.OnErrorListener {
@@ -122,7 +119,7 @@ public class MainMessages extends Fragment implements HttpRequest.OnReadyStateCh
                 switch (httpRequest.getStatus()) {
                     case HttpURLConnection.HTTP_OK:
                         Log.i("TAG", httpRequest.getResponseText());
-                        chatWithList = new ArrayList<ChatModel>();
+                        chatWithList = new ArrayList<>();
                         adapter = new Adapter(getActivity().getApplicationContext(), chatWithList);
                         mMessagesListView.setAdapter(adapter);
                         try {

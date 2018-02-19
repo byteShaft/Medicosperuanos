@@ -373,6 +373,7 @@ public class AppGlobals extends Application {
 
         }
     }
+
     public static void saveSubscriptionState(String value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
         sharedPreferences.edit().putString(SUBSRIPTION_STATUS, value).apply();

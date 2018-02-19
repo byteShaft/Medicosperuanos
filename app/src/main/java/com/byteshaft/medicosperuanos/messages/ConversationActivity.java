@@ -51,7 +51,6 @@ import com.byteshaft.medicosperuanos.utils.SoftKeyboard;
 import com.byteshaft.requests.FormData;
 import com.byteshaft.requests.HttpRequest;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,16 +59,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -79,7 +74,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 
 public class ConversationActivity extends AppCompatActivity implements View.OnClickListener,
-        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener{
+        HttpRequest.OnReadyStateChangeListener, HttpRequest.OnErrorListener {
 
     private View view;
     private ImageButton deleteButton;
@@ -446,7 +441,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
         request.open("GET", String.format("%smessages/%s", AppGlobals.BASE_URL, secondPersonId));
         request.setRequestHeader("Authorization", "Token " +
                 AppGlobals.getStringFromSharedPreferences(AppGlobals.KEY_TOKEN));
-        Log.e("TAG", "second person id"  + secondPersonId);
+        Log.e("TAG", "second person id" + secondPersonId);
         request.send();
     }
 
@@ -498,7 +493,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                                 ChatModel chatModel = new ChatModel();
                                 if (!singleMessage.getBoolean("read")) {
                                     setReadMessages(singleMessage.getInt("id"));
-                                    unreadCount = unreadCount+1;
+                                    unreadCount = unreadCount + 1;
                                 }
                                 chatModel.setPatientId(singleMessage.getInt("patient"));
                                 chatModel.setDoctorId(singleMessage.getInt("doctor"));
@@ -731,7 +726,6 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
     private class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyChatViewHolder> {
 
-
         private static final int RIGHT_MSG = 0;
         private static final int LEFT_MSG = 1;
         private static final int RIGHT_MSG_IMG = 2;
@@ -815,7 +809,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
 
             public void setTxtMessage(String message) {
                 if (txtMessage == null) return;
-                    txtMessage.setText(Html.fromHtml(message));
+                txtMessage.setText(Html.fromHtml(message));
 
             }
 
@@ -945,7 +939,7 @@ public class ConversationActivity extends AppCompatActivity implements View.OnCl
                         switch (httpRequest.getStatus()) {
                             case HttpURLConnection.HTTP_OK:
                                 Log.e("TAG", httpRequest.getResponseText());
-                                readCount = readCount+1;
+                                readCount = readCount + 1;
                                 if (readCount == unreadCount) {
                                     MainActivity.getInstance().getMessages();
                                 }
